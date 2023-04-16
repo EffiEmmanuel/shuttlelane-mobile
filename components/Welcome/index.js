@@ -24,9 +24,8 @@ const Welcome = () => {
 
   // Search State
   const [search, setSearch] = useState("");
-
   return (
-    <View style={{ marginTop: 10 }}>
+    <View style={{ marginTop: 30 }}>
       <View style={{}}>
         <Text style={{ fontSize: 18, fontFamily: "PoppinsRegular" }}>
           Hello, Emmanuel.
@@ -74,6 +73,7 @@ const Welcome = () => {
                 justifyContent: "center",
                 alignItems: "center",
               }}
+              onPress={() => router.push('/bookings/airport-transfer')}
             >
               {/* <PaperAirplaneIcon style={{ width: 24, rotate: "-90deg" }} /> */}
               <Image source={airplaneIcon} style={{ width: 55, height: 55 }} />
@@ -102,6 +102,7 @@ const Welcome = () => {
                 justifyContent: "center",
                 alignItems: "center",
               }}
+              onPress={() => router.push('/bookings/car-hire')}
             >
               <Image source={carHireIcon} style={{ width: 60, height: 60 }} />
               <Text
@@ -129,6 +130,7 @@ const Welcome = () => {
                 justifyContent: "center",
                 alignItems: "center",
               }}
+              onPress={() => router.push('/bookings/priority-pass')}
             >
               <Image
                 source={priorityPassIcon}

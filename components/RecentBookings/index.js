@@ -5,12 +5,11 @@ import priorityPassWhite from "../../assets/icons/priorityPassWhite.png";
 
 const RecentBookings = () => {
   return (
-    <View style={{ marginTop: 40 }}>
-      <View style={{}}>
+    <View style={{ marginTop: 45 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'baseline'  }}>
         <Text
           style={{
             fontSize: 24,
-            marginTop: 5,
             fontWeight: "500",
             color: COLORS.shuttlelanePurple,
             fontFamily: 'PoppinsBold'
@@ -18,6 +17,8 @@ const RecentBookings = () => {
         >
           Recent Bookings
         </Text>
+
+        <Text style={{ textDecorationColor: COLORS.shuttlelanePurple, textDecorationLine: 'underline', color: COLORS.shuttlelanePurple, marginLeft: 10 }}>See all{"->"}</Text>
       </View>
 
       <View style={{ marginTop: 20 }}>
