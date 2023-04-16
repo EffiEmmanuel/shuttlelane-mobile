@@ -91,7 +91,7 @@ const AirportTransfer = () => {
     userLocation();
   }, []);
 
-  // ON FORM SUBMIT
+  // ON FORM SUBMIT - PICKUP
   async function airportPickupNextStep() {
     if (!pickupAirport || !dropoffAddress || !date || !passengers) {
       alert("Please fill in the missing fields to proceed");
@@ -103,6 +103,24 @@ const AirportTransfer = () => {
       params: {
         pickupAirport,
         dropoffAddress,
+        date,
+        passengers,
+      },
+    });
+  }
+
+  // ON FORM SUBMIT - DROPOFF
+  async function airportDropoffNextStep() {
+    if (!dropoffAirport || !pickupAddress || !date || !passengers) {
+      alert("Please fill in the missing fields to proceed");
+      return;
+    }
+
+    router.push({
+      pathname: "/bookings/airport-transfer/airport-dropoff/step-2",
+      params: {
+        dropoffAirport,
+        pickupAddress,
         date,
         passengers,
       },
@@ -227,127 +245,181 @@ const AirportTransfer = () => {
         </View>
 
         {/* AIRPORT PICKUP FORM */}
-        <View style={{ marginTop: 20 }}>
-          <TextInput
-            value={dropoffAddress}
-            style={{
-              height: 50,
-              padding: 10,
-              paddingHorizontal: 20,
-              fontSize: 16,
-              fontFamily: "PoppinsRegular",
-              borderColor: "#C9C9C9",
-              borderWidth: 0.5,
-              borderRadius: 10,
-            }}
-            placeholder="Dropoff Address"
-            placeholderTextColor="#C9C9C9"
-            onChangeText={(value) => setDropoffAddress(value)}
-          />
-
-          {/* SELECT DROPDOWN */}
+        {airportPickup && (
           <View style={{ marginTop: 20 }}>
-            <SelectList
-              setSelected={(value) => setPickupAirport(value)}
-              data={airports}
-              arrowicon={
-                <Image
-                  source={arrowDownIcon}
-                  style={{ width: 40, height: 40, marginTop: -8 }}
-                  resizeMode="cover"
-                />
-              }
-              closeicon={
-                <Image
-                  source={closeIcon}
-                  style={{ width: 50, height: 50, marginTop: -1 }}
-                  resizeMode="cover"
-                />
-              }
-              boxStyles={{
-                borderRadius: 10,
-                borderWidth: 0.5,
-                borderColor: "#C9C9C9",
+            <TextInput
+              value={dropoffAddress}
+              style={{
                 height: 50,
                 padding: 10,
-              }}
-              dropdownItemStyles={{
-                marginVertical: 5,
-              }}
-              dropdownStyles={{
-                borderRadius: 10,
-                borderWidth: 0.5,
-                borderColor: "#C9C9C9",
-                padding: 10,
-              }}
-              inputStyles={{
-                fontFamily: "PoppinsRegular",
-                color: "#C9C9C9",
-                marginTop: 4,
+                paddingHorizontal: 20,
                 fontSize: 16,
-              }}
-              dropdownTextStyles={{
                 fontFamily: "PoppinsRegular",
+                borderColor: "#C9C9C9",
+                borderWidth: 0.5,
+                borderRadius: 10,
               }}
-              placeholder="Select Pickup Airport"
-              searchPlaceholder="Search airports"
+              placeholder="Dropoff Address"
+              placeholderTextColor="#C9C9C9"
+              onChangeText={(value) => setDropoffAddress(value)}
             />
-          </View>
 
-          {/* DATE PICKER */}
-          <View style={{ marginTop: 20 }}>
-            {datePicker && (
-              <Modal
-                animationType="slide"
-                visible={datePicker}
-                transparent={true}
-              >
-                <View
-                  style={{
-                    flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    marginTop: 22,
-                  }}
+            {/* SELECT DROPDOWN */}
+            <View style={{ marginTop: 20 }}>
+              <SelectList
+                setSelected={(value) => setPickupAirport(value)}
+                data={airports}
+                arrowicon={
+                  <Image
+                    source={arrowDownIcon}
+                    style={{ width: 40, height: 40, marginTop: -8 }}
+                    resizeMode="cover"
+                  />
+                }
+                closeicon={
+                  <Image
+                    source={closeIcon}
+                    style={{ width: 50, height: 50, marginTop: -1 }}
+                    resizeMode="cover"
+                  />
+                }
+                boxStyles={{
+                  borderRadius: 10,
+                  borderWidth: 0.5,
+                  borderColor: "#C9C9C9",
+                  height: 50,
+                  padding: 10,
+                }}
+                dropdownItemStyles={{
+                  marginVertical: 5,
+                }}
+                dropdownStyles={{
+                  borderRadius: 10,
+                  borderWidth: 0.5,
+                  borderColor: "#C9C9C9",
+                  padding: 10,
+                }}
+                inputStyles={{
+                  fontFamily: "PoppinsRegular",
+                  color: "#C9C9C9",
+                  marginTop: 4,
+                  fontSize: 16,
+                }}
+                dropdownTextStyles={{
+                  fontFamily: "PoppinsRegular",
+                }}
+                placeholder="Select Pickup Airport"
+                searchPlaceholder="Search airports"
+              />
+            </View>
+
+            {/* DATE PICKER */}
+            <View style={{ marginTop: 20 }}>
+              {datePicker && (
+                <Modal
+                  animationType="slide"
+                  visible={datePicker}
+                  transparent={true}
                 >
                   <View
                     style={{
-                      margin: 20,
-                      backgroundColor: COLORS.white,
-                      borderRadius: 20,
-                      width: "90%",
+                      flex: 1,
+                      justifyContent: "center",
                       alignItems: "center",
-                      shadowColor: "#000",
-                      shadowOffset: {
-                        width: 0,
-                        height: 2,
-                      },
-                      shadowOpacity: 0.25,
-                      shadowRadius: 4,
-                      elevation: 5,
-                      paddingBottom: 20,
+                      marginTop: 22,
                     }}
                   >
-                    <DatePicker
-                      mode="calendar"
-                      selected={date}
-                      AirportTransfer
-                      onDateChange={(value) => setDate(value)}
-                    />
+                    <View
+                      style={{
+                        margin: 20,
+                        backgroundColor: COLORS.white,
+                        borderRadius: 20,
+                        width: "90%",
+                        alignItems: "center",
+                        shadowColor: "#000",
+                        shadowOffset: {
+                          width: 0,
+                          height: 2,
+                        },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 4,
+                        elevation: 5,
+                        paddingBottom: 20,
+                      }}
+                    >
+                      <DatePicker
+                        mode="calendar"
+                        selected={date}
+                        AirportTransfer
+                        onDateChange={(value) => setDate(value)}
+                      />
 
-                    <TouchableOpacity onPress={() => setDatePicker(false)}>
-                      <Text style={{ fontFamily: "PoppinsRegular" }}>
-                        Close
-                      </Text>
-                    </TouchableOpacity>
+                      <TouchableOpacity onPress={() => setDatePicker(false)}>
+                        <Text style={{ fontFamily: "PoppinsRegular" }}>
+                          Close
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
-                </View>
-              </Modal>
-            )}
+                </Modal>
+              )}
 
-            <View
-              style={{ flexDirection: "row", justifyContent: "space-between" }}
-            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <TouchableOpacity
+                  value=""
+                  style={{
+                    height: 50,
+                    padding: 10,
+                    fontSize: 16,
+                    fontFamily: "PoppinsRegular",
+                    borderColor: "#C9C9C9",
+                    borderWidth: 0.5,
+                    borderRadius: 10,
+                    justifyContent: "center",
+                    alignContent: "center",
+                    width: "45%",
+                  }}
+                  onPress={() => setDatePicker(true)}
+                >
+                  <Text
+                    style={{
+                      color: "#C9C9C9",
+                      paddingHorizontal: 10,
+                      fontSize: 16,
+                      fontFamily: "PoppinsRegular",
+                    }}
+                  >
+                    {date ? date : "Set Pickup date"}
+                  </Text>
+                </TouchableOpacity>
+
+                <TextInput
+                  value={passengers}
+                  style={{
+                    height: 50,
+                    padding: 10,
+                    paddingHorizontal: 20,
+                    fontSize: 16,
+                    fontFamily: "PoppinsRegular",
+                    borderColor: "#C9C9C9",
+                    borderWidth: 0.5,
+                    borderRadius: 10,
+                    width: "45%",
+                  }}
+                  keyboardType="number-pad"
+                  placeholder="Passengers"
+                  placeholderTextColor="#C9C9C9"
+                  onChangeText={(value) => setPassengers(+value)}
+                />
+              </View>
+            </View>
+
+            <View style={{ paddingTop: 20 }}>
               <TouchableOpacity
                 value=""
                 style={{
@@ -355,78 +427,236 @@ const AirportTransfer = () => {
                   padding: 10,
                   fontSize: 16,
                   fontFamily: "PoppinsRegular",
-                  borderColor: "#C9C9C9",
-                  borderWidth: 0.5,
+                  backgroundColor: COLORS.shuttlelaneYellow,
                   borderRadius: 10,
                   justifyContent: "center",
                   alignContent: "center",
-                  width: "45%",
                 }}
-                onPress={() => setDatePicker(true)}
+                onPress={airportPickupNextStep}
               >
                 <Text
                   style={{
-                    color: "#C9C9C9",
                     paddingHorizontal: 10,
                     fontSize: 16,
                     fontFamily: "PoppinsRegular",
+                    color: COLORS.white,
+                    width: "100%",
+                    textAlign: "center",
                   }}
                 >
-                  {date ? date : "Set Pickup date"}
+                  Book Now
                 </Text>
               </TouchableOpacity>
-
-              <TextInput
-                value={passengers}
-                style={{
-                  height: 50,
-                  padding: 10,
-                  paddingHorizontal: 20,
-                  fontSize: 16,
-                  fontFamily: "PoppinsRegular",
-                  borderColor: "#C9C9C9",
-                  borderWidth: 0.5,
-                  borderRadius: 10,
-                  width: "45%",
-                }}
-                keyboardType="number-pad"
-                placeholder="Passengers"
-                placeholderTextColor="#C9C9C9"
-                onChangeText={(value) => setPassengers(+value)}
-              />
             </View>
           </View>
+        )}
 
-          <View style={{ paddingTop: 20 }}>
-            <TouchableOpacity
-              value=""
+        {/* AIRPORT DROPOFF FORM */}
+        {airportDropoff && (
+          <View style={{ marginTop: 20 }}>
+            <TextInput
+              value={pickupAddress}
               style={{
                 height: 50,
                 padding: 10,
+                paddingHorizontal: 20,
                 fontSize: 16,
                 fontFamily: "PoppinsRegular",
-                backgroundColor: COLORS.shuttlelaneYellow,
+                borderColor: "#C9C9C9",
+                borderWidth: 0.5,
                 borderRadius: 10,
-                justifyContent: "center",
-                alignContent: "center",
               }}
-              onPress={airportPickupNextStep}
-            >
-              <Text
-                style={{
-                  paddingHorizontal: 10,
-                  fontSize: 16,
+              placeholder="Pickup Address"
+              placeholderTextColor="#C9C9C9"
+              onChangeText={(value) => setPickupAddress(value)}
+            />
+
+            {/* SELECT DROPDOWN */}
+            <View style={{ marginTop: 20 }}>
+              <SelectList
+                setSelected={(value) => setDropoffAirport(value)}
+                data={airports}
+                arrowicon={
+                  <Image
+                    source={arrowDownIcon}
+                    style={{ width: 40, height: 40, marginTop: -8 }}
+                    resizeMode="cover"
+                  />
+                }
+                closeicon={
+                  <Image
+                    source={closeIcon}
+                    style={{ width: 50, height: 50, marginTop: -1 }}
+                    resizeMode="cover"
+                  />
+                }
+                boxStyles={{
+                  borderRadius: 10,
+                  borderWidth: 0.5,
+                  borderColor: "#C9C9C9",
+                  height: 50,
+                  padding: 10,
+                }}
+                dropdownItemStyles={{
+                  marginVertical: 5,
+                }}
+                dropdownStyles={{
+                  borderRadius: 10,
+                  borderWidth: 0.5,
+                  borderColor: "#C9C9C9",
+                  padding: 10,
+                }}
+                inputStyles={{
                   fontFamily: "PoppinsRegular",
-                  color: COLORS.white,
-                  width: "100%",
-                  textAlign: "center",
+                  color: "#C9C9C9",
+                  marginTop: 4,
+                  fontSize: 16,
+                }}
+                dropdownTextStyles={{
+                  fontFamily: "PoppinsRegular",
+                }}
+                placeholder="Select Dropoff Airport"
+                searchPlaceholder="Search airports"
+              />
+            </View>
+
+            {/* DATE PICKER */}
+            <View style={{ marginTop: 20 }}>
+              {datePicker && (
+                <Modal
+                  animationType="slide"
+                  visible={datePicker}
+                  transparent={true}
+                >
+                  <View
+                    style={{
+                      flex: 1,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      marginTop: 22,
+                    }}
+                  >
+                    <View
+                      style={{
+                        margin: 20,
+                        backgroundColor: COLORS.white,
+                        borderRadius: 20,
+                        width: "90%",
+                        alignItems: "center",
+                        shadowColor: "#000",
+                        shadowOffset: {
+                          width: 0,
+                          height: 2,
+                        },
+                        shadowOpacity: 0.25,
+                        shadowRadius: 4,
+                        elevation: 5,
+                        paddingBottom: 20,
+                      }}
+                    >
+                      <DatePicker
+                        mode="calendar"
+                        selected={date}
+                        AirportTransfer
+                        onDateChange={(value) => setDate(value)}
+                      />
+
+                      <TouchableOpacity onPress={() => setDatePicker(false)}>
+                        <Text style={{ fontFamily: "PoppinsRegular" }}>
+                          Close
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </Modal>
+              )}
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
                 }}
               >
-                Book Now
-              </Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                  value=""
+                  style={{
+                    height: 50,
+                    padding: 10,
+                    fontSize: 16,
+                    fontFamily: "PoppinsRegular",
+                    borderColor: "#C9C9C9",
+                    borderWidth: 0.5,
+                    borderRadius: 10,
+                    justifyContent: "center",
+                    alignContent: "center",
+                    width: "45%",
+                  }}
+                  onPress={() => setDatePicker(true)}
+                >
+                  <Text
+                    style={{
+                      color: "#C9C9C9",
+                      paddingHorizontal: 10,
+                      fontSize: 16,
+                      fontFamily: "PoppinsRegular",
+                    }}
+                  >
+                    {date ? date : "Set Pickup date"}
+                  </Text>
+                </TouchableOpacity>
+
+                <TextInput
+                  value={passengers}
+                  style={{
+                    height: 50,
+                    padding: 10,
+                    paddingHorizontal: 20,
+                    fontSize: 16,
+                    fontFamily: "PoppinsRegular",
+                    borderColor: "#C9C9C9",
+                    borderWidth: 0.5,
+                    borderRadius: 10,
+                    width: "45%",
+                  }}
+                  keyboardType="number-pad"
+                  placeholder="Passengers"
+                  placeholderTextColor="#C9C9C9"
+                  onChangeText={(value) => setPassengers(+value)}
+                />
+              </View>
+            </View>
+
+            <View style={{ paddingTop: 20 }}>
+              <TouchableOpacity
+                value=""
+                style={{
+                  height: 50,
+                  padding: 10,
+                  fontSize: 16,
+                  fontFamily: "PoppinsRegular",
+                  backgroundColor: COLORS.shuttlelaneYellow,
+                  borderRadius: 10,
+                  justifyContent: "center",
+                  alignContent: "center",
+                }}
+                onPress={airportDropoffNextStep}
+              >
+                <Text
+                  style={{
+                    paddingHorizontal: 10,
+                    fontSize: 16,
+                    fontFamily: "PoppinsRegular",
+                    color: COLORS.white,
+                    width: "100%",
+                    textAlign: "center",
+                  }}
+                >
+                  Book Now
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
+        )}
       </View>
       {/* MAPS HERE */}
       <MapView

@@ -18,9 +18,9 @@ import luggageIcon from "../../../../../assets/icons/luggageIcon.png";
 // CARS
 import economy from "../../../../../assets/images/cars/economy.png";
 
-const AirportPickupStepTwo = () => {
+const AirportDropoffStepTwo = () => {
   const params = useSearchParams();
-  const { pickupAirport, dropoffAddress, date, passengers } = params;
+  const { dropoffAirport, pickupAddress, date, passengers } = params;
 
   const router = useRouter();
 
@@ -68,7 +68,7 @@ const AirportPickupStepTwo = () => {
               style={{ width: 28, height: 28 }}
             />
             <Text style={{ fontFamily: "PoppinsRegular" }}>
-              {pickupAirport}
+              {dropoffAirport}
             </Text>
           </View>
 
@@ -79,7 +79,7 @@ const AirportPickupStepTwo = () => {
               style={{ width: 28, height: 28 }}
             />
             <Text style={{ fontFamily: "PoppinsRegular" }}>
-              {dropoffAddress}
+              {pickupAddress}
             </Text>
           </View>
         </View>
@@ -93,9 +93,9 @@ const AirportPickupStepTwo = () => {
               router.push({
                 pathname: "/bookings/summary",
                 params: {
-                  bookingType: "Airport Pickup",
-                  pickupAirport,
-                  dropoffAddress,
+                  bookingType: "Airport Dropoff",
+                  dropoffAirport,
+                  pickupAddress,
                   passengers,
                   date,
                   carPicked: "economy",
@@ -183,9 +183,9 @@ const AirportPickupStepTwo = () => {
               router.push({
                 pathname: "/bookings/summary",
                 params: {
-                  bookingType: "Airport Pickup",
-                  pickupAirport,
-                  dropoffAddress,
+                  bookingType: "Airport Dropoff",
+                  dropoffAirport,
+                  pickupAddress,
                   passengers,
                   date,
                   carPicked,
@@ -273,9 +273,9 @@ const AirportPickupStepTwo = () => {
               router.push({
                 pathname: "/bookings/summary",
                 params: {
-                  bookingType: "Airport Pickup",
-                  pickupAirport,
-                  dropoffAddress,
+                  bookingType: "Airport Dropoff",
+                  dropoffAirport,
+                  pickupAddress,
                   passengers,
                   date,
                   carPicked,
@@ -363,9 +363,9 @@ const AirportPickupStepTwo = () => {
               router.push({
                 pathname: "/bookings/summary",
                 params: {
-                  bookingType: "Airport Pickup",
-                  pickupAirport,
-                  dropoffAddress,
+                  bookingType: "Airport Dropoff",
+                  dropoffAirport,
+                  pickupAddress,
                   passengers,
                   date,
                   carPicked,
@@ -453,9 +453,9 @@ const AirportPickupStepTwo = () => {
               router.push({
                 pathname: "/bookings/summary",
                 params: {
-                  bookingType: "Airport Pickup",
-                  pickupAirport,
-                  dropoffAddress,
+                  bookingType: "Airport Dropoff",
+                  dropoffAirport,
+                  pickupAddress,
                   passengers,
                   date,
                   carPicked,
@@ -543,9 +543,9 @@ const AirportPickupStepTwo = () => {
               router.push({
                 pathname: "/bookings/summary",
                 params: {
-                  bookingType: "Airport Pickup",
-                  pickupAirport,
-                  dropoffAddress,
+                  bookingType: "Airport Dropoff",
+                  dropoffAirport,
+                  pickupAddress,
                   passengers,
                   date,
                   carPicked,
@@ -633,9 +633,9 @@ const AirportPickupStepTwo = () => {
               router.push({
                 pathname: "/bookings/summary",
                 params: {
-                  bookingType: "Airport Pickup",
-                  pickupAirport,
-                  dropoffAddress,
+                  bookingType: "Airport Dropoff",
+                  dropoffAirport,
+                  pickupAddress,
                   passengers,
                   date,
                   carPicked,
@@ -722,4 +722,4 @@ const AirportPickupStepTwo = () => {
   );
 };
 
-export default AirportPickupStepTwo;
+export default AirportDropoffStepTwo;

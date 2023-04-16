@@ -134,14 +134,15 @@ const Welcome = () => {
             >
               <Image
                 source={priorityPassIcon}
-                style={{ width: 53, height: 53 }}
+                style={{ width: 49, height: 49, marginTop: 5 }}
               />
               <Text
                 style={{
                   fontSize: 13,
-                  marginTop: -5,
+                  marginTop: 0,
                   color: "#A1A1A1",
                   fontFamily: "PoppinsRegular",
+                  marginTop: -5
                 }}
               >
                 Priority Pass

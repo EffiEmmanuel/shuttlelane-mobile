@@ -11,7 +11,10 @@ import currentLocationIcon from "../.././../assets/icons/currentLocationIcon.png
 import destinationIcon from "../.././../assets/icons/destinationIcon.png";
 import carIcon from "../.././../assets/icons/carIcon.png";
 import passengerIcon from "../.././../assets/icons/passengerIcon.png";
+import timeIcon from "../.././../assets/icons/timeIcon.png";
+import priorityPassIcon from "../.././../assets/icons/priorityPassIcon.png";
 import luggageIcon from "../.././../assets/icons/luggageIcon.png";
+import calendarIcon from "../.././../assets/icons/calendarIcon.png";
 import paypal from "../.././../assets/images/logos/paypal.png";
 import flutterwave from "../.././../assets/images/logos/flutterwave.png";
 import stripe from "../.././../assets/images/logos/stripe.png";
@@ -22,7 +25,20 @@ const BookingSummary = () => {
   const router = useRouter();
 
   const params = useSearchParams();
-  const { pickupAirport, dropoffAddress, date, passengers, carPicked } = params;
+  const {
+    pickupAirport,
+    dropoffAddress,
+    date,
+    passengers,
+    carPicked,
+    dropoffAirport,
+    pickupAddress,
+    bookingType,
+    pass,
+    time,
+    airport,
+    service,
+  } = params;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
@@ -55,52 +71,181 @@ const BookingSummary = () => {
         >
           Booking Summary
         </Text>
+        <Text
+          style={{
+            fontSize: 16,
+            fontFamily: "PoppinsSemiBold",
+          }}
+        >
+          {bookingType}
+        </Text>
 
         <View style={{ marginTop: 20 }}>
           <View
             style={{
               //   backgroundColor: COLORS.shuttlelaneYellowFaded,
-              padding: 10,
+              // padding: ,
+              marginVertical: 10,
               borderRadius: 10,
             }}
           >
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Image
-                source={currentLocationIcon}
-                resizeMode="cover"
-                style={{ width: 28, height: 28 }}
-              />
-              <Text style={{ fontFamily: "PoppinsRegular" }}>
-                {pickupAirport}
-              </Text>
-            </View>
+            {pickupAirport && (
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Image
+                  source={currentLocationIcon}
+                  resizeMode="cover"
+                  style={{ width: 28, height: 28 }}
+                />
+                <Text style={{ fontFamily: "PoppinsRegular" }}>
+                  {pickupAirport}
+                </Text>
+              </View>
+            )}
 
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Image
-                source={destinationIcon}
-                resizeMode="cover"
-                style={{ width: 28, height: 28 }}
-              />
-              <Text style={{ fontFamily: "PoppinsRegular" }}>
-                {dropoffAddress}
-              </Text>
-            </View>
+            {service && (
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Image
+                  source={passengerIcon}
+                  resizeMode="cover"
+                  style={{ width: 28, height: 28 }}
+                />
+                <Text style={{ fontFamily: "PoppinsRegular" }}>
+                  {service}
+                </Text>
+              </View>
+            )}
 
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Image
-                source={carIcon}
-                resizeMode="cover"
-                style={{ width: 30, height: 30 }}
-              />
-              <Text
-                style={{
-                  fontFamily: "PoppinsRegular",
-                  textTransform: "capitalize",
-                }}
-              >
-                {carPicked}
-              </Text>
-            </View>
+            {dropoffAddress && (
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Image
+                  source={destinationIcon}
+                  resizeMode="cover"
+                  style={{ width: 28, height: 28 }}
+                />
+                <Text style={{ fontFamily: "PoppinsRegular" }}>
+                  {dropoffAddress}
+                </Text>
+              </View>
+            )}
+
+            {pickupAddress && (
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Image
+                  source={currentLocationIcon}
+                  resizeMode="cover"
+                  style={{ width: 28, height: 28 }}
+                />
+                <Text style={{ fontFamily: "PoppinsRegular" }}>
+                  {pickupAddress}
+                </Text>
+              </View>
+            )}
+
+            {dropoffAirport && (
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Image
+                  source={destinationIcon}
+                  resizeMode="cover"
+                  style={{ width: 28, height: 28 }}
+                />
+                <Text style={{ fontFamily: "PoppinsRegular" }}>
+                  {dropoffAirport}
+                </Text>
+              </View>
+            )}
+
+            {airport && (
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Image
+                  source={destinationIcon}
+                  resizeMode="cover"
+                  style={{ width: 28, height: 28 }}
+                />
+                <Text style={{ fontFamily: "PoppinsRegular" }}>
+                  {airport}
+                </Text>
+              </View>
+            )}
+
+            {passengers && (
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Image
+                  source={passengerIcon}
+                  resizeMode="cover"
+                  style={{ width: 28, height: 28 }}
+                />
+                <Text style={{ fontFamily: "PoppinsRegular" }}>
+                  {passengers}
+                </Text>
+              </View>
+            )}
+
+            {pass && (
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Image
+                  source={priorityPassIcon}
+                  resizeMode="cover"
+                  style={{ width: 28, height: 28 }}
+                />
+                <Text style={{ fontFamily: "PoppinsRegular" }}>
+                  {pass}
+                </Text>
+              </View>
+            )}
+
+            {carPicked && (
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Image
+                  source={carIcon}
+                  resizeMode="cover"
+                  style={{ width: 30, height: 30 }}
+                />
+                <Text
+                  style={{
+                    fontFamily: "PoppinsRegular",
+                    textTransform: "capitalize",
+                  }}
+                >
+                  {carPicked}
+                </Text>
+              </View>
+            )}
+
+            {date && (
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Image
+                  source={calendarIcon}
+                  resizeMode="cover"
+                  style={{ width: 30, height: 30 }}
+                />
+                <Text
+                  style={{
+                    fontFamily: "PoppinsRegular",
+                    textTransform: "capitalize",
+                  }}
+                >
+                  {date}
+                </Text>
+              </View>
+            )}
+
+            {time && (
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Image
+                  source={timeIcon}
+                  resizeMode="cover"
+                  style={{ width: 30, height: 30 }}
+                />
+                <Text
+                  style={{
+                    fontFamily: "PoppinsRegular",
+                    textTransform: "capitalize",
+                  }}
+                >
+                  {time}
+                </Text>
+              </View>
+            )}
           </View>
           <View
             style={{
