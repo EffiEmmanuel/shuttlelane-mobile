@@ -5,6 +5,11 @@
       "bundler": "metro"
     },
     "name": "Shuttlelane",
-    "slug": "Shuttlelane"
+    "slug": "Shuttlelane",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#fff"
+    }
   }
 }

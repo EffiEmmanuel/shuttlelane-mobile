@@ -47,7 +47,7 @@ const AirportTransfer = () => {
   const [datePicker, setDatePicker] = useState(false);
 
   // PASSENGERS SETUP
-  const [passengers, setPassengers] = useState(0);
+  const [passengers, setPassengers] = useState('');
 
   const airports = [
     {
