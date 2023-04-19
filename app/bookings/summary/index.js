@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ScrollView } from "react-native";
 import { Text } from "react-native";
 import { View } from "react-native";
@@ -20,6 +20,7 @@ import flutterwave from "../.././../assets/images/logos/flutterwave.png";
 import stripe from "../.././../assets/images/logos/stripe.png";
 
 import { Image } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const BookingSummary = () => {
   const router = useRouter();
@@ -38,7 +39,46 @@ const BookingSummary = () => {
     time,
     airport,
     service,
+    total,
   } = params;
+  
+  const [isLoading, setIsLoading] = useState(false)
+
+    // USER DATA
+    const [user, setUser] = useState();
+    async function fetchUserData() {
+      const parsedUser = JSON.parse(await AsyncStorage.getItem("user"));
+      setUser(parsedUser);
+    }
+  
+    // AIRPORT STATE
+    const [airportPicked, setAirportPicked] = useState()
+  
+    // Fetch Airport
+    const fetchAirportDetails = async () => {
+      setIsLoading(true);
+      const response = await fetch(
+        //   "https://www.shuttlelane.com/api/users/signin",
+        `http://172.20.10.6:3001/api/airports/${pickupAirport}`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+      setAirportPicked(data.data);
+      console.log('AIRPORT PICKED:', data.data)
+      setIsLoading(false);
+    };
+  
+  
+    useEffect(() => {
+      fetchAirportDetails();
+      fetchUserData();
+    }, []);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
@@ -97,7 +137,7 @@ const BookingSummary = () => {
                   style={{ width: 28, height: 28 }}
                 />
                 <Text style={{ fontFamily: "PoppinsRegular" }}>
-                  {pickupAirport}
+                  {airportPicked?.name}
                 </Text>
               </View>
             )}
@@ -109,9 +149,7 @@ const BookingSummary = () => {
                   resizeMode="cover"
                   style={{ width: 28, height: 28 }}
                 />
-                <Text style={{ fontFamily: "PoppinsRegular" }}>
-                  {service}
-                </Text>
+                <Text style={{ fontFamily: "PoppinsRegular" }}>{service}</Text>
               </View>
             )}
 
@@ -161,9 +199,7 @@ const BookingSummary = () => {
                   resizeMode="cover"
                   style={{ width: 28, height: 28 }}
                 />
-                <Text style={{ fontFamily: "PoppinsRegular" }}>
-                  {airport}
-                </Text>
+                <Text style={{ fontFamily: "PoppinsRegular" }}>{airport}</Text>
               </View>
             )}
 
@@ -187,9 +223,7 @@ const BookingSummary = () => {
                   resizeMode="cover"
                   style={{ width: 28, height: 28 }}
                 />
-                <Text style={{ fontFamily: "PoppinsRegular" }}>
-                  {pass}
-                </Text>
+                <Text style={{ fontFamily: "PoppinsRegular" }}>{pass}</Text>
               </View>
             )}
 
@@ -281,7 +315,16 @@ const BookingSummary = () => {
                   textTransform: "uppercase",
                 }}
               >
-                $30
+                {user?.currency === "dollars"
+                  ? "$"
+                  : user?.currency === "neira"
+                  ? "₦"
+                  : user?.currency === "pounds"
+                  ? "£"
+                  : user?.currency === "euros"
+                  ? "€"
+                  : "!"}
+                {total}
               </Text>
             </View>
           </View>

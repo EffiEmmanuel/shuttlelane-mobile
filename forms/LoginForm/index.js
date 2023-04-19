@@ -45,8 +45,8 @@ const LoginForm = () => {
 
   // LOGIN FUNCTION
   async function loginUser() {
-    console.log('email', email)
-    console.log('password', password)
+    console.log("email", email);
+    console.log("password", password);
     setIsLoading(true);
     const response = await fetch(
       //   "https://www.shuttlelane.com/api/users/signin",
@@ -71,13 +71,16 @@ const LoginForm = () => {
     }
 
     showToastMessage("Log in successful", "success");
-    const stringifiedToken = JSON.stringify(user?.token)
-    const stringifiedUser = JSON.stringify(user?.data)
-    console.log(stringifiedToken)
-    console.log(stringifiedUser)
+    const stringifiedToken = JSON.stringify(user?.token);
+    const userObject = JSON.stringify({
+      name: user?.data?.name,
+      email: user?.data?.email,
+      mobile: user?.data?.mobile,
+      currency: user?.data?.currency,
+    });
 
-    await AsyncStorage.setItem("token", JSON.stringify(user?.token));
-    await AsyncStorage.setItem("user", JSON.stringify(user?.data));
+    await AsyncStorage.setItem("token", stringifiedToken);
+    await AsyncStorage.setItem("user", userObject);
     setIsLoading(false);
     router.replace("/dashboard");
     return;
