@@ -70,6 +70,7 @@ const AirportTransfer = () => {
   const [mapRegion, setMapRegion] = useState();
   const [pickupAddress, setPickupAddress] = useState("");
   const [dropoffAddress, setDropoffAddress] = useState("");
+  const [time, setTime] = useState();
 
   // User Location
   const userLocation = async () => {
@@ -97,8 +98,8 @@ const AirportTransfer = () => {
   const fetchAllAirports = async () => {
     setIsLoading(true);
     const response = await fetch(
-      //   "https://www.shuttlelane.com/api/users/signin",
-      "http://172.20.10.6:3001/api/airports",
+      "https://www.shuttlelane.com/api/v1/airports",
+      // "http://172.20.10.6:3001/api/airports",
       {
         method: "GET",
         headers: {
@@ -109,19 +110,20 @@ const AirportTransfer = () => {
     );
     const data = await response.json();
     console.log("DATA:::", data);
-    const airports = data.data
+    const airports = data.data;
 
-    let formattedAirports = []
+    let formattedAirports = [];
 
-    airports.forEach(airport => {
+    airports.forEach((airport) => {
       formattedAirports.push({
         key: airport?._id,
-        value: airport?.name,
-      })
-    })
+        value: airport?.airportName,
+      });
+    });
 
-    setAirports(formattedAirports)
-    setIsLoading(false)
+    console.log('FA:', formattedAirports)
+    setAirports(formattedAirports);
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -131,36 +133,38 @@ const AirportTransfer = () => {
 
   // ON FORM SUBMIT - PICKUP
   async function airportPickupNextStep() {
-    if (!pickupAirport || !dropoffAddress || !date || !passengers) {
+    if (!pickupAirport || !dropoffAddress || !date || !passengers || !time) {
       alert("Please fill in the missing fields to proceed");
       return;
     }
 
     router.push({
-      pathname: "/bookings/airport-transfer/airport-pickup/step-2",
+      pathname: "/bookings/airport-transfer/step-2",
       params: {
         pickupAirport,
         dropoffAddress,
         date,
         passengers,
+        time,
       },
     });
   }
 
   // ON FORM SUBMIT - DROPOFF
   async function airportDropoffNextStep() {
-    if (!dropoffAirport || !pickupAddress || !date || !passengers) {
+    if (!dropoffAirport || !pickupAddress || !date || !passengers || !time) {
       alert("Please fill in the missing fields to proceed");
       return;
     }
 
     router.push({
-      pathname: "/bookings/airport-transfer/airport-dropoff/step-2",
+      pathname: "/bookings/airport-transfer/step-2",
       params: {
         dropoffAirport,
         pickupAddress,
         date,
         passengers,
+        time,
       },
     });
   }
@@ -304,57 +308,59 @@ const AirportTransfer = () => {
                   onChangeText={(value) => setDropoffAddress(value)}
                 />
 
-                {/* SELECT DROPDOWN */}
-                <View style={{ marginTop: 20 }}>
-                  <SelectList
-                    setSelected={(value) => setPickupAirport(value)}
-                    data={airports}
-                    arrowicon={
-                      <Image
-                        source={arrowDownIcon}
-                        style={{ width: 40, height: 40, marginTop: -8 }}
-                        resizeMode="cover"
-                      />
-                    }
-                    closeicon={
-                      <Image
-                        source={closeIcon}
-                        style={{ width: 50, height: 50, marginTop: -1 }}
-                        resizeMode="cover"
-                      />
-                    }
-                    boxStyles={{
-                      borderRadius: 10,
-                      borderWidth: 0.5,
-                      borderColor: "#C9C9C9",
-                      height: 50,
-                      padding: 10,
-                    }}
-                    dropdownItemStyles={{
-                      marginVertical: 5,
-                    }}
-                    dropdownStyles={{
-                      borderRadius: 10,
-                      borderWidth: 0.5,
-                      borderColor: "#C9C9C9",
-                      padding: 10,
-                    }}
-                    inputStyles={{
-                      fontFamily: "PoppinsRegular",
-                      color: "#C9C9C9",
-                      marginTop: 4,
-                      fontSize: 16,
-                    }}
-                    dropdownTextStyles={{
-                      fontFamily: "PoppinsRegular",
-                    }}
-                    placeholder="Select Pickup Airport"
-                    searchPlaceholder="Search airports"
-                  />
+                <View>
+                  {/* SELECT DROPDOWN */}
+                  <View style={{ marginTop: 10 }}>
+                    <SelectList
+                      setSelected={(value) => setPickupAirport(value)}
+                      data={airports}
+                      arrowicon={
+                        <Image
+                          source={arrowDownIcon}
+                          style={{ width: 40, height: 40, marginTop: -8 }}
+                          resizeMode="cover"
+                        />
+                      }
+                      closeicon={
+                        <Image
+                          source={closeIcon}
+                          style={{ width: 50, height: 50, marginTop: -1 }}
+                          resizeMode="cover"
+                        />
+                      }
+                      boxStyles={{
+                        borderRadius: 10,
+                        borderWidth: 0.5,
+                        borderColor: "#C9C9C9",
+                        height: 50,
+                        padding: 10,
+                      }}
+                      dropdownItemStyles={{
+                        marginVertical: 5,
+                      }}
+                      dropdownStyles={{
+                        borderRadius: 10,
+                        borderWidth: 0.5,
+                        borderColor: "#C9C9C9",
+                        padding: 10,
+                      }}
+                      inputStyles={{
+                        fontFamily: "PoppinsRegular",
+                        color: "#C9C9C9",
+                        marginTop: 4,
+                        fontSize: 16,
+                      }}
+                      dropdownTextStyles={{
+                        fontFamily: "PoppinsRegular",
+                      }}
+                      placeholder="Select Pickup Airport"
+                      searchPlaceholder="Search airports"
+                    />
+                  </View>
                 </View>
 
                 {/* DATE PICKER */}
-                <View style={{ marginTop: 20 }}>
+                <View style={{ marginTop: 10 }}>
                   {datePicker && (
                     <Modal
                       animationType="slide"
@@ -441,7 +447,7 @@ const AirportTransfer = () => {
                     </TouchableOpacity>
 
                     <TextInput
-                      value={passengers}
+                      value={time}
                       style={{
                         height: 50,
                         padding: 10,
@@ -451,14 +457,35 @@ const AirportTransfer = () => {
                         borderColor: "#C9C9C9",
                         borderWidth: 0.5,
                         borderRadius: 10,
-                        width: "45%",
+                        width: "48%",
                       }}
-                      keyboardType="number-pad"
-                      placeholder="Passengers"
+                      placeholder="TIME E.g 7:30AM"
                       placeholderTextColor="#C9C9C9"
-                      onChangeText={(value) => setPassengers(+value)}
+                      onChangeText={(value) => setTime(value)}
                     />
                   </View>
+                  <TextInput
+                    value={passengers}
+                    style={{
+                      height: 50,
+                      padding: 10,
+                      paddingHorizontal: 20,
+                      fontSize: 16,
+                      fontFamily: "PoppinsRegular",
+                      borderColor: "#C9C9C9",
+                      borderWidth: 0.5,
+                      borderRadius: 10,
+                      // width: "45%",
+                      marginTop: 10,
+                    }}
+                    keyboardType="number-pad"
+                    aria-valuemax={10}
+                    aria-valuemin={1}
+                    maxLength={2}
+                    placeholder="Passengers"
+                    placeholderTextColor="#C9C9C9"
+                    onChangeText={(value) => setPassengers(+value)}
+                  />
                 </View>
 
                 <View style={{ paddingTop: 20 }}>
@@ -514,7 +541,7 @@ const AirportTransfer = () => {
                 />
 
                 {/* SELECT DROPDOWN */}
-                <View style={{ marginTop: 20 }}>
+                <View style={{ marginTop: 10 }}>
                   <SelectList
                     setSelected={(value) => setDropoffAirport(value)}
                     data={airports}
@@ -563,7 +590,7 @@ const AirportTransfer = () => {
                 </View>
 
                 {/* DATE PICKER */}
-                <View style={{ marginTop: 20 }}>
+                <View style={{ marginTop: 10 }}>
                   {datePicker && (
                     <Modal
                       animationType="slide"
@@ -650,7 +677,7 @@ const AirportTransfer = () => {
                     </TouchableOpacity>
 
                     <TextInput
-                      value={passengers}
+                      value={time}
                       style={{
                         height: 50,
                         padding: 10,
@@ -660,15 +687,34 @@ const AirportTransfer = () => {
                         borderColor: "#C9C9C9",
                         borderWidth: 0.5,
                         borderRadius: 10,
-                        width: "45%",
+                        width: "48%",
                       }}
-                      keyboardType="number-pad"
-                      placeholder="Passengers"
+                      placeholder="TIME E.g 7:30AM"
                       placeholderTextColor="#C9C9C9"
-                      onChangeText={(value) => setPassengers(+value)}
+                      onChangeText={(value) => setTime(value)}
                     />
                   </View>
                 </View>
+
+                <TextInput
+                  value={passengers}
+                  style={{
+                    height: 50,
+                    padding: 10,
+                    paddingHorizontal: 20,
+                    fontSize: 16,
+                    fontFamily: "PoppinsRegular",
+                    borderColor: "#C9C9C9",
+                    borderWidth: 0.5,
+                    borderRadius: 10,
+                    // width: "45%",
+                    marginTop: 10,
+                  }}
+                  keyboardType="number-pad"
+                  placeholder="Passengers"
+                  placeholderTextColor="#C9C9C9"
+                  onChangeText={(value) => setPassengers(+value)}
+                />
 
                 <View style={{ paddingTop: 20 }}>
                   <TouchableOpacity

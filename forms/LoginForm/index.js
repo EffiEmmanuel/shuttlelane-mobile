@@ -49,8 +49,8 @@ const LoginForm = () => {
     console.log("password", password);
     setIsLoading(true);
     const response = await fetch(
-      //   "https://www.shuttlelane.com/api/users/signin",
-      "http://172.20.10.6:3001/api/users/signin",
+      "https://www.shuttlelane.com/api/users/signin",
+      // "http://172.20.10.6:3001/api/users/signin",
       {
         method: "POST",
         headers: {
@@ -62,7 +62,13 @@ const LoginForm = () => {
           password: password,
         }),
       }
-    );
+    ).catch((err) => {
+      setIsLoading(false);
+      return showToastMessage(
+        "Please check your internet connection and try again",
+        "error"
+      );
+    });
     const user = await response.json();
     console.log("RESPONSE:", user);
     setIsLoading(false);
@@ -77,6 +83,7 @@ const LoginForm = () => {
       email: user?.data?.email,
       mobile: user?.data?.mobile,
       currency: user?.data?.currency,
+      _id: user?.data?._id,
     });
 
     await AsyncStorage.setItem("token", stringifiedToken);
@@ -196,6 +203,7 @@ const LoginForm = () => {
                 borderRadius: 10,
               }}
               onPress={() => loginUser()}
+              disabled={isLoading}
             >
               {!isLoading && (
                 <Text

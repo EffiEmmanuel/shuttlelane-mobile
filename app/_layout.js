@@ -2,6 +2,7 @@ import { Stack } from "expo-router";
 import { useCallback } from "react";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
+import { StripeProvider } from "@stripe/stripe-react-native";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -16,12 +17,12 @@ const Layout = () => {
   });
 
   const onLayoutRootView = useCallback(async () => {
-    if(fontsLoaded) {
-        await SplashScreen.hideAsync()
+    if (fontsLoaded) {
+      await SplashScreen.hideAsync();
     }
-  }, [fontsLoaded])
+  }, [fontsLoaded]);
 
-  if(!fontsLoaded) return null
+  if (!fontsLoaded) return null;
 
   return <Stack onLayout={onLayoutRootView} />;
 };

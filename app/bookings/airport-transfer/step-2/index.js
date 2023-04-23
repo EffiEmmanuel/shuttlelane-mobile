@@ -2,6 +2,7 @@ import { Stack, useRouter, useSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Dimensions,
   Image,
   SafeAreaView,
   ScrollView,
@@ -9,22 +10,31 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { COLORS } from "../../../../../constants/themes";
-import arrowBackIcon from "../../../../../assets/icons/arrowBackIcon.png";
-import currentLocationIcon from "../../../../../assets/icons/currentLocationIcon.png";
-import destinationIcon from "../../../../../assets/icons/destinationIcon.png";
-import passengerIcon from "../../../../../assets/icons/passengerIcon.png";
-import luggageIcon from "../../../../../assets/icons/luggageIcon.png";
+import { COLORS } from "../../../../constants/themes";
+import arrowBackIcon from "../../../../assets/icons/arrowBackIcon.png";
+import currentLocationIcon from "../../../../assets/icons/currentLocationIcon.png";
+import destinationIcon from "../../../../assets/icons/destinationIcon.png";
+import passengerIcon from "../../../../assets/icons/passengerIcon.png";
+import luggageIcon from "../../../../assets/icons/luggageIcon.png";
 
 // CARS
-import economy from "../../../../../assets/images/cars/economy.png";
+import economy from "../../../../assets/images/cars/economy.png";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import ToastMessage from "../../../../components/ToastMessage";
 
 const AirportPickupStepTwo = () => {
   const params = useSearchParams();
-  const { pickupAirport, dropoffAddress, date, passengers } = params;
+  const {
+    pickupAirport,
+    dropoffAddress,
+    date,
+    passengers,
+    time,
+    dropoffAirport,
+    pickupAddress,
+  } = params;
 
   // pickup airport
   const [airportDetails, setAirportDetails] = useState();
@@ -48,7 +58,9 @@ const AirportPickupStepTwo = () => {
     setIsLoading(true);
     const response = await fetch(
       //   "https://www.shuttlelane.com/api/users/signin",
-      `http://172.20.10.6:3001/api/airports/${pickupAirport}`,
+      `https://www.shuttlelane.com/api/v1/airports/${
+        pickupAirport ? pickupAirport : dropoffAirport
+      }`,
       {
         method: "GET",
         headers: {
@@ -58,6 +70,7 @@ const AirportPickupStepTwo = () => {
       }
     );
     const data = await response.json();
+    console.log("AIRPORT DATA:", data);
     setAirportDetails(data.data);
     setIsLoading(false);
 
@@ -82,7 +95,7 @@ const AirportPickupStepTwo = () => {
   async function fetchExchangeRates() {
     setIsLoading(true);
     await axios
-      .get(`http://172.20.10.6:3001/api/rates`)
+      .get(`https://www.shuttlelane.com/api/rates`)
       .then((res) => {
         const exchangeRates = res.data.data[0];
         setRates(res.data.data[0]);
@@ -98,9 +111,9 @@ const AirportPickupStepTwo = () => {
 
   // Handle Currency Conversion
   function makeConversion(amount) {
-    const dollarRate = Number(rates?.dollar)
-    const poundRate = Number(rates?.pound)
-    const euroRate = Number(rates?.euro)
+    const dollarRate = Number(rates?.dollar);
+    const poundRate = Number(rates?.pound);
+    const euroRate = Number(rates?.euro);
 
     let newAmount;
     if (user?.currency === "neira") {
@@ -127,6 +140,21 @@ const AirportPickupStepTwo = () => {
     fetchExchangeRates();
   }, []);
 
+  // TOAST CONFIGS
+  const [isToasting, setIsToasting] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState("");
+
+  // TOAST MESSAGE FUNCTION
+  const showToastMessage = (message, type) => {
+    setToastMessage(message);
+    setToastType(type);
+    setIsToasting(true);
+    setTimeout(() => {
+      setIsToasting(false);
+    }, 2500);
+  };
+
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: COLORS.white, display: "relative" }}
@@ -138,7 +166,12 @@ const AirportPickupStepTwo = () => {
           },
           headerShadowVisible: false,
           headerLeft: () => (
-            <TouchableOpacity style={{}} onPress={() => router.back()}>
+            <TouchableOpacity
+              style={{}}
+              onPress={() => {
+                router.back();
+              }}
+            >
               <Image
                 source={arrowBackIcon}
                 resizeMode="cover"
@@ -149,6 +182,22 @@ const AirportPickupStepTwo = () => {
           headerTitle: "",
         }}
       />
+
+      {/* TOAST MESSAGE */}
+      {isToasting && (
+        <ToastMessage
+          type={toastType}
+          message={toastMessage}
+          style={{
+            position: "absolute",
+            zIndex: 90,
+            top: 0,
+            width: Dimensions.get("window").width,
+            flexDirection: "row",
+            justifyContent: "center",
+          }}
+        />
+      )}
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -171,7 +220,7 @@ const AirportPickupStepTwo = () => {
                   style={{ width: 28, height: 28 }}
                 />
                 <Text style={{ fontFamily: "PoppinsRegular" }}>
-                  {airportDetails?.name}
+                  {airportDetails?.airportName}
                 </Text>
               </View>
 
@@ -182,31 +231,46 @@ const AirportPickupStepTwo = () => {
                   style={{ width: 28, height: 28 }}
                 />
                 <Text style={{ fontFamily: "PoppinsRegular" }}>
-                  {dropoffAddress}
+                  {dropoffAddress ? dropoffAddress : pickupAddress}
                 </Text>
               </View>
             </View>
 
             {/* CARS */}
             <View style={{ marginTop: 20, paddingBottom: 80 }}>
-              {airportDetails?.vehicleClasses.map((vehicle) => {
-                const price = makeConversion(Number(vehicle?.rate));
+              {airportDetails?.cars.map((vehicle) => {
+                const prePrice = makeConversion(Number(vehicle?.rate));
+                const price = Intl.NumberFormat("en-US", {
+                }).format(prePrice);
+
+                console.log("CAR:", vehicle);
                 return (
                   <TouchableOpacity
                     onPress={() => {
                       setCarPicked(`${vehicle?.name}`);
-                      router.push({
-                        pathname: "/bookings/summary",
-                        params: {
-                          bookingType: "Airport Pickup",
-                          pickupAirport,
-                          dropoffAddress,
-                          passengers,
-                          date,
-                          carPicked: "economy",
-                          total: price
-                        },
-                      });
+
+                      if (carPicked === `${vehicle?.name}`) {
+                        router.push({
+                          pathname: "/bookings/summary",
+                          params: {
+                            bookingType: pickupAirport
+                              ? "Airport Pickup"
+                              : "Airport Dropoff",
+                            pickupAirport,
+                            dropoffAddress,
+                            passengers,
+                            date,
+                            time,
+                            carPicked: carPicked,
+                            total: price,
+                          },
+                        });
+                      }
+
+                      showToastMessage(
+                        "Tap again to confirm selection",
+                        "info"
+                      );
                     }}
                     key={vehicle?._id}
                     style={{
@@ -241,7 +305,7 @@ const AirportPickupStepTwo = () => {
                         >
                           <Icon name="person" size={20} color="#000" />
                           <Text style={{ fontFamily: "PoppinsRegular" }}>
-                            {vehicle?.passengers ?? 4}
+                            {vehicle?.capacity ?? 4}
                           </Text>
                         </View>
                         {/* LUGGAGE */}
@@ -281,7 +345,7 @@ const AirportPickupStepTwo = () => {
                       }}
                     >
                       <Image
-                        source={economy}
+                        source={{ uri: vehicle?.image }}
                         resizeMode="contain"
                         style={{ height: 130, width: 130 }}
                       />

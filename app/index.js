@@ -11,6 +11,7 @@ import { Stack } from "expo-router";
 import LoginForm from "../forms/LoginForm";
 import { COLORS } from "../constants/themes";
 import AuthProvider from "../context/AuthContext";
+import { StripeProvider } from "@stripe/stripe-react-native";
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
