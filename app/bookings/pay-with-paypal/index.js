@@ -26,7 +26,7 @@ import axios from "axios";
 import ToastMessage from "../../../components/ToastMessage";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { PayWithFlutterwave } from "flutterwave-react-native";
-import { FLUTTERWAVE_KEY, STRIPE_PUBLISHABLE_KEY } from "@env";
+import { FLUTTERWAVE_KEY, STRIPE_PUBLISHABLE_KEY, PAYPAL_BEARER } from "@env";
 import WebView from "react-native-webview";
 
 const PayWithPayPal = () => {
@@ -118,7 +118,7 @@ const PayWithPayPal = () => {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
             Authorization:
-              "Bearer A21AAIgVJFGoXjRGfEm8EgXaRr0nlNAkVRpj6V-41Bsy3x3xMpH4Ouyc-HDh-QdsM0kNDVZiB8hW29m_Olb7Obl5Cxorz8cDQ",
+              `Bearer ${PAYPAL_BEARER}`,
           },
         }
       )
