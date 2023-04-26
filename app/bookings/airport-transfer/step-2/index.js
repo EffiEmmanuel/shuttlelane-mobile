@@ -57,7 +57,6 @@ const AirportPickupStepTwo = () => {
   const fetchAirportDetails = async () => {
     setIsLoading(true);
     const response = await fetch(
-      //   "https://www.shuttlelane.com/api/users/signin",
       `https://www.shuttlelane.com/api/v1/airports/${
         pickupAirport ? pickupAirport : dropoffAirport
       }`,
@@ -73,19 +72,6 @@ const AirportPickupStepTwo = () => {
     console.log("AIRPORT DATA:", data);
     setAirportDetails(data.data);
     setIsLoading(false);
-
-    // const airports = data.data
-
-    // let formattedAirports = []
-
-    // airports.forEach(airport => {
-    //   formattedAirports.push({
-    //     key: airport?._id,
-    //     value: airport?.name,
-    //   })
-    // })
-
-    // setAirports(formattedAirports)
   };
 
   // Fetch Exchange rates
@@ -240,10 +226,10 @@ const AirportPickupStepTwo = () => {
             <View style={{ marginTop: 20, paddingBottom: 80 }}>
               {airportDetails?.cars.map((vehicle) => {
                 const prePrice = makeConversion(Number(vehicle?.rate));
-                const price = Intl.NumberFormat("en-US", {
-                }).format(prePrice);
+                const price = Intl.NumberFormat("en-US", {}).format(prePrice);
 
                 console.log("CAR:", vehicle);
+                console.log('price::', price)
                 return (
                   <TouchableOpacity
                     onPress={() => {

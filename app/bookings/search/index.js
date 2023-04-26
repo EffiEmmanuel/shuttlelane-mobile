@@ -28,8 +28,8 @@ const SearchResultPage = () => {
     async function fetchBooking() {
       setIsLoading(true);
       const response = await fetch(
-        // "https://www.shuttlelane.com/api/users",
-        `http://172.20.10.6:3001/api/booking/search`,
+        "https://www.shuttlelane.com/api/booking/search",
+        // `http://172.20.10.6:3001/api/booking/search`,
         {
           method: "POST",
           headers: {
@@ -46,8 +46,12 @@ const SearchResultPage = () => {
       if (booking?.status === 404) {
         setErrorMessage(booking?.message);
         setIsLoading(false);
+        return;
       }
       console.log("RES:::", booking);
+
+      setBooking(booking?.data);
+      setIsLoading(false);
     }
 
     fetchBooking();
@@ -103,7 +107,7 @@ const SearchResultPage = () => {
             <Text
               style={{
                 fontSize: 16,
-                marginTop: 20,
+                marginTop: 10,
                 fontWeight: "500",
 
                 fontFamily: "PoppinsRegular",
@@ -121,35 +125,494 @@ const SearchResultPage = () => {
           )}
 
           {/* BOOKING DETAILS */}
-          <View style={{ marginTop: 20 }}>
-            <Text
-              style={{
-                fontSize: 18,
-                marginTop: 20,
-                fontWeight: "500",
-
-                fontFamily: "PoppinsSemiBold",
-              }}
-            >
-              Booking Reference: CJJJODFA
-            </Text>
-
+          {!isLoading && (
             <View style={{ marginTop: 20 }}>
-              <Icon name="place" size={24} color="#000" />
+              <Text
+                style={{
+                  fontSize: 18,
+                  marginTop: -10,
+                  fontWeight: "500",
+
+                  fontFamily: "PoppinsSemiBold",
+                }}
+              >
+                Booking Reference: {bookingId}
+              </Text>
+
+              {/* GROUP */}
+              <View>
+                <Text
+                  style={{
+                    fontSize: 20,
+                    marginTop: 30,
+                    fontWeight: "500",
+                    color: COLORS.shuttlelanePurple,
+                    fontFamily: "PoppinsSemiBold",
+                  }}
+                >
+                  Pickup{" "}
+                  <Icon
+                    name="place"
+                    size={20}
+                    color={COLORS.shuttlelanePurple}
+                  />
+                </Text>
+
+                <View
+                  style={{
+                    marginTop: 10,
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      marginHorizontal: 10,
+                      fontWeight: "500",
+                      fontFamily: "PoppinsSemiBold",
+                    }}
+                  >
+                    {booking?.pickupAirport &&
+                      `Airport Name: ${booking?.pickupAirport}`}
+                    {booking?.pickupAddress &&
+                      `Pickup address: ${booking?.pickupAddress}`}
+                  </Text>
+                </View>
+
+                <View
+                  style={{
+                    marginTop: 10,
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      marginHorizontal: 10,
+                      fontWeight: "500",
+                      fontFamily: "PoppinsSemiBold",
+                    }}
+                  >
+                    {booking?.pickupAirport &&
+                      `Meeting Point: Proceed to trolly stand behind Baggage Conveyor for your free trolley and porter service.`}
+                  </Text>
+                </View>
+              </View>
+
+              {/* GROUP */}
+              <View>
+                <Text
+                  style={{
+                    fontSize: 20,
+                    marginTop: 30,
+                    fontWeight: "500",
+                    color: COLORS.shuttlelanePurple,
+                    fontFamily: "PoppinsSemiBold",
+                  }}
+                >
+                  Dropoff{" "}
+                  <Icon
+                    name="place"
+                    size={20}
+                    color={COLORS.shuttlelanePurple}
+                  />
+                </Text>
+
+                <View
+                  style={{
+                    marginTop: 10,
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      marginHorizontal: 10,
+                      fontWeight: "500",
+                      fontFamily: "PoppinsSemiBold",
+                    }}
+                  >
+                    {booking?.dropoffAirport &&
+                      `Dropoff Airport: ${booking?.dropoffAirport}`}
+                    {booking?.dropoffAddress &&
+                      `Dropoff address: ${booking?.dropoffAddress}`}
+                  </Text>
+                </View>
+              </View>
+
+              {/* GROUP */}
+              <View>
+                <Text
+                  style={{
+                    fontSize: 20,
+                    marginTop: 30,
+                    fontWeight: "500",
+                    color: COLORS.shuttlelanePurple,
+                    fontFamily: "PoppinsSemiBold",
+                  }}
+                >
+                  Driver Details{" "}
+                  <Icon
+                    name="person"
+                    size={20}
+                    color={COLORS.shuttlelanePurple}
+                  />
+                </Text>
+
+                <View
+                  style={{
+                    marginTop: 10,
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      marginHorizontal: 10,
+                      fontWeight: "500",
+                      fontFamily: "PoppinsSemiBold",
+                    }}
+                  >
+                    Name:{" "}
+                    {booking?.assignedDriver?.name
+                      ? booking?.assignedDriver?.name
+                      : "Not assigned yet"}
+                  </Text>
+                </View>
+
+                <View
+                  style={{
+                    marginTop: 10,
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      marginHorizontal: 10,
+                      fontWeight: "500",
+                      fontFamily: "PoppinsSemiBold",
+                    }}
+                  >
+                    Mobile Number:{" "}
+                    {booking?.assignedDriver?.mobile
+                      ? booking?.assignedDriver?.mobile
+                      : "Not assigned yet"}
+                  </Text>
+                </View>
+              </View>
+
+              {/* GROUP */}
+              {booking?.assignedCar && (
+                <View>
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      marginTop: 30,
+                      fontWeight: "500",
+                      color: COLORS.shuttlelanePurple,
+                      fontFamily: "PoppinsSemiBold",
+                    }}
+                  >
+                    Car Details{" "}
+                    <Icon
+                      name="local-taxi"
+                      size={20}
+                      color={COLORS.shuttlelanePurple}
+                    />
+                  </Text>
+
+                  <View
+                    style={{
+                      marginTop: 10,
+                      display: "flex",
+                      flexDirection: "row",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        marginHorizontal: 10,
+                        fontWeight: "500",
+                        fontFamily: "PoppinsSemiBold",
+                      }}
+                    >
+                      Type:{" "}
+                      {booking?.assignedCar?.type
+                        ? booking?.assignedCar?.type
+                        : "Not assigned yet"}
+                    </Text>
+                  </View>
+
+                  <View
+                    style={{
+                      marginTop: 10,
+                      display: "flex",
+                      flexDirection: "row",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        marginHorizontal: 10,
+                        fontWeight: "500",
+                        fontFamily: "PoppinsSemiBold",
+                      }}
+                    >
+                      Plate Number:{" "}
+                      {booking?.assignedCar?.plateNumber
+                        ? booking?.assignedCar?.plateNumber
+                        : "Not assigned yet"}
+                    </Text>
+                  </View>
+
+                  <View
+                    style={{
+                      marginTop: 10,
+                      display: "flex",
+                      flexDirection: "row",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        marginHorizontal: 10,
+                        fontWeight: "500",
+                        fontFamily: "PoppinsSemiBold",
+                      }}
+                    >
+                      Color:{" "}
+                      {booking?.assignedCar?.color
+                        ? booking?.assignedCar?.color
+                        : "Not assigned yet"}
+                    </Text>
+                  </View>
+                </View>
+              )}
             </View>
+          )}
 
-            <Text
-              style={{
-                fontSize: 18,
-                marginTop: 20,
-                fontWeight: "500",
+          {!isLoading && (
+            <View>
+              {/* GROUP */}
+              <View>
+                <Text
+                  style={{
+                    fontSize: 20,
+                    marginTop: 30,
+                    fontWeight: "500",
+                    color: COLORS.shuttlelanePurple,
+                    fontFamily: "PoppinsSemiBold",
+                  }}
+                >
+                  Date and Time{" "}
+                  <Icon
+                    name="schedule"
+                    size={20}
+                    color={COLORS.shuttlelanePurple}
+                  />
+                </Text>
 
-                fontFamily: "PoppinsSemiBold",
-              }}
-            >
-              Booking Reference: CJJJODFA
-            </Text>
-          </View>
+                <View
+                  style={{
+                    marginTop: 10,
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      marginHorizontal: 10,
+                      fontWeight: "500",
+                      fontFamily: "PoppinsSemiBold",
+                    }}
+                  >
+                    Date: {booking?.createdAt.split("T")[0]}
+                  </Text>
+                </View>
+
+                <View
+                  style={{
+                    marginTop: 10,
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      marginHorizontal: 10,
+                      fontWeight: "500",
+                      fontFamily: "PoppinsSemiBold",
+                    }}
+                  >
+                    Time: {booking?.time}
+                  </Text>
+                </View>
+              </View>
+
+              {/* GROUP */}
+              <View>
+                <Text
+                  style={{
+                    fontSize: 20,
+                    marginTop: 30,
+                    fontWeight: "500",
+                    color: COLORS.shuttlelanePurple,
+                    fontFamily: "PoppinsSemiBold",
+                  }}
+                >
+                  Vehicle Class{" "}
+                  <Icon
+                    name="local-taxi"
+                    size={20}
+                    color={COLORS.shuttlelanePurple}
+                  />
+                </Text>
+
+                <View
+                  style={{
+                    marginTop: 10,
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      marginHorizontal: 10,
+                      fontWeight: "500",
+                      fontFamily: "PoppinsSemiBold",
+                    }}
+                  >
+                    Class: {booking?.carType}
+                  </Text>
+                </View>
+              </View>
+
+              {/* GROUP */}
+              <View>
+                <Text
+                  style={{
+                    fontSize: 20,
+                    marginTop: 30,
+                    fontWeight: "500",
+                    color: COLORS.shuttlelanePurple,
+                    fontFamily: "PoppinsSemiBold",
+                  }}
+                >
+                  Passenger{" "}
+                  <Icon
+                    name="person"
+                    size={20}
+                    color={COLORS.shuttlelanePurple}
+                  />
+                </Text>
+
+                <View
+                  style={{
+                    marginTop: 10,
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      marginHorizontal: 10,
+                      fontWeight: "500",
+                      fontFamily: "PoppinsSemiBold",
+                    }}
+                  >
+                    Name: {booking?.firstName} {booking?.lastName}
+                  </Text>
+                </View>
+
+                <View
+                  style={{
+                    marginTop: 10,
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      marginHorizontal: 10,
+                      fontWeight: "500",
+                      fontFamily: "PoppinsSemiBold",
+                    }}
+                  >
+                    Passengers: {booking?.passengers} in total
+                  </Text>
+                </View>
+              </View>
+
+              {/* GROUP */}
+              <View>
+                <Text
+                  style={{
+                    fontSize: 20,
+                    marginTop: 30,
+                    fontWeight: "500",
+                    color: COLORS.shuttlelanePurple,
+                    fontFamily: "PoppinsSemiBold",
+                  }}
+                >
+                  Contact{" "}
+                  <Icon
+                    name="support-agent"
+                    size={20}
+                    color={COLORS.shuttlelanePurple}
+                  />
+                </Text>
+
+                <View
+                  style={{
+                    marginTop: 10,
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      marginHorizontal: 10,
+                      fontWeight: "500",
+                      fontFamily: "PoppinsSemiBold",
+                    }}
+                  >
+                    Mobile Number: {booking?.mobile}
+                  </Text>
+                </View>
+
+                <View
+                  style={{
+                    marginTop: 10,
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      marginHorizontal: 10,
+                      fontWeight: "500",
+                      fontFamily: "PoppinsSemiBold",
+                    }}
+                  >
+                    Email: {booking?.email}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>

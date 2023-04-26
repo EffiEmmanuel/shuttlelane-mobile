@@ -25,6 +25,8 @@ import { StripeProvider, useStripe } from "@stripe/stripe-react-native";
 import axios from "axios";
 import ToastMessage from "../../../components/ToastMessage";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import { PayWithFlutterwave } from "flutterwave-react-native";
+import { FLUTTERWAVE_KEY, STRIPE_PUBLISHABLE_KEY } from "@env";
 
 const BookingSummary = () => {
   const router = useRouter();
@@ -44,6 +46,7 @@ const BookingSummary = () => {
     airport,
     service,
     total,
+    days,
   } = params;
 
   const [isLoading, setIsLoading] = useState(false);
@@ -64,7 +67,7 @@ const BookingSummary = () => {
     const response = await fetch(
       //   "https://www.shuttlelane.com/api/users/signin",
       `https://www.shuttlelane.com/api/v1/airports/${
-        pickupAirport ?? dropoffAirport
+        pickupAirport ?? dropoffAirport ?? airport
       }`,
       {
         method: "GET",
@@ -106,12 +109,14 @@ const BookingSummary = () => {
   async function payWithStripe() {
     setIsLoading(true);
     console.log(typeof total);
-    console.log("TOTAL::");
+    console.log("TOTAL::", total);
     await axios
       .post(`https://www.shuttlelane.com/stripe/create-payment-intent`, {
         // .post(`http://172.20.10.6:3001/stripe/create-payment-intent`, {
         email: user?.email,
-        amount: Number(`${total.split(",")[0]}${total.split(",")[1]}`),
+        amount: total?.includes(",")
+          ? Number(`${total.split(",")[0]}${total.split(",")[1]}`)
+          : Number(total),
         currency:
           user?.currency === "neira"
             ? "ngn"
@@ -150,40 +155,111 @@ const BookingSummary = () => {
 
         // SAVE BOOKING TO THE DATABASE
         setIsLoading(true);
-        const response = await fetch(
-          "https://www.shuttlelane.com/api/booking/airport",
-          // "http://172.20.10.6:3001/api/booking/airport",
-          {
-            method: "POST",
-            headers: {
-              Accept: "application/json",
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              user: user?._id,
-              email: user?.email,
-              mobile: user?.mobile,
-              amount: total,
-              currency: user?.currency,
-              formType: bookingType,
-              carType: carPicked,
-              pickupAirport: pickupAirport ? airportPicked?.airportName : "",
-              dropoffAddress: dropoffAddress ?? "",
-              isPriorityPass: bookingType === "Priority Pass" ?? false,
-              pickupAddress: pickupAddress ?? "",
-              dropoffAirport: dropoffAirport ? airportPicked?.airportName : "",
-              time: time,
-              pickupDate: date,
-              arrivalDate: date,
-              passengers: passengers,
-              firstName: user?.name?.split(" ")[0],
-              lastName: user?.name?.split(" ")[1],
-              paymentStatus: "Successful",
-              paymentId: res?.data,
-              paymentMethod: "Stripe",
-            }),
-          }
-        );
+
+        let response;
+
+        switch (bookingType) {
+          case "Car Hire":
+            response = await fetch(
+              "https://www.shuttlelane.com/api/booking/car",
+              // "http://172.20.10.6:3001/api/booking/airport",
+              {
+                method: "POST",
+                headers: {
+                  Accept: "application/json",
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  user: user?._id,
+                  email: user?.email,
+                  mobile: user?.mobile,
+                  amount: total,
+                  currency: user?.currency,
+                  carType: carPicked,
+                  pickupAddress: pickupAddress ?? "",
+                  time: time,
+                  date: date,
+                  days: days,
+                  firstName: user?.name?.split(" ")[0],
+                  lastName: user?.name?.split(" ")[1],
+                }),
+              }
+            );
+            break;
+          case "Airport Pickup" || "Airport Dropoff":
+            response = await fetch(
+              "https://www.shuttlelane.com/api/booking/airport",
+              // "http://172.20.10.6:3001/api/booking/airport",
+              {
+                method: "POST",
+                headers: {
+                  Accept: "application/json",
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  user: user?._id,
+                  email: user?.email,
+                  mobile: user?.mobile,
+                  amount: total,
+                  currency: user?.currency,
+                  formType: bookingType,
+                  carType: carPicked,
+                  pickupAirport: pickupAirport
+                    ? airportPicked?.airportName
+                    : "",
+                  dropoffAddress: dropoffAddress ?? "",
+                  isPriorityPass: bookingType === "Priority Pass" ?? false,
+                  pickupAddress: pickupAddress ?? "",
+                  dropoffAirport: dropoffAirport
+                    ? airportPicked?.airportName
+                    : "",
+                  time: time,
+                  pickupDate: date,
+                  arrivalDate: date,
+                  passengers: passengers,
+                  firstName: user?.name?.split(" ")[0],
+                  lastName: user?.name?.split(" ")[1],
+                  paymentStatus: "Successful",
+                  paymentId: res?.data,
+                  paymentMethod: "Stripe",
+                }),
+              }
+            );
+            break;
+          case "Priority Pass":
+            response = await fetch(
+              "https://www.shuttlelane.com/api/booking/priority",
+              // "http://172.20.10.6:3001/api/booking/airport",
+              {
+                method: "POST",
+                headers: {
+                  Accept: "application/json",
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  user: user?._id,
+                  email: user?.email,
+                  mobile: user?.mobile,
+                  amount: total,
+                  currency: user?.currency,
+                  airport,
+                  service,
+                  time: time,
+                  date,
+                  passengers: passengers,
+                  firstName: user?.name?.split(" ")[0],
+                  lastName: user?.name?.split(" ")[1],
+                  paymentStatus: "Successful",
+                  paymentId: res?.data,
+                  paymentMethod: "Stripe",
+                }),
+              }
+            );
+            break;
+          default:
+            break;
+        }
+
         const booking = await response.json();
         console.log("RESPONSE:", booking);
 
@@ -200,6 +276,175 @@ const BookingSummary = () => {
         setIsLoading(false);
       });
   }
+
+  // FLUTTERWAVE CONFIGS
+  /* An example function called when transaction is completed successfully or canceled */
+  const handleOnRedirect = async (data) => {
+    console.log("data", data);
+    if (data.status === "cancelled") {
+      return showToastMessage("Payment was canceled", "error");
+    }
+
+    if (data.status !== "cancelled" && data.status !== "failed") {
+      // ELSE SHOW SUCCESS MESSAGE
+
+      // SAVE BOOKING TO THE DATABASE
+      setIsLoading(true);
+
+      let response;
+
+      switch (bookingType) {
+        case "Car Hire":
+          response = await fetch(
+            "https://www.shuttlelane.com/api/booking/car",
+            // "http://172.20.10.6:3001/api/booking/airport",
+            {
+              method: "POST",
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                user: user?._id,
+                email: user?.email,
+                mobile: user?.mobile,
+                amount: total,
+                currency: user?.currency,
+                carType: carPicked,
+                pickupAddress: pickupAddress ?? "",
+                time: time,
+                date: date,
+                days: days,
+                firstName: user?.name?.split(" ")[0],
+                lastName: user?.name?.split(" ")[1],
+              }),
+            }
+          );
+          break;
+        case "Airport Pickup" || "Airport Dropoff":
+          response = await fetch(
+            "https://www.shuttlelane.com/api/booking/airport",
+            // "http://172.20.10.6:3001/api/booking/airport",
+            {
+              method: "POST",
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                user: user?._id,
+                email: user?.email,
+                mobile: user?.mobile,
+                amount: total,
+                currency: user?.currency,
+                formType: bookingType,
+                carType: carPicked,
+                pickupAirport: pickupAirport ? airportPicked?.airportName : "",
+                dropoffAddress: dropoffAddress ?? "",
+                isPriorityPass: bookingType === "Priority Pass" ?? false,
+                pickupAddress: pickupAddress ?? "",
+                dropoffAirport: dropoffAirport
+                  ? airportPicked?.airportName
+                  : "",
+                time: time,
+                pickupDate: date,
+                arrivalDate: date,
+                passengers: passengers,
+                firstName: user?.name?.split(" ")[0],
+                lastName: user?.name?.split(" ")[1],
+                paymentStatus: "Successful",
+                paymentId: res?.data,
+                paymentMethod: "Stripe",
+              }),
+            }
+          );
+          break;
+        case "Priority Pass":
+          response = await fetch(
+            "https://www.shuttlelane.com/api/booking/priority",
+            // "http://172.20.10.6:3001/api/booking/airport",
+            {
+              method: "POST",
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                user: user?._id,
+                email: user?.email,
+                mobile: user?.mobile,
+                amount: total,
+                currency: user?.currency,
+                airport,
+                service,
+                time: time,
+                date,
+                passengers: passengers,
+                firstName: user?.name?.split(" ")[0],
+                lastName: user?.name?.split(" ")[1],
+                paymentStatus: "Successful",
+                paymentId: res?.data,
+                paymentMethod: "Stripe",
+              }),
+            }
+          );
+          break;
+        default:
+          break;
+      }
+
+      const booking = await response.json();
+      console.log("RESPONSE:", booking);
+
+      showToastMessage("Payment successful!", "success");
+      setIsLoading(false);
+      setTimeout(() => {
+        router.replace("/dashboard");
+      }, 1500);
+
+      showToastMessage("Booking successful!", "success");
+    }
+  };
+
+  /* An example function to generate a random transaction reference */
+  const generateTransactionRef = (length) => {
+    var result = "";
+    var characters =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return `flw_tx_ref_${result}`;
+  };
+
+  // PAYPAL PAYMENT
+  async function payWithPayPal() {
+    router.push({
+      pathname: "/bookings/pay-with-paypal",
+      params: {
+        user,
+        total,
+        bookingType,
+        pickupAirport,
+        dropoffAddress,
+        date,
+        passengers,
+        carPicked,
+        dropoffAirport,
+        pickupAddress,
+        pass,
+        time,
+        airport,
+        service,
+        days,
+      },
+    });
+  }
+
+  useEffect(() => {
+    console.log("TOTALLLLL::", total);
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
@@ -241,7 +486,7 @@ const BookingSummary = () => {
           }}
         />
       )}
-      <StripeProvider publishableKey="pk_test_51FSsN2JVCyKylojXpnS50eSLRIIPyrqHTEsA99QPiuSBxilFRAR1mK0aHmIhi7tpsaybouZSXlIuDrC6GeTpAGip00GgpQiYnb">
+      <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}>
         <ScrollView
           showsVerticalScrollIndicator={false}
           style={{ padding: 20 }}
@@ -256,6 +501,7 @@ const BookingSummary = () => {
             Booking Summary
           </Text>
 
+          {/* BOOKING TYPE */}
           <Text
             style={{
               fontSize: 16,
@@ -334,7 +580,7 @@ const BookingSummary = () => {
                     style={{ width: 28, height: 28 }}
                   />
                   <Text style={{ fontFamily: "PoppinsRegular" }}>
-                    {dropoffAirport}
+                    {airportPicked?.airportName}
                   </Text>
                 </View>
               )}
@@ -347,7 +593,7 @@ const BookingSummary = () => {
                     style={{ width: 28, height: 28 }}
                   />
                   <Text style={{ fontFamily: "PoppinsRegular" }}>
-                    {airport}
+                    {airportPicked?.airportName}
                   </Text>
                 </View>
               )}
@@ -430,6 +676,8 @@ const BookingSummary = () => {
                 </View>
               )}
             </View>
+
+            {/* TOTAL */}
             <View
               style={{
                 backgroundColor: COLORS.shuttlelaneYellowFaded,
@@ -473,7 +721,9 @@ const BookingSummary = () => {
                     : user?.currency === "euros"
                     ? "€"
                     : "!"}
-                  {total}
+                  {total?.includes(",")
+                    ? total
+                    : Intl.NumberFormat("en-US", {}).format(total)}
                 </Text>
               </View>
             </View>
@@ -499,44 +749,79 @@ const BookingSummary = () => {
 
                 {/* PAYMENT OPTIONS */}
                 <View style={{ width: "100%", alignItems: "center" }}>
-                  <TouchableOpacity
-                    style={{
-                      borderWidth: 1,
-                      marginTop: 20,
-                      borderColor: "#C9C9C9",
-                      width: "100%",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      height: 60,
-                      borderRadius: 10,
-                    }}
-                  >
-                    <Image
-                      source={paypal}
-                      style={{ width: 100, height: 100 }}
-                      resizeMode="cover"
-                    />
-                  </TouchableOpacity>
+                  {/* PAYPAL PAYMENT */}
+                  {user?.currency !== "neira" && (
+                    <TouchableOpacity
+                      style={{
+                        borderWidth: 1,
+                        marginTop: 20,
+                        borderColor: "#C9C9C9",
+                        width: "100%",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        height: 60,
+                        borderRadius: 10,
+                      }}
+                      onPress={payWithPayPal}
+                    >
+                      <Image
+                        source={paypal}
+                        style={{ width: 100, height: 100 }}
+                        resizeMode="cover"
+                      />
+                    </TouchableOpacity>
+                  )}
 
-                  <TouchableOpacity
-                    style={{
-                      borderWidth: 1,
-                      marginTop: 20,
-                      borderColor: "#C9C9C9",
-                      width: "100%",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      height: 60,
-                      borderRadius: 10,
+                  {/* FLUTTERWAVE PAYMENT */}
+                  <PayWithFlutterwave
+                    onRedirect={handleOnRedirect}
+                    options={{
+                      tx_ref: generateTransactionRef(10),
+                      authorization: FLUTTERWAVE_KEY,
+                      customer: {
+                        email: user?.email,
+                      },
+                      amount: total?.includes(",")
+                        ? Number(`${total.split(",")[0]}${total.split(",")[1]}`)
+                        : Number(total),
+                      currency:
+                        user?.currency === "neira"
+                          ? "NGN"
+                          : user?.currency === "dollars"
+                          ? "USD"
+                          : user?.currency === "pounds"
+                          ? "GBP"
+                          : user?.currency === "euros"
+                          ? "EUR"
+                          : "NGN",
+                      payment_options: "card",
                     }}
-                  >
-                    <Image
-                      source={flutterwave}
-                      style={{ width: 100, height: 100 }}
-                      resizeMode="contain"
-                    />
-                  </TouchableOpacity>
+                    customButton={(props) => (
+                      <TouchableOpacity
+                        style={{
+                          borderWidth: 1,
+                          marginTop: 20,
+                          borderColor: "#C9C9C9",
+                          width: "100%",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          height: 60,
+                          borderRadius: 10,
+                        }}
+                        onPress={props.onPress}
+                        isBusy={props.isInitializing}
+                        disabled={props.disabled}
+                      >
+                        <Image
+                          source={flutterwave}
+                          style={{ width: 100, height: 100 }}
+                          resizeMode="contain"
+                        />
+                      </TouchableOpacity>
+                    )}
+                  />
 
+                  {/* STRIPE PAYMENT */}
                   <TouchableOpacity
                     style={{
                       borderWidth: 1,

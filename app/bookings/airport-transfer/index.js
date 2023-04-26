@@ -55,17 +55,6 @@ const AirportTransfer = () => {
   const [passengers, setPassengers] = useState("");
   const [airports, setAirports] = useState([]);
 
-  // const airports = [
-  //   {
-  //     key: "Murtala Mohammed International Airport",
-  //     value: "Murtala Mohammed International Airport",
-  //   },
-  //   {
-  //     key: "Murtala Mohammed Domestic Airport",
-  //     value: "Murtala Mohammed Domestic Airport",
-  //   },
-  // ];
-
   // MAP SETUP
   const [mapRegion, setMapRegion] = useState();
   const [pickupAddress, setPickupAddress] = useState("");
@@ -73,7 +62,9 @@ const AirportTransfer = () => {
   const [time, setTime] = useState();
 
   // User Location
+  const [isMapLoading, setIsMapLoading] = useState(false);
   const userLocation = async () => {
+    setIsMapLoading(true);
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
       console.log("Access to location was denied!");
@@ -92,6 +83,7 @@ const AirportTransfer = () => {
       latitudeDelta: 0.0922,
       longitudeDelta: 0.0421,
     });
+    setIsMapLoading(false);
   };
 
   // Fetch airports
@@ -121,7 +113,7 @@ const AirportTransfer = () => {
       });
     });
 
-    console.log('FA:', formattedAirports)
+    console.log("FA:", formattedAirports);
     setAirports(formattedAirports);
     setIsLoading(false);
   };
@@ -752,17 +744,30 @@ const AirportTransfer = () => {
 
         {isLoading && <ActivityIndicator size={30} />}
       </View>
+
       {/* MAPS HERE */}
-      <MapView
-        style={{
-          flex: 1,
-          width: Dimensions.get("window").width,
-          height: Dimensions.get("window").height,
-        }}
-        region={mapRegion}
-      >
-        <Marker coordinate={mapRegion} title="Marker" />
-      </MapView>
+      {isMapLoading && (
+        <View style={{ marginTop: 60 }}>
+          <ActivityIndicator size={48} />
+          <Text style={{ fontSize: 24, color: "#C1C1C1", textAlign: "center" }}>
+            Fetching your location
+          </Text>
+        </View>
+      )}
+
+      {/* MAPS HERE */}
+      {!isMapLoading && (
+        <MapView
+          style={{
+            flex: 1,
+            width: Dimensions.get("window").width,
+            height: Dimensions.get("window").height,
+          }}
+          region={mapRegion}
+        >
+          <Marker coordinate={mapRegion} title="Marker" />
+        </MapView>
+      )}
     </ScrollView>
   );
 };
