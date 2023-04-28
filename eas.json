@@ -12,10 +12,7 @@
     },
     "production": {
       "env": {
-        "API_BASE_URL": "https://www.shuttlelane.com/api",
-        "STRIPE_PUBLISHABLE_KEY": "pk_live_51FSsN2JVCyKylojXO49aThUPBcYv2nXWa0kwTMCa63ftDdhFsC2E8i3uz72XSYE2QtvWLjgZu9InJaiQXXE4npKE00bQEQlrDh",
-        "FLUTTERWAVE_KEY": "FLWPUBK-4e040f92b25e6e3615d680449918aeb5-X",
-        "PAYPAL_BEARER": "A21AAIgVJFGoXjRGfEm8EgXaRr0nlNAkVRpj6V-41Bsy3x3xMpH4Ouyc-HDh-QdsM0kNDVZiB8hW29m_Olb7Obl5Cxorz8cDQ"
+
       }
     },
     "androidapk": {
