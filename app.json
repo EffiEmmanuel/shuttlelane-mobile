@@ -10,6 +10,17 @@
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#fff"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "8bddb1c9-3fee-4a98-b62a-2db391bd2e43"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.effiemmanuel.Shuttlelane"
+    },
+    "android": {
+      "package": "com.effiemmanuel.Shuttlelane"
     }
   }
 }

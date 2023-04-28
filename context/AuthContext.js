@@ -10,7 +10,7 @@ const AuthProvider = ({ children }) => {
 
   // API CONFIG
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter()
+  const router = useRouter();
 
   // TOAST CONFIGS
   const [isToasting, setIsToasting] = useState(false);
@@ -29,12 +29,12 @@ const AuthProvider = ({ children }) => {
 
   // LOGIN FUNCTION
   async function loginUser(email, password) {
-    console.log('email', email)
-    console.log('password', password)
+    console.log("email", email);
+    console.log("password", password);
     setIsLoading(true);
     const response = await fetch(
-      //   "https://www.shuttlelane.com/api/users/signin",
-      "http://172.20.10.6:3001/api/users",
+      "https://www.shuttlelane.com/api/users/signin",
+      // "http://172.20.10.6:3001/api/users",
       {
         method: "POST",
         headers: {
@@ -55,10 +55,10 @@ const AuthProvider = ({ children }) => {
     }
 
     showToastMessage("Log in successful", "success");
-    const stringifiedToken = JSON.stringify(user?.token)
-    const stringifiedUser = JSON.stringify(user?.data)
-    console.log(stringifiedToken)
-    console.log(stringifiedUser)
+    const stringifiedToken = JSON.stringify(user?.token);
+    const stringifiedUser = JSON.stringify(user?.data);
+    console.log(stringifiedToken);
+    console.log(stringifiedUser);
 
     // await AsyncStorage.setItem("token", JSON.stringify(user?.token));
     // await AsyncStorage.setItem("user", JSON.stringify(user?.data));
@@ -90,8 +90,8 @@ const AuthProvider = ({ children }) => {
   ) {
     setIsLoading(true);
     const response = await fetch(
-      // "https://www.shuttlelane.com/api/users",
-      "http://172.20.10.6:3001/api/users",
+      "https://www.shuttlelane.com/api/users",
+      // "http://172.20.10.6:3001/api/users",
       {
         method: "POST",
         headers: {
@@ -129,7 +129,7 @@ const AuthProvider = ({ children }) => {
         isToasting,
         toastMessage,
         toastType,
-        user
+        user,
       }}
     >
       {children}

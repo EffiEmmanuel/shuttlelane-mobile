@@ -72,8 +72,8 @@ const SignupForm = () => {
   async function signupUser() {
     setIsLoading(true);
     const response = await fetch(
-      // "https://www.shuttlelane.com/api/users",
-      "http://172.20.10.6:3001/api/users",
+      "https://www.shuttlelane.com/api/users",
+      // "http://172.20.10.6:3001/api/users",
       {
         method: "POST",
         headers: {
