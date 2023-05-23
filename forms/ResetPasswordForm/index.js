@@ -13,9 +13,9 @@ import { Dimensions } from "react-native";
 import { COLORS } from "../../constants/themes";
 import { AuthContext } from "../../context/AuthContext";
 
-const LoginForm = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+const ResetPasswordForm = () => {
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
 
   // ICON CONFIG
   const AnimatedIcon = Animated.createAnimatedComponent(Icon);
@@ -43,36 +43,37 @@ const LoginForm = () => {
     }, 2500);
   };
 
-  // LOGIN FUNCTION
-  async function loginUser() {
-    console.log("email", email);
-    console.log("password", password);
-    const isToken = await AsyncStorage.getItem("token");
-    const isUser = await AsyncStorage.getItem("user");
-    const isGuest = await AsyncStorage.getItem("isGuest");
-    if (isUser) {
-      await AsyncStorage.removeItem("user");
-    }
-    if (isToken) {
-      await AsyncStorage.removeItem("token");
-    }
-    if (isGuest) {
-      await AsyncStorage.removeItem("isGuest");
-    }
+  // USER DATA
+  const [userData, setUserData] = useState();
+  async function fetchUserData() {
+    const parsedUser = JSON.parse(await AsyncStorage.getItem("user"));
+    setUserData(parsedUser);
+  }
 
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  // FORGOT PASSWORD HANDLER FUNCTION
+  async function forgotPasswordHandler() {
+    console.log("oldPassword", oldPassword);
+    if (!oldPassword || !newPassword) {
+      return showToastMessage("Please fill in the missing fields.", "error");
+    }
+    console.log(userData)
     setIsLoading(true);
     const response = await fetch(
-      "https://www.shuttlelane.com/api/users/signin",
+      `https://www.shuttlelane.com/api/users/${userData?._id}/reset-password`,
       // "http://172.20.10.6:3001/api/users/signin",
       {
-        method: "POST",
+        method: "PUT",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: email,
-          password: password,
+          oldPassword: oldPassword,
+          newPassword: newPassword,
         }),
       }
     ).catch((err) => {
@@ -89,22 +90,9 @@ const LoginForm = () => {
       return showToastMessage(user?.error, "error");
     }
 
-    showToastMessage("Log in successful", "success");
-    const stringifiedToken = JSON.stringify(user?.token);
-    const userObject = JSON.stringify({
-      name: user?.data?.name,
-      email: user?.data?.email,
-      mobile: user?.data?.mobile,
-      countryCode: user?.data?.countryCode,
-      currency: user?.data?.currency,
-      image: user?.data?.image,
-      _id: user?.data?._id,
-    });
-
-    await AsyncStorage.setItem("token", stringifiedToken);
-    await AsyncStorage.setItem("user", userObject);
-    setIsLoading(false);
-    router.replace("/dashboard/home");
+    showToastMessage(`Your password has been successfully reset!`, "success");
+    setOldPassword("");
+    setNewPassword("");
     return;
   }
 
@@ -117,41 +105,49 @@ const LoginForm = () => {
           message={toastMessage}
           style={{
             position: "absolute",
-            zIndex: 100,
             top: 0,
+            zIndex: 90,
             width: Dimensions.get("window").width,
             flexDirection: "row",
             justifyContent: "center",
           }}
         />
       )}
-      <View style={{ marginTop: 40, padding: 20 }}>
-        <Text
+      <View style={{ padding: 10 }}>
+      <Text
+          style={{
+            fontSize: 24,
+            fontWeight: "500",
+            color: COLORS.shuttlelanePurple,
+            fontFamily: "PoppinsBold",
+          }}
+        >
+          Reset your password
+        </Text>
+        {/* <Text
           style={{
             fontSize: 24,
             fontFamily: "PoppinsBold",
             color: COLORS.shuttlelanePurple,
-            textAlign: "center",
           }}
         >
-          Log in
+          Forgot Password
         </Text>
         <Text
           style={{
             fontSize: 16,
             fontFamily: "PoppinsRegular",
             marginTop: 5,
-            textAlign: "center",
           }}
         >
-          Sign in to your Shuttlelane account
-        </Text>
+          Reset your account password
+        </Text> */}
 
         <View style={{ marginTop: 20 }}>
           <View style={{ marginTop: 20 }}>
-            <Text style={{ fontFamily: "PoppinsRegular" }}>Email Address</Text>
+            <Text style={{ fontFamily: "PoppinsRegular" }}>Old Password</Text>
             <TextInput
-              value={email}
+              value={oldPassword}
               style={{
                 height: 50,
                 padding: 10,
@@ -163,17 +159,17 @@ const LoginForm = () => {
                 borderWidth: 0.5,
                 borderRadius: 10,
               }}
-              keyboardType="email-address"
               returnKeyType="done"
-              placeholder="abc@example.com"
+              secureTextEntry={true}
+              placeholder="********"
               placeholderTextColor="#C9C9C9"
-              onChangeText={(value) => setEmail(value)}
+              onChangeText={(value) => setOldPassword(value)}
             />
           </View>
           <View style={{ marginTop: 20 }}>
-            <Text style={{ fontFamily: "PoppinsRegular" }}>Password</Text>
+            <Text style={{ fontFamily: "PoppinsRegular" }}>New Password</Text>
             <TextInput
-              value={password}
+              value={newPassword}
               style={{
                 height: 50,
                 padding: 10,
@@ -185,32 +181,19 @@ const LoginForm = () => {
                 borderWidth: 0.5,
                 borderRadius: 10,
               }}
-              secureTextEntry={true}
               returnKeyType="done"
               placeholder="********"
               placeholderTextColor="#C9C9C9"
-              onChangeText={(value) => setPassword(value)}
+              secureTextEntry={true}
+              onChangeText={(value) => setNewPassword(value)}
             />
           </View>
-
-          {/* <View
-            style={{
-              marginTop: 20,
-            }}
-          >
-            <Text>
-              {" "}
-              <Link style={{ color: COLORS.shuttlelanePurple }} href="/forgotPassword">
-                Forgot Password?
-              </Link>
-            </Text>
-          </View> */}
 
           <View style={{ marginTop: 20 }}>
             <TouchableOpacity
               style={{
                 height: 50,
-                padding: 10,
+                // padding: ,
                 paddingHorizontal: 20,
                 fontSize: 16,
                 marginTop: 10,
@@ -218,16 +201,20 @@ const LoginForm = () => {
                 alignItems: "center",
                 backgroundColor: COLORS.shuttlelanePurple,
                 borderRadius: 10,
+                flexDirection: "row",
+                alignItems: "center",
               }}
-              onPress={() => loginUser()}
+              onPress={() => forgotPasswordHandler()}
               disabled={isLoading}
             >
               {!isLoading && (
-                <Text
-                  style={{ fontFamily: "PoppinsSemiBold", color: COLORS.white }}
-                >
-                  Log in
-                </Text>
+                <>
+                  <Text
+                    style={{ color: "#FFF", fontFamily: "PoppinsSemiBold" }}
+                  >
+                    Reset password
+                  </Text>
+                </>
               )}
 
               {isLoading && (
@@ -235,31 +222,10 @@ const LoginForm = () => {
               )}
             </TouchableOpacity>
           </View>
-
-          <View
-            style={{
-              marginTop: 20,
-              // flexDirection: "row",
-              // justifyContent: "center",
-            }}
-          >
-            <Text>
-              Don't have an account?{" "}
-              <Link style={{ color: COLORS.shuttlelanePurple }} href="/signup">
-                Sign up
-              </Link>
-              {/* <TouchableOpacity
-                onPress={() => router.push("/signup")}
-                style={{ color: COLORS.shuttlelanePurple }}
-              >
-                Sign up
-              </TouchableOpacity> */}
-            </Text>
-          </View>
         </View>
       </View>
     </>
   );
 };
 
-export default LoginForm;
+export default ResetPasswordForm;

@@ -4,6 +4,7 @@ import {
   ActivityIndicator,
   Dimensions,
   Image,
+  Modal,
   SafeAreaView,
   ScrollView,
   Text,
@@ -34,6 +35,8 @@ const AirportPickupStepTwo = () => {
     time,
     dropoffAirport,
     pickupAddress,
+    flightNumber,
+    isGuest,
   } = params;
 
   // pickup airport
@@ -101,19 +104,29 @@ const AirportPickupStepTwo = () => {
     const poundRate = Number(rates?.pound);
     const euroRate = Number(rates?.euro);
 
+    console.log("HIIII");
+    console.log("USER CURRENCY", user?.currency);
+
     let newAmount;
     if (user?.currency === "neira") {
       newAmount = amount;
+      console.log("NEW AMOUNT:", newAmount);
       return newAmount;
     } else if (user?.currency === "dollars") {
       newAmount = amount / dollarRate;
-      return newAmount;
+      console.log("rate$:", dollarRate);
+      console.log("NEW AMOUNT:", newAmount);
+      return newAmount.toFixed(2);
     } else if (user?.currency === "pounds") {
       newAmount = amount / poundRate;
-      return newAmount;
-    } else if (user?.currency === "euro") {
+      console.log("rate GBP:", poundRate);
+      console.log("NEW AMOUNT:", newAmount);
+      return newAmount.toFixed(2);
+    } else if (user?.currency === "euros") {
       newAmount = amount / euroRate;
-      return newAmount;
+      console.log("rate $:", euroRate);
+      console.log("NEW AMOUNT:", newAmount);
+      return newAmount.toFixed(2);
     }
   }
 
@@ -141,9 +154,17 @@ const AirportPickupStepTwo = () => {
     }, 2500);
   };
 
+  // CAR DETAILS SETUP
+  const [isCarDetails, setIsCarDetails] = useState(false);
+  const [carDetails, setCarDetails] = useState();
+  const showCarDetails = (vehicle) => {
+    setCarDetails(vehicle);
+    setIsCarDetails(true);
+  };
+
   return (
     <SafeAreaView
-      style={{ flex: 1, backgroundColor: COLORS.white, display: "relative" }}
+      style={{ flex: 1, backgroundColor: COLORS.white, position: "relative" }}
     >
       <Stack.Screen
         options={{
@@ -185,6 +206,212 @@ const AirportPickupStepTwo = () => {
         />
       )}
 
+      {/* CAR DETAILS MODAL */}
+      <Modal visible={isCarDetails} animationType="slide" transparent={true}>
+        <View
+          style={{
+            height: "100%",
+            width: "100%",
+            position: "absolute",
+            bottom: 0,
+            backgroundColor: "#FFF",
+            // paddingVertical: 40,
+            paddingTop: 40,
+            paddingHorizontal: 20,
+          }}
+        >
+          <ScrollView
+            style={{ flex: 1, flexDirection: "column" }}
+            showsVerticalScrollIndicator={false}
+          >
+            <View
+              style={{
+                flex: 1,
+                height: Dimensions.get("screen").height,
+                marginTop: 20,
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    fontFamily: "PoppinsBold",
+                    fontSize: 20,
+                    color: COLORS.shuttlelanePurple,
+                  }}
+                >
+                  Car Details
+                </Text>
+                <TouchableOpacity onPress={() => setIsCarDetails(false)}>
+                  <Icon name="close" size={25} />
+                </TouchableOpacity>
+              </View>
+              <View style={{ alignItems: "center" }}>
+                <Image
+                  source={{ uri: carDetails?.image }}
+                  style={{ width: "80%", height: "80%", marginTop: -110 }}
+                  resizeMode="contain"
+                />
+              </View>
+              <View style={{ marginTop: -350 }}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <Text style={{ fontFamily: "PoppinsBold", fontSize: 24 }}>
+                    {carDetails?.name}
+                  </Text>
+
+                  {/* CAR LUGGAGE AND PASSENGER DETAILS */}
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        marginLeft: 10,
+                      }}
+                    >
+                      <Icon name="people" size={18} />
+                      <Text
+                        style={{
+                          fontFamily: "PoppinsRegular",
+                          fontSize: 18,
+                          marginLeft: 5,
+                        }}
+                      >
+                        {carDetails?.capacity}
+                      </Text>
+                    </View>
+
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        marginLeft: 10,
+                      }}
+                    >
+                      <Icon name="luggage" size={18} />
+                      <Text
+                        style={{
+                          fontFamily: "PoppinsRegular",
+                          fontSize: 18,
+                          marginLeft: 5,
+                        }}
+                      >
+                        {carDetails?.luggage}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+
+                <View style={{ marginTop: 20 }}>
+                  <Text style={{ fontFamily: "PoppinsRegular", fontSize: 16 }}>
+                    {carDetails?.name === "Economy" &&
+                      "The most economic and popular class suitable for most trips. Promises a smooth and convenient ride. Can accommodate up to 4 passengers and 2 luggages."}
+
+                    {carDetails?.name === "Business" &&
+                      "Can accommodate up to 4 passengers and comes with extra space for luggages. It also promises a smooth and convenient ride."}
+                    {carDetails?.name === "Executive" &&
+                      "A step closer to luxury. Comfort and convenience is guaranteed. Can accommodate up to 4 passengers and 2 luggages."}
+                    {carDetails?.name === "Luxury" &&
+                      "The most prestigious vehicles in our fleet. It is for those who love luxury and comfort. Takes you on your trip in elegance and style."}
+                    {carDetails?.name === "Shuttle" &&
+                      "One of the most spacious vehicles in our fleet. It is for those who love to travel in numbers and comfort. Can accommodate up to 10 passengers and 6 luggages. It also promises a smooth and convenient ride."}
+                    {carDetails?.name === "Shuttle Extra" &&
+                      "The most spacious vehicles in our fleet. It is for those who love to travel in numbers and comfort. Can accommodate up to 10 passengers and 7 luggages. It also promises a smooth and convenient ride."}
+                  </Text>
+                </View>
+
+                <View style={{ marginTop: 30 }}>
+                  <Text
+                    style={{
+                      fontFamily: "PoppinsBold",
+                      fontSize: 20,
+                      color: COLORS.shuttlelanePurple,
+                    }}
+                  >
+                    Also included
+                  </Text>
+
+                  <View style={{ marginVertical: 10 }}>
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
+                      <Icon name="check" size={28} color="#4BB543" />
+                      <Text
+                        style={{ fontFamily: "PoppinsRegular", marginLeft: 5 }}
+                      >
+                        Free airport meet and greet.
+                      </Text>
+                    </View>
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
+                      <Icon name="check" size={28} color="#4BB543" />
+                      <Text
+                        style={{ fontFamily: "PoppinsRegular", marginLeft: 5 }}
+                      >
+                        Free Porter Service.
+                      </Text>
+                    </View>
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
+                      <Icon name="check" size={28} color="#4BB543" />
+                      <Text
+                        style={{ fontFamily: "PoppinsRegular", marginLeft: 5 }}
+                      >
+                        Free bottled water.
+                      </Text>
+                    </View>
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
+                      <Icon name="check" size={28} color="#4BB543" />
+                      <Text
+                        style={{ fontFamily: "PoppinsRegular", marginLeft: 5 }}
+                      >
+                        Free cancellation up to 24 hours before pick-up.
+                      </Text>
+                    </View>
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
+                      <Icon name="check" size={28} color="#4BB543" />
+                      <Text
+                        style={{ fontFamily: "PoppinsRegular", marginLeft: 5 }}
+                      >
+                        60 minutes waiting time after flight arrival.
+                      </Text>
+                    </View>
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
+                    >
+                      <Icon name="check" size={28} color="#4BB543" />
+                      <Text
+                        style={{ fontFamily: "PoppinsRegular", marginLeft: 5 }}
+                      >
+                        Free Trolley.
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </ScrollView>
+        </View>
+      </Modal>
+
       <ScrollView
         showsVerticalScrollIndicator={false}
         style={{ flex: 1, backgroundColor: COLORS.white, padding: 20 }}
@@ -216,7 +443,7 @@ const AirportPickupStepTwo = () => {
                   resizeMode="cover"
                   style={{ width: 28, height: 28 }}
                 />
-                <Text style={{ fontFamily: "PoppinsRegular" }}>
+                <Text style={{ fontFamily: "PoppinsRegular", maxWidth: "90%" }}>
                   {dropoffAddress ? dropoffAddress : pickupAddress}
                 </Text>
               </View>
@@ -225,91 +452,126 @@ const AirportPickupStepTwo = () => {
             {/* CARS */}
             <View style={{ marginTop: 20, paddingBottom: 80 }}>
               {airportDetails?.cars.map((vehicle) => {
+                console.log("VEHICLEEEEEEEEE:::", vehicle);
                 const prePrice = makeConversion(Number(vehicle?.rate));
                 const price = Intl.NumberFormat("en-US", {}).format(prePrice);
 
-                console.log("CAR:", vehicle);
-                console.log('price::', price)
+                console.log("CAR:", vehicle?.rate);
+                console.log("price::", prePrice);
+                console.log("price::", price);
+
                 return (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setCarPicked(`${vehicle?.name}`);
-
-                      if (carPicked === `${vehicle?.name}`) {
-                        router.push({
-                          pathname: "/bookings/summary",
-                          params: {
-                            bookingType: pickupAirport
-                              ? "Airport Pickup"
-                              : "Airport Dropoff",
-                            pickupAirport,
-                            dropoffAddress,
-                            passengers,
-                            date,
-                            time,
-                            carPicked: carPicked,
-                            total: price,
-                          },
-                        });
-                      }
-
-                      showToastMessage(
-                        "Tap again to confirm selection",
-                        "info"
-                      );
-                    }}
-                    key={vehicle?._id}
+                  <View
                     style={{
                       borderRadius: 10,
                       borderWidth: 0.5,
                       borderColor: "#C9C9C9",
-                      height: 160,
+                      // height: 160,
                       padding: 20,
                       marginVertical: 10,
                     }}
+                    key={vehicle?._id}
                   >
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "space-between",
+                    <TouchableOpacity
+                      onPress={async () => {
+                        setCarPicked(`${vehicle?.name}`);
+
+                        const guest = await AsyncStorage.getItem("isGuest");
+
+                        if (carPicked === `${vehicle?.name}`) {
+                          if (guest) {
+                            console.log("Hiiiii");
+                            router.push({
+                              pathname: "/bookings/user-details",
+                              params: {
+                                bookingType: pickupAirport
+                                  ? "Airport Pickup"
+                                  : "Airport Dropoff",
+                                pickupAirport,
+                                dropoffAddress,
+                                passengers,
+                                date,
+                                time,
+                                carPicked: carPicked,
+                                total: price,
+                                flightNumber,
+                              },
+                            });
+                          } else {
+                            router.push({
+                              pathname: "/bookings/summary",
+                              params: {
+                                bookingType: pickupAirport
+                                  ? "Airport Pickup"
+                                  : "Airport Dropoff",
+                                pickupAirport,
+                                dropoffAddress,
+                                passengers,
+                                date,
+                                time,
+                                carPicked: carPicked,
+                                total: price,
+                                flightNumber,
+                              },
+                            });
+                          }
+                        }
+
+                        showToastMessage(
+                          "Tap again to confirm selection",
+                          "info"
+                        );
                       }}
+                      key={vehicle?._id}
+                      style={{}}
                     >
-                      <Text style={{ fontFamily: "PoppinsBold", fontSize: 22 }}>
-                        {vehicle?.name}
-                      </Text>
                       <View
-                        style={{ flexDirection: "row", alignItems: "center" }}
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                        }}
                       >
-                        {/* PASSENGERS */}
-                        <View
-                          style={{
-                            flexDirection: "row",
-                            alignItems: "center",
-                            marginHorizontal: 8,
-                          }}
+                        <Text
+                          style={{ fontFamily: "PoppinsBold", fontSize: 22 }}
                         >
-                          <Icon name="person" size={20} color="#000" />
-                          <Text style={{ fontFamily: "PoppinsRegular" }}>
-                            {vehicle?.capacity ?? 4}
-                          </Text>
-                        </View>
-                        {/* LUGGAGE */}
+                          {vehicle?.name}
+                        </Text>
                         <View
                           style={{ flexDirection: "row", alignItems: "center" }}
                         >
-                          <Icon name="luggage" size={20} color="#000" />
-                          {/* <Image
+                          {/* PASSENGERS */}
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              alignItems: "center",
+                              marginHorizontal: 8,
+                            }}
+                          >
+                            <Icon name="person" size={20} color="#000" />
+                            <Text style={{ fontFamily: "PoppinsRegular" }}>
+                              {vehicle?.capacity ?? 4}
+                            </Text>
+                          </View>
+                          {/* LUGGAGE */}
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              alignItems: "center",
+                            }}
+                          >
+                            <Icon name="luggage" size={20} color="#000" />
+                            {/* <Image
                           source={luggageIcon}
                           resizeMode="cover"
                           style={{ width: 38, height: 38 }}
                         /> */}
-                          <Text style={{ fontFamily: "PoppinsRegular" }}>
-                            {vehicle?.luggage ?? 3}
-                          </Text>
-                        </View>
-                        {/* BOXES */}
-                        {/* <View
+                            <Text style={{ fontFamily: "PoppinsRegular" }}>
+                              {vehicle?.luggage ?? 3}
+                            </Text>
+                          </View>
+                          {/* BOXES */}
+                          {/* <View
                         style={{ flexDirection: "row", alignItems: "center" }}
                       >
                         <Image
@@ -319,42 +581,52 @@ const AirportPickupStepTwo = () => {
                         />
                         <Text style={{ fontFamily: "PoppinsRegular" }}>0</Text>
                       </View> */}
+                        </View>
                       </View>
-                    </View>
-                    {/* CAR AND PRICE */}
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        marginTop: -10,
-                      }}
-                    >
-                      <Image
-                        source={{ uri: vehicle?.image }}
-                        resizeMode="contain"
-                        style={{ height: 130, width: 130 }}
-                      />
-                      <Text
+                      {/* CAR AND PRICE */}
+                      <View
                         style={{
-                          fontFamily: "PoppinsBold",
-                          fontSize: 32,
-                          color: COLORS.green,
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          marginTop: -10,
                         }}
                       >
-                        {user?.currency === "dollars"
-                          ? "$"
-                          : user?.currency === "neira"
-                          ? "₦"
-                          : user?.currency === "pounds"
-                          ? "£"
-                          : user?.currency === "euros"
-                          ? "€"
-                          : "!"}
-                        {price}
+                        <Image
+                          source={{ uri: vehicle?.image }}
+                          resizeMode="contain"
+                          style={{ height: 130, width: 130 }}
+                        />
+                        <Text
+                          style={{
+                            fontFamily: "PoppinsBold",
+                            fontSize: 32,
+                            color: COLORS.green,
+                          }}
+                        >
+                          {user?.currency === "dollars"
+                            ? "$"
+                            : user?.currency === "neira"
+                            ? "₦"
+                            : user?.currency === "pounds"
+                            ? "£"
+                            : user?.currency === "euros"
+                            ? "€"
+                            : "!"}
+                          {price}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={{}}
+                      onPress={() => showCarDetails(vehicle)}
+                    >
+                      <Text style={{ textDecorationLine: "underline" }}>
+                        Trip details {">"}
                       </Text>
-                    </View>
-                  </TouchableOpacity>
+                    </TouchableOpacity>
+                  </View>
                 );
               })}
             </View>

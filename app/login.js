@@ -1,16 +1,16 @@
 import { View, Text, SafeAreaView, ScrollView, Image } from "react-native";
-import { COLORS } from "../../constants/themes";
+import { COLORS } from "../constants/themes";
 import { Stack } from "expo-router";
-import logo from "../../assets/images/logo.png";
-import LoginForm from "../../forms/LoginForm";
-import ToastMessage from "../../components/ToastMessage";
+import logo from "../assets/images/logo.png";
+import LoginForm from "../forms/LoginForm";
+import ToastMessage from "../components/ToastMessage";
 import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../../context/AuthContext";
+import { AuthContext } from "../context/AuthContext";
 
 const LoginPage = () => {
   return (
     <SafeAreaView
-      style={{ flex: 1, backgroundColor: COLORS.white, display: "relative" }}
+      style={{ flex: 1, backgroundColor: COLORS.white, position: "relative" }}
     >
       <Stack.Screen
         options={{
@@ -27,11 +27,14 @@ const LoginPage = () => {
               width={28}
             />
           ),
+          headerLeft: () => '',
+          gestureEnabled: false,
+          headerShown: false
         }}
       />
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={{ flex: 1, padding: 20 }}>
+        <View style={{ flex: 1, padding: 20, marginTop: 50 }}>
           <LoginForm />
         </View>
       </ScrollView>

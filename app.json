@@ -6,21 +6,52 @@
     },
     "name": "Shuttlelane",
     "slug": "Shuttlelane",
+    "orientation": "portrait",
+    "version": "1.0.1",
+    "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#fff"
     },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you pick a profile picture for your account.",
+          "cameraPermission": "The app accesses your photos to let you take a profile picture for your account."
+        }
+      ],
+      [
+        "expo-tracking-transparency",
+        {
+          "userTrackingPermission": "This identifier will be used to deliver personalized ads to you. Also, for app and booking personalization."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow Shuttlelane to use your location. This is solely for pickup address auto completion during bookings.",
+          "locationAlwaysPermission": "Allow Shuttlelane to use your location. This is solely for pickup address auto completion during bookings.",
+          "locationWhenInUsePermission": "Allow Shuttlelane to use your location. This is solely for pickup address auto completion during bookings."
+        }
+      ]
+    ],
     "extra": {
       "eas": {
         "projectId": "8bddb1c9-3fee-4a98-b62a-2db391bd2e43"
       }
     },
     "ios": {
-      "bundleIdentifier": "com.effiemmanuel.Shuttlelane"
+      "bundleIdentifier": "com.Shuttlelane.Shuttlelane",
+      "buildNumber": "18",
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses the camera to take user pictures. This is for their profile images and problem reports."
+      }
     },
     "android": {
-      "package": "com.effiemmanuel.Shuttlelane"
+      "package": "com.effiemmanuel.Shuttlelane",
+      "versionCode": 10
     }
   }
 }

@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
   Image,
+  Platform,
   Text,
   TextInput,
   TouchableOpacity,
@@ -22,9 +24,18 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import ToastMessage from "../ToastMessage";
 import { Dimensions } from "react-native";
+import { Alert } from "react-native";
 
-const Welcome = () => {
-  const [user, setUser] = useState(null);
+const Welcome = ({
+  userBookings,
+  userCarBookings,
+  userPriorityBookings,
+  userSpend,
+  isLoading,
+  isSpendLoading,
+  isGuest,
+}) => {
+  const [user, setUser] = useState();
 
   const router = useRouter();
 
@@ -53,6 +64,7 @@ const Welcome = () => {
     }
 
     getUser();
+    console.log("GUESTTTTT FROM WELCOME:", isGuest);
   }, []);
 
   async function handleSearch() {
@@ -90,145 +102,189 @@ const Welcome = () => {
 
       <View style={{ marginTop: 30 }}>
         <View style={{}}>
-          <Text style={{ fontSize: 18, fontFamily: "PoppinsRegular" }}>
-            Hello, {user?.name?.split(" ")[1]}.
-          </Text>
-          <Text
-            style={{
-              fontSize: 24,
-              marginTop: 5,
-              fontWeight: "500",
-              color: COLORS.shuttlelanePurple,
-              fontFamily: "PoppinsBold",
-            }}
-          >
-            Schedule your next booking
-          </Text>
-        </View>
-
-        <View
-          style={{
-            paddingHorizontal: 35,
-            marginTop: 40,
-            backgroundColor: "#FBFBFB",
-            paddingVertical: 14,
-            borderRadius: 20,
-          }}
-        >
           <View
             style={{
-              marginTop: -10,
               flexDirection: "row",
               justifyContent: "space-between",
               alignItems: "center",
             }}
           >
-            <View
+            {/* <View
               style={{
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
+                height: 90,
+                width: Dimensions.get("window").width / 2 - 30,
+                backgroundColor: COLORS.shuttlelaneYellowFaded,
+                position: "relative",
+                top: -20,
+                marginVertical: 15,
+                borderRadius: 10,
+                padding: 20,
               }}
             >
-              <TouchableOpacity
-                style={{
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-                onPress={() => router.push("/bookings/airport-transfer")}
-              >
-                {/* <PaperAirplaneIcon style={{ width: 24, rotate: "-90deg" }} /> */}
-                {/* <Image source={airplaneIcon} style={{ width: 55, height: 55 }} /> */}
-                <Icon
-                  name="flight-takeoff"
-                  size={30}
-                  color="#000"
-                  style={{ marginVertical: 12 }}
-                />
-              </TouchableOpacity>
-              <Text
-                style={{
-                  fontSize: 12,
-                  marginTop: -5,
-                  color: "#A1A1A1",
-                  fontFamily: "PoppinsRegular",
-                }}
-              >
-                Airport Transfer
-              </Text>
-            </View>
+              <View>
+                <Text style={{ fontFamily: "PoppinsSemiBold", fontSize: 16 }}>
+                  Total Bookings:
+                </Text>
+                <Text style={{ fontFamily: "PoppinsBold", fontSize: 26 }}>
+                  {userBookings?.length}
+                </Text>
+              </View>
+            </View> */}
             <View
               style={{
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
+                height: 100,
+                width: Dimensions.get("window").width / 2 - 30,
+                backgroundColor: COLORS.shuttlelaneYellowFaded,
+                position: "relative",
+                top: -20,
+                marginVertical: 15,
+                borderRadius: 10,
+                padding: 15,
               }}
             >
-              <TouchableOpacity
+              <View
                 style={{
-                  flexDirection: "column",
-                  justifyContent: "center",
+                  position: "relative",
+                  flexDirection: "row",
                   alignItems: "center",
                 }}
-                onPress={() => router.push("/bookings/car-hire")}
               >
-                <Icon
-                  name="car-rental"
-                  size={30}
-                  color="#000"
-                  style={{ marginVertical: 15 }}
-                />
-                <Text
+                <TouchableOpacity
+                  onPress={() =>
+                    Alert.alert(
+                      "Tooltip💡",
+                      "This is only an estimate of the total number of airport bookings you have made on Shuttlelane. We are constantly improving on these features and if you need further enquiries, please contact support @info@shuttlelane.com"
+                    )
+                  }
                   style={{
-                    fontSize: 12,
-                    marginTop: -10,
-                    color: "#A1A1A1",
-                    fontFamily: "PoppinsRegular",
+                    width: "100%",
                   }}
                 >
-                  Car Hire
-                </Text>
-              </TouchableOpacity>
-            </View>
-            <View
-              style={{
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <TouchableOpacity
-                style={{
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-                onPress={() => router.push("/bookings/priority-pass")}
-              >
-                <Icon
-                  name="luggage"
-                  size={30}
-                  color="#000"
-                  style={{ marginVertical: 12 }}
-                />
+                  <Icon
+                    name="flight-takeoff"
+                    size={18}
+                    color="#191919"
+                    style={{ position: "absolute", right: 0 }}
+                  />
 
-                <Text
+                  <Text style={{ fontFamily: "PoppinsSemiBold", fontSize: 16 }}>
+                    Bookings:
+                  </Text>
+                  {!isGuest && (
+                    <Text style={{ fontFamily: "PoppinsBold", fontSize: 26 }}>
+                      {isLoading && (
+                        <ActivityIndicator
+                          size={20}
+                          color={COLORS.shuttlelanePurple}
+                        />
+                      )}
+                      {!isLoading &&
+                        userBookings?.length + userCarBookings?.length + userPriorityBookings?.length}
+                    </Text>
+                  )}
+                  {isGuest && (
+                    <Text
+                      style={{
+                        fontFamily: "PoppinsRegular",
+                        fontSize: 12,
+                        marginTop: 10,
+                      }}
+                    >
+                      Create an account to see stats
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View
+              style={{
+                height: 100,
+                width: Dimensions.get("window").width / 2 - 30,
+                backgroundColor: COLORS.shuttlelaneYellowFaded,
+                position: "relative",
+                top: -20,
+                marginVertical: 15,
+                borderRadius: 10,
+                padding: 15,
+              }}
+            >
+              <View
+                style={{
+                  position: "relative",
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
+                <TouchableOpacity
+                  onPress={() =>
+                    Alert.alert(
+                      "Tooltip💡",
+                      "This is only an estimate of the total amount you have spent on Shuttlelane. For now, we advise that you avoid changing currencies to get the best estimates. For further enquiries, please contact support @info@shuttlelane.com"
+                    )
+                  }
                   style={{
-                    fontSize: 12,
-                    marginTop: 0,
-                    color: "#A1A1A1",
-                    fontFamily: "PoppinsRegular",
-                    marginTop: -5,
+                    width: "100%",
                   }}
                 >
-                  Priority Pass
-                </Text>
-              </TouchableOpacity>
+                  <Icon
+                    name="info"
+                    size={18}
+                    color="#191919"
+                    style={{ position: "absolute", right: 0 }}
+                  />
+
+                  <Text style={{ fontFamily: "PoppinsSemiBold", fontSize: 16 }}>
+                    Total Spent:
+                  </Text>
+                  {!isGuest && (
+                    <Text style={{ fontFamily: "PoppinsBold", fontSize: 26 }}>
+                      {isSpendLoading && (
+                        <ActivityIndicator
+                          size={20}
+                          color={COLORS.shuttlelanePuple}
+                        />
+                      )}
+
+                      {!isSpendLoading && (
+                        <>
+                          {user?.currency === "dollars" && "$"}
+                          {user?.currency === "pounds" && "£"}
+                          {user?.currency === "euros" && "€"}
+                          {user?.currency === "naira" && "₦"}
+                          {userSpend}
+                        </>
+                      )}
+                    </Text>
+                  )}
+                  {isGuest && (
+                    <Text
+                      style={{
+                        fontFamily: "PoppinsRegular",
+                        fontSize: 12,
+                        marginTop: 10,
+                      }}
+                    >
+                      Create an account to see stats
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-        </View>
 
+          <Text
+            style={{
+              fontSize: Platform.OS === "ios" ? 28 : 23,
+              marginTop: 10,
+              fontWeight: "500",
+              color: "#191919",
+              fontFamily: "PoppinsBold",
+              maxWidth: 300,
+            }}
+          >
+            Schedule your next booking
+          </Text>
+        </View>
         {/* Search bookings */}
         <View style={{ marginTop: 40, flexDirection: "row", width: "100%" }}>
           <TextInput
@@ -254,7 +310,7 @@ const Welcome = () => {
 
           <TouchableOpacity
             style={{
-              backgroundColor: COLORS.shuttlelaneYellow,
+              backgroundColor: COLORS.shuttlelanePurple,
               width: "15%",
               borderTopRightRadius: 10,
               borderBottomRightRadius: 10,
@@ -271,6 +327,154 @@ const Welcome = () => {
               height={30}
             />
           </TouchableOpacity>
+        </View>
+
+        <View
+          style={{
+            paddingHorizontal: 25,
+            marginTop: 50,
+            // backgroundColor: "#FBFBFB",
+            paddingVertical: 14,
+            borderRadius: 20,
+          }}
+        >
+          <View
+            style={{
+              marginTop: -10,
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <TouchableOpacity
+                style={{
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: 60,
+                  width: 60,
+                  borderWidth: 1,
+                  backgroundColor: COLORS.shuttlelanePurple,
+                  borderRadius: 50,
+                  marginBottom: 15,
+                }}
+                onPress={() => {
+                  console.log("IS GUEST FROM AIRPORT TRANSFER::", isGuest);
+                  router.push({
+                    pathname: "/bookings/airport-transfer",
+                    params: {
+                      isGuest: isGuest,
+                    },
+                  });
+                }}
+              >
+                {/* <PaperAirplaneIcon style={{ width: 24, rotate: "-90deg" }} /> */}
+                {/* <Image source={airplaneIcon} style={{ width: 55, height: 55 }} /> */}
+                <Icon
+                  name="flight-takeoff"
+                  size={30}
+                  color={COLORS.white}
+                  style={{ marginVertical: 12 }}
+                />
+              </TouchableOpacity>
+              <Text
+                style={{
+                  fontSize: 12,
+                  marginTop: -5,
+                  color: "#A1A1A1",
+                  fontFamily: "PoppinsRegular",
+                }}
+              >
+                Airport
+              </Text>
+            </View>
+            <View
+              style={{
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <TouchableOpacity
+                style={{
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: 60,
+                  width: 60,
+                  borderWidth: 1,
+                  backgroundColor: COLORS.shuttlelanePurple,
+                  borderRadius: 50,
+                  marginBottom: 15,
+                }}
+                onPress={() => router.push("/bookings/car-hire")}
+              >
+                <Icon
+                  name="car-rental"
+                  size={30}
+                  color={COLORS.white}
+                  style={{ marginVertical: 15 }}
+                />
+              </TouchableOpacity>
+              <Text
+                style={{
+                  fontSize: 12,
+                  marginTop: -10,
+                  color: "#A1A1A1",
+                  fontFamily: "PoppinsRegular",
+                }}
+              >
+                Car Hire
+              </Text>
+            </View>
+            <View
+              style={{
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <TouchableOpacity
+                style={{
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: 60,
+                  width: 60,
+                  borderWidth: 1,
+                  backgroundColor: COLORS.shuttlelanePurple,
+                  borderRadius: 50,
+                  marginBottom: 15,
+                }}
+                onPress={() => router.push("/bookings/priority-pass")}
+              >
+                <Icon
+                  name="luggage"
+                  size={30}
+                  color={COLORS.white}
+                  style={{ marginVertical: 12 }}
+                />
+              </TouchableOpacity>
+              <Text
+                style={{
+                  fontSize: 12,
+                  marginTop: 0,
+                  color: "#A1A1A1",
+                  fontFamily: "PoppinsRegular",
+                  marginTop: -5,
+                }}
+              >
+                Priority
+              </Text>
+            </View>
+          </View>
         </View>
       </View>
     </>

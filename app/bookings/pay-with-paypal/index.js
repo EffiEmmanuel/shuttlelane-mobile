@@ -75,6 +75,8 @@ const PayWithPayPal = () => {
   const [paymentId, setPaymentId] = useState();
 
   async function paypalPayment() {
+    console.log("Hi::", PAYPAL_BEARER);
+    console.log("total:", total);
     const transactionCurrency =
       user?.currency === "dollars"
         ? "USD"
@@ -105,20 +107,22 @@ const PayWithPayPal = () => {
       ],
 
       redirect_urls: {
-        return_url: "https://google.com",
-        cancel_url: "https://google.com",
+        return_url: "https://www.shuttlelane.com",
+        cancel_url: "https://www.shuttlelane.com",
       },
     };
 
-    axios
+    console.log("PAYPAL BEARER:", PAYPAL_BEARER);
+
+    await axios
       .post(
         "https://api-m.paypal.com/v1/oauth2/token",
         "grant_type=client_credentials",
         {
           headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
             Authorization:
-              `Bearer ${PAYPAL_BEARER}`,
+              "Basic QVlLSmJkZ1l0YUxTU2RyX2R5X2szbTE5ZEp6aEc2MDJmc1pmM0ZTYTl6ZjlTbWdhS01XRDNjbzd1dzFfTHRZREV4QUJ4bkljVEx1MXVJY186RUpRc3Rxd1dxRGtqRnhZZkREbzAyWXYyVUVtdVpaalFTS1N3RkpTREZrN3R4a0o2Wk1hNnU5VDRuaTJtVUR4U3ZhcUJjYmhlald1QnFNNXM=",
+            "Content-Type": "text/plain",
           },
         }
       )
@@ -145,15 +149,18 @@ const PayWithPayPal = () => {
               (data) => data.rel == "approval_url"
             );
 
+            console.log("APPROVAL URL::", approvalUrl);
+            console.log("PAYMENT ID::", id);
+
             setApprovalUrl(approvalUrl.href);
             setPaymentId(id);
           })
           .catch((err) => {
-            console.log("payment ERROR response::", err.response.data);
+            console.log("payment ERROR response 1::", err);
           });
       })
       .catch((err) => {
-        console.log("payment ERROR response::", err.message);
+        console.log("payment ERROR response 2::", err?.message);
       });
   }
 
@@ -161,7 +168,7 @@ const PayWithPayPal = () => {
   async function onNavigationStateChange(webViewState) {
     setIsLoading(true);
     console.log("Weview state::", webViewState);
-    if (webViewState.url.includes("https://google.com")) {
+    if (webViewState.url.includes("https://www.shuttlelane.com")) {
       setApprovalUrl(null);
       router.back();
     }
@@ -169,149 +176,135 @@ const PayWithPayPal = () => {
     // GET THE PAYER ID AND PAYMENT ID
     const { PayerID, paymentId } = webViewState.url;
     console.log("PAYERID:", PayerID);
+    console.log("PAYMENTID:", paymentId);
 
     // MAKE API REQUEST TO VALIDATE PAYMENT
-    await axios
-      .post(
-        `https://api-m.paypal.com/v1/payments/payment/${paymentId}/execute`,
-        {
-          payer_id: PayerID,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
+    if (PayerID && paymentId) {
+      await axios
+        .post(
+          `https://api-m.paypal.com/v1/payments/payment/${paymentId}/execute`,
+          {
+            payer_id: PayerID,
           },
-        }
-      )
-      .then(async (res) => {
-        console.log("PAYMENT VALIDATION RESPONSE:", res.data);
-        if (res.data.name == "INVALID_RESOURCE_ID") {
-          setApprovalUrl(null);
-          alert("Payment Failed. Please try again");
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        )
+        .then(async (res) => {
+          console.log("PAYMENT VALIDATION RESPONSE:", res.data);
+          if (res.data.name == "INVALID_RESOURCE_ID") {
+            setApprovalUrl(null);
+            alert("Payment Failed. Please try again");
+            setIsLoading(false);
+            return;
+          }
+
+          let response;
+
+          switch (bookingType) {
+            case "Airport Pickup" || "Airport Dropoff":
+              response = await fetch(
+                "https://www.shuttlelane.com/api/booking/airport",
+                // "http://172.20.10.6:3001/api/booking/airport",
+                {
+                  method: "POST",
+                  headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    user: user?._id,
+                    email: user?.email,
+                    mobile: user?.mobile,
+                    amount: total,
+                    currency: user?.currency,
+                    formType: bookingType,
+                    carType: carPicked,
+                    pickupAirport: pickupAirport
+                      ? airportPicked?.airportName
+                      : "",
+                    dropoffAddress: dropoffAddress ?? "",
+                    isPriorityPass: bookingType === "Priority Pass" ?? false,
+                    pickupAddress: pickupAddress ?? "",
+                    dropoffAirport: dropoffAirport
+                      ? airportPicked?.airportName
+                      : "",
+                    time: time,
+                    pickupDate: date,
+                    arrivalDate: date,
+                    passengers: passengers,
+                    countryCode: countryCode ?? user?.countryCode,
+                    firstName: user?.firstName ?? user?.name?.split(" ")[0],
+                    lastName: user?.lastName ?? user?.name?.split(" ")[1],
+                    username: `${
+                      user?.firstName ?? user?.name?.split(" ")[0]
+                    } ${user?.lastName ?? user?.name?.split(" ")[1]}`,
+                    title: `${user?.title}`,
+                    paymentStatus: "Successful",
+                    paymentId: res?.data,
+                    paymentMethod: "Stripe",
+                  }),
+                }
+              );
+              break;
+            case "Priority Pass":
+              response = await fetch(
+                "https://www.shuttlelane.com/api/booking/priority",
+                // "http://172.20.10.6:3001/api/booking/airport",
+                {
+                  method: "POST",
+                  headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    user: user?._id,
+                    email: user?.email,
+                    mobile: user?.mobile,
+                    amount: total,
+                    currency: user?.currency,
+                    airport,
+                    service,
+                    time: time,
+                    date,
+                    passengers: passengers,
+                    countryCode: countryCode ?? user?.countryCode,
+                    firstName: user?.firstName ?? user?.name?.split(" ")[0],
+                    lastName: user?.lastName ?? user?.name?.split(" ")[1],
+                    username: `${
+                      user?.firstName ?? user?.name?.split(" ")[0]
+                    } ${user?.lastName ?? user?.name?.split(" ")[1]}`,
+                    title: `${user?.title}`,
+                    paymentStatus: "Successful",
+                    paymentId: res?.data,
+                    paymentMethod: "Stripe",
+                  }),
+                }
+              );
+              break;
+            default:
+              break;
+          }
+
+          const booking = await response.json();
+          console.log("RESPONSE:", booking);
+
+          Alert.alert("Payment successful!");
           setIsLoading(false);
-          return;
-        }
+          setTimeout(() => {
+            router.replace("/dashboard");
+          }, 1500);
 
-        let response;
-
-        switch (bookingType) {
-          case "Car Hire":
-            response = await fetch(
-              "https://www.shuttlelane.com/api/booking/car",
-              // "http://172.20.10.6:3001/api/booking/airport",
-              {
-                method: "POST",
-                headers: {
-                  Accept: "application/json",
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  user: user?._id,
-                  email: user?.email,
-                  mobile: user?.mobile,
-                  amount: total,
-                  currency: user?.currency,
-                  carType: carPicked,
-                  pickupAddress: pickupAddress ?? "",
-                  time: time,
-                  date: date,
-                  days: days,
-                  firstName: user?.name?.split(" ")[0],
-                  lastName: user?.name?.split(" ")[1],
-                }),
-              }
-            );
-            break;
-          case "Airport Pickup" || "Airport Dropoff":
-            response = await fetch(
-              "https://www.shuttlelane.com/api/booking/airport",
-              // "http://172.20.10.6:3001/api/booking/airport",
-              {
-                method: "POST",
-                headers: {
-                  Accept: "application/json",
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  user: user?._id,
-                  email: user?.email,
-                  mobile: user?.mobile,
-                  amount: total,
-                  currency: user?.currency,
-                  formType: bookingType,
-                  carType: carPicked,
-                  pickupAirport: pickupAirport
-                    ? airportPicked?.airportName
-                    : "",
-                  dropoffAddress: dropoffAddress ?? "",
-                  isPriorityPass: bookingType === "Priority Pass" ?? false,
-                  pickupAddress: pickupAddress ?? "",
-                  dropoffAirport: dropoffAirport
-                    ? airportPicked?.airportName
-                    : "",
-                  time: time,
-                  pickupDate: date,
-                  arrivalDate: date,
-                  passengers: passengers,
-                  firstName: user?.name?.split(" ")[0],
-                  lastName: user?.name?.split(" ")[1],
-                  paymentStatus: "Successful",
-                  paymentId: res?.data,
-                  paymentMethod: "Stripe",
-                }),
-              }
-            );
-            break;
-          case "Priority Pass":
-            response = await fetch(
-              "https://www.shuttlelane.com/api/booking/priority",
-              // "http://172.20.10.6:3001/api/booking/airport",
-              {
-                method: "POST",
-                headers: {
-                  Accept: "application/json",
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  user: user?._id,
-                  email: user?.email,
-                  mobile: user?.mobile,
-                  amount: total,
-                  currency: user?.currency,
-                  airport,
-                  service,
-                  time: time,
-                  date,
-                  passengers: passengers,
-                  firstName: user?.name?.split(" ")[0],
-                  lastName: user?.name?.split(" ")[1],
-                  paymentStatus: "Successful",
-                  paymentId: res?.data,
-                  paymentMethod: "Stripe",
-                }),
-              }
-            );
-            break;
-          default:
-            break;
-        }
-
-        const booking = await response.json();
-        console.log("RESPONSE:", booking);
-
-        Alert.alert("Payment successful!");
-        setIsLoading(false);
-        setTimeout(() => {
-          router.replace("/dashboard");
-        }, 1500);
-
-        Alert.alert("Booking successful!");
-      })
-      .catch((err) => {
-        console.log("PAYMENT VALIDATION ERROR:", err.response.data);
-        setIsLoading(false);
-      });
+          Alert.alert("Booking successful!");
+        })
+        .catch((err) => {
+          console.log("PAYMENT VALIDATION ERROR:", err.response.data);
+          setIsLoading(false);
+        });
+    }
   }
 
   // TOAST MESSAGE CONFIG
@@ -331,23 +324,53 @@ const PayWithPayPal = () => {
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      {approvalUrl ? (
-        <WebView
-          style={{ height: "100%", width: "100%", backgroundColor: "red" }}
-          source={{ uri: approvalUrl }}
-          onNavigationStateChange={onNavigationStateChange}
-          domStorageEnabled={true}
-          javaScriptEnabled={true}
-          startInLoadingState={true}
-        />
-      ) : (
-        <View style={{ flex: 1, justifyContent: "center" }}>
-          <Text>Do not go back or refresh page.</Text>
-          <ActivityIndicator size={36} />
-        </View>
-      )}
-    </View>
+    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
+      <Stack.Screen
+        options={{
+          headerStyle: {
+            backgroundColor: COLORS.white,
+          },
+          headerShadowVisible: false,
+          headerLeft: () => (
+            <TouchableOpacity
+              style={{}}
+              onPress={() => {
+                router.replace("/dashboard");
+              }}
+            >
+              <Image
+                source={arrowBackIcon}
+                resizeMode="cover"
+                style={{ width: 45, height: 45 }}
+              />
+            </TouchableOpacity>
+          ),
+          headerTitle: "",
+        }}
+      />
+      <View style={{ justifyContent: "center", alignItems: "center", flex: 1 }}>
+        {approvalUrl ? (
+          <WebView
+            originWhitelist={["*"]}
+            style={{
+              height: Dimensions.get("window").height,
+              width: Dimensions.get("window").width,
+              backgroundColor: "red",
+            }}
+            source={{ uri: approvalUrl }}
+            onNavigationStateChange={onNavigationStateChange}
+            domStorageEnabled={true}
+            javaScriptEnabled={true}
+            startInLoadingState={true}
+          />
+        ) : (
+          <View style={{ flex: 1, justifyContent: "center" }}>
+            <Text>Do not go back or refresh page.</Text>
+            <ActivityIndicator size={36} />
+          </View>
+        )}
+      </View>
+    </SafeAreaView>
   );
 };
 

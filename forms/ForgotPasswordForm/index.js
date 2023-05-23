@@ -13,9 +13,8 @@ import { Dimensions } from "react-native";
 import { COLORS } from "../../constants/themes";
 import { AuthContext } from "../../context/AuthContext";
 
-const LoginForm = () => {
+const ForgotPasswordForm = () => {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
   // ICON CONFIG
   const AnimatedIcon = Animated.createAnimatedComponent(Icon);
@@ -43,26 +42,12 @@ const LoginForm = () => {
     }, 2500);
   };
 
-  // LOGIN FUNCTION
-  async function loginUser() {
+  // FORGOT PASSWORD HANDLER FUNCTION
+  async function forgotPasswordHandler() {
     console.log("email", email);
-    console.log("password", password);
-    const isToken = await AsyncStorage.getItem("token");
-    const isUser = await AsyncStorage.getItem("user");
-    const isGuest = await AsyncStorage.getItem("isGuest");
-    if (isUser) {
-      await AsyncStorage.removeItem("user");
-    }
-    if (isToken) {
-      await AsyncStorage.removeItem("token");
-    }
-    if (isGuest) {
-      await AsyncStorage.removeItem("isGuest");
-    }
-
     setIsLoading(true);
     const response = await fetch(
-      "https://www.shuttlelane.com/api/users/signin",
+      "https://www.shuttlelane.com/api/users/forgotpassword",
       // "http://172.20.10.6:3001/api/users/signin",
       {
         method: "POST",
@@ -72,7 +57,6 @@ const LoginForm = () => {
         },
         body: JSON.stringify({
           email: email,
-          password: password,
         }),
       }
     ).catch((err) => {
@@ -89,22 +73,8 @@ const LoginForm = () => {
       return showToastMessage(user?.error, "error");
     }
 
-    showToastMessage("Log in successful", "success");
-    const stringifiedToken = JSON.stringify(user?.token);
-    const userObject = JSON.stringify({
-      name: user?.data?.name,
-      email: user?.data?.email,
-      mobile: user?.data?.mobile,
-      countryCode: user?.data?.countryCode,
-      currency: user?.data?.currency,
-      image: user?.data?.image,
-      _id: user?.data?._id,
-    });
-
-    await AsyncStorage.setItem("token", stringifiedToken);
-    await AsyncStorage.setItem("user", userObject);
-    setIsLoading(false);
-    router.replace("/dashboard/home");
+    showToastMessage(`A password reset link has been sent to your email @${email}`, "success");
+    setEmail('')
     return;
   }
 
@@ -117,7 +87,7 @@ const LoginForm = () => {
           message={toastMessage}
           style={{
             position: "absolute",
-            zIndex: 100,
+            zIndex: 90,
             top: 0,
             width: Dimensions.get("window").width,
             flexDirection: "row",
@@ -131,25 +101,23 @@ const LoginForm = () => {
             fontSize: 24,
             fontFamily: "PoppinsBold",
             color: COLORS.shuttlelanePurple,
-            textAlign: "center",
           }}
         >
-          Log in
+          Forgot Password
         </Text>
         <Text
           style={{
             fontSize: 16,
             fontFamily: "PoppinsRegular",
             marginTop: 5,
-            textAlign: "center",
           }}
         >
-          Sign in to your Shuttlelane account
+          Reset your account password
         </Text>
 
         <View style={{ marginTop: 20 }}>
           <View style={{ marginTop: 20 }}>
-            <Text style={{ fontFamily: "PoppinsRegular" }}>Email Address</Text>
+            <Text style={{ fontFamily: "PoppinsRegular" }}>Email</Text>
             <TextInput
               value={email}
               style={{
@@ -170,64 +138,30 @@ const LoginForm = () => {
               onChangeText={(value) => setEmail(value)}
             />
           </View>
-          <View style={{ marginTop: 20 }}>
-            <Text style={{ fontFamily: "PoppinsRegular" }}>Password</Text>
-            <TextInput
-              value={password}
-              style={{
-                height: 50,
-                padding: 10,
-                paddingHorizontal: 20,
-                fontSize: 16,
-                marginTop: 10,
-                fontFamily: "PoppinsRegular",
-                borderColor: "#C9C9C9",
-                borderWidth: 0.5,
-                borderRadius: 10,
-              }}
-              secureTextEntry={true}
-              returnKeyType="done"
-              placeholder="********"
-              placeholderTextColor="#C9C9C9"
-              onChangeText={(value) => setPassword(value)}
-            />
-          </View>
-
-          {/* <View
-            style={{
-              marginTop: 20,
-            }}
-          >
-            <Text>
-              {" "}
-              <Link style={{ color: COLORS.shuttlelanePurple }} href="/forgotPassword">
-                Forgot Password?
-              </Link>
-            </Text>
-          </View> */}
 
           <View style={{ marginTop: 20 }}>
             <TouchableOpacity
               style={{
                 height: 50,
-                padding: 10,
+                // padding: ,
                 paddingHorizontal: 20,
                 fontSize: 16,
                 marginTop: 10,
                 justifyContent: "center",
                 alignItems: "center",
-                backgroundColor: COLORS.shuttlelanePurple,
+                backgroundColor: COLORS.shuttlelaneYellow,
                 borderRadius: 10,
+                flexDirection: 'row',
+                alignItems: 'center',
               }}
-              onPress={() => loginUser()}
+              onPress={() => forgotPasswordHandler()}
               disabled={isLoading}
             >
               {!isLoading && (
-                <Text
-                  style={{ fontFamily: "PoppinsSemiBold", color: COLORS.white }}
-                >
-                  Log in
-                </Text>
+                <>
+                  <Icon name="email" size={18} style={{ margin: 5 }} color="#FFF" />
+                  <Text style={{color: '#FFF', fontFamily: 'PoppinsSemiBold'}}>Send Email</Text>
+                </>
               )}
 
               {isLoading && (
@@ -236,30 +170,10 @@ const LoginForm = () => {
             </TouchableOpacity>
           </View>
 
-          <View
-            style={{
-              marginTop: 20,
-              // flexDirection: "row",
-              // justifyContent: "center",
-            }}
-          >
-            <Text>
-              Don't have an account?{" "}
-              <Link style={{ color: COLORS.shuttlelanePurple }} href="/signup">
-                Sign up
-              </Link>
-              {/* <TouchableOpacity
-                onPress={() => router.push("/signup")}
-                style={{ color: COLORS.shuttlelanePurple }}
-              >
-                Sign up
-              </TouchableOpacity> */}
-            </Text>
-          </View>
         </View>
       </View>
     </>
   );
 };
 
-export default LoginForm;
+export default ForgotPasswordForm;

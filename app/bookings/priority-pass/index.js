@@ -25,9 +25,20 @@ import DatePicker from "react-native-modern-datepicker";
 import { ActivityIndicator } from "react-native";
 import axios from "axios";
 import ToastMessage from "../../../components/ToastMessage";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import { Alert } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import RNDateTimePicker from "@react-native-community/datetimepicker";
 
 const PriorityPass = () => {
   const router = useRouter();
+
+  // TIME SETUP
+  const shuttleDate = new Date();
+  // DATE SETUP
+  const [year, setYear] = useState();
+  const [month, setMonth] = useState();
+  const [day, setDay] = useState();
 
   // FETCH AIRPORTS
   const fetchAirports = async () => {
@@ -57,6 +68,11 @@ const PriorityPass = () => {
   const [pass, setPass] = useState("");
   const [passengers, setPassengers] = useState(0);
   const [time, setTime] = useState("");
+  const [flightNumber, setflightNumber] = useState("");
+  const [airline, setAirline] = useState("");
+
+  // DATETIME SETUP
+  const [timePicker, setTimePicker] = useState(false);
 
   // ARRIVAL DATE SETUP
   const [date, setDate] = useState();
@@ -154,29 +170,127 @@ const PriorityPass = () => {
     fetchAllAirports();
   }, []);
 
+  // Fetch Exchange rates
+  const [rates, setRates] = useState();
+
+  // FUNCTION
+  async function fetchExchangeRates() {
+    setIsLoading(true);
+    await axios
+      .get(`https://www.shuttlelane.com/api/rates`)
+      .then((res) => {
+        const exchangeRates = res.data.data[0];
+        setRates(res.data.data[0]);
+        console.log("res:", res.data.data[0]?.dollar);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.log("err:", err);
+      });
+  }
+
+  // Handle Currency Conversion
+  function makeConversion(amount) {
+    const dollarRate = Number(rates?.dollar);
+    const poundRate = Number(rates?.pound);
+    const euroRate = Number(rates?.euro);
+
+    let newAmount;
+    if (user?.currency === "neira") {
+      newAmount = amount;
+      return newAmount;
+    } else if (user?.currency === "dollars") {
+      newAmount = amount / dollarRate;
+      return newAmount;
+    } else if (user?.currency === "pounds") {
+      newAmount = amount / poundRate;
+      return newAmount;
+    } else if (user?.currency === "euros") {
+      newAmount = amount / euroRate;
+      return newAmount;
+    }
+  }
+
+  // USER DATA
+  const [user, setUser] = useState();
+  const [guest, setGuest] = useState();
+  async function fetchUserData() {
+    // const user = ;
+    const parsedUser = JSON.parse(await AsyncStorage.getItem("user"));
+    const parsedGuest = JSON.parse(await AsyncStorage.getItem("user"));
+    setUser(parsedUser);
+    setGuest(parsedGuest);
+  }
+
+  useEffect(() => {
+    fetchExchangeRates();
+    fetchUserData();
+  }, []);
+
   // ON FORM SUBMIT - PRIORITY PASS
   async function priorityPassNextStep() {
     if (!service || !passengers || !airport || !date || !pass || !time) {
       showToastMessage("Please fill in the missing fields to proceed", "error");
+      Alert.alert("Attention", "Please fill in the missing fields to proceed");
       return;
     }
 
+    console.log("HIIIIIIIIIII");
     const total = Number(pass) * Number(passengers);
 
-    router.push({
-      pathname: "/bookings/summary",
-      params: {
-        bookingType: "Priority Pass",
-        service,
-        passengers,
-        airport,
-        date,
-        pass,
-        time,
-        total,
-      },
-    });
+    const finalPrice = await makeConversion(total);
+
+    const isGuest = JSON.parse(await AsyncStorage.getItem("isGuest"));
+
+    if (isGuest) {
+      router.push({
+        pathname: "/bookings/user-details",
+        params: {
+          bookingType: "Priority Pass",
+          service,
+          passengers,
+          airport,
+          date,
+          pass,
+          time,
+          total: finalPrice,
+          airline,
+          flightNumber,
+        },
+      });
+    } else {
+      router.push({
+        pathname: "/bookings/summary",
+        params: {
+          bookingType: "Priority Pass",
+          service,
+          passengers,
+          airport,
+          date,
+          pass,
+          time,
+          total: finalPrice,
+          airline,
+          flightNumber,
+        },
+      });
+    }
   }
+
+  // SET DATE
+  useEffect(() => {
+    const shuttleDate = new Date();
+    const year = shuttleDate.getFullYear();
+    const month = shuttleDate.getMonth();
+    const day = shuttleDate.getDate();
+
+    console.log("year:::", year);
+    console.log("month:::", month);
+    console.log("day:::", day);
+    setYear(year);
+    setMonth(month);
+    setDay(day);
+  }, []);
 
   return (
     <ScrollView
@@ -229,7 +343,7 @@ const PriorityPass = () => {
             padding: 20,
             paddingTop: 10,
             paddingBottom: 30,
-            position: "fixed",
+            // position: "fixed",
             top: 0,
           }}
         >
@@ -238,6 +352,17 @@ const PriorityPass = () => {
           <View style={{}}>
             {/* SERVICE SELECT DROPDOWN */}
             <View style={{ marginTop: 10 }}>
+              <View style={{ flexDirection: "row", marginVertical: 20 }}>
+                <Icon name="flight-land" size={20} />
+                <Text
+                  style={{
+                    fontFamily: "PoppinsRegular",
+                    marginHorizontal: 5,
+                  }}
+                >
+                  Service Type
+                </Text>
+              </View>
               <SelectList
                 setSelected={(value) => setService(value)}
                 data={serviceType}
@@ -288,6 +413,17 @@ const PriorityPass = () => {
 
             {/* AIRPORT  SELECT DROPDOWN */}
             <View style={{ marginTop: 10 }}>
+              <View style={{ flexDirection: "row", marginVertical: 20 }}>
+                <Icon name="flight" size={20} />
+                <Text
+                  style={{
+                    fontFamily: "PoppinsRegular",
+                    marginHorizontal: 5,
+                  }}
+                >
+                  Airport
+                </Text>
+              </View>
               <SelectList
                 setSelected={(value) => setAirport(value)}
                 data={airports}
@@ -338,12 +474,25 @@ const PriorityPass = () => {
 
             {/* PASSENGERS AND PASS */}
             <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
+              style={
+                {
+                  // flexDirection: "row",
+                  // alignItems: "center",
+                  // justifyContent: "space-between",
+                }
+              }
             >
+              <View style={{ flexDirection: "row", marginVertical: 20 }}>
+                <Icon name="people" size={20} />
+                <Text
+                  style={{
+                    fontFamily: "PoppinsRegular",
+                    marginHorizontal: 5,
+                  }}
+                >
+                  Passengers
+                </Text>
+              </View>
               <TextInput
                 value={passengers}
                 style={{
@@ -351,12 +500,12 @@ const PriorityPass = () => {
                   padding: 10,
                   paddingHorizontal: 20,
                   fontSize: 16,
-                  marginTop: 10,
+                  // marginTop: 10,
                   fontFamily: "PoppinsRegular",
                   borderColor: "#C9C9C9",
                   borderWidth: 0.5,
                   borderRadius: 10,
-                  width: "47%",
+                  // width: "47%",
                 }}
                 keyboardType="number-pad"
                 returnKeyType="done"
@@ -364,95 +513,31 @@ const PriorityPass = () => {
                 placeholderTextColor="#C9C9C9"
                 onChangeText={(value) => setPassengers(value)}
               />
-
-              <TouchableOpacity
-                value=""
-                style={{
-                  height: 50,
-                  padding: 10,
-                  fontSize: 16,
-                  marginTop: 10,
-                  fontFamily: "PoppinsRegular",
-                  borderColor: "#C9C9C9",
-                  borderWidth: 0.5,
-                  borderRadius: 10,
-                  justifyContent: "center",
-                  alignContent: "center",
-                  width: "48%",
-                }}
-                onPress={() => setDatePicker(true)}
-              >
-                <Text
-                  style={{
-                    color: "#C9C9C9",
-                    paddingHorizontal: 10,
-                    fontSize: 16,
-                    fontFamily: "PoppinsRegular",
-                  }}
-                >
-                  {date ? date : "Set Pickup date"}
-                </Text>
-              </TouchableOpacity>
             </View>
 
             {/* DATE PICKER */}
             <View style={{ marginTop: 20 }}>
-              {datePicker && (
-                <Modal
-                  animationType="slide"
-                  visible={datePicker}
-                  transparent={true}
-                >
-                  <View
-                    style={{
-                      flex: 1,
-                      justifyContent: "center",
-                      alignItems: "center",
-                      marginTop: 22,
-                    }}
-                  >
-                    <View
-                      style={{
-                        margin: 20,
-                        backgroundColor: COLORS.white,
-                        borderRadius: 20,
-                        width: "90%",
-                        alignItems: "center",
-                        shadowColor: "#000",
-                        shadowOffset: {
-                          width: 0,
-                          height: 2,
-                        },
-                        shadowOpacity: 0.25,
-                        shadowRadius: 4,
-                        elevation: 5,
-                        paddingBottom: 20,
-                      }}
-                    >
-                      <DatePicker
-                        mode="calendar"
-                        selected={date}
-                        onDateChange={(value) => setDate(value)}
-                      />
-
-                      <TouchableOpacity onPress={() => setDatePicker(false)}>
-                        <Text style={{ fontFamily: "PoppinsRegular" }}>
-                          Close
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </Modal>
-              )}
-
               <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                }}
+                style={
+                  {
+                    // flexDirection: "row",
+                    // justifyContent: "space-between",
+                  }
+                }
               >
                 {/* PASS SELECT DROPDOWN */}
-                <View style={{ width: "47%" }}>
+                <View style={{}}>
+                  <View style={{ flexDirection: "row", marginVertical: 10 }}>
+                    <Icon name="toll" size={20} />
+                    <Text
+                      style={{
+                        fontFamily: "PoppinsRegular",
+                        marginHorizontal: 5,
+                      }}
+                    >
+                      Pass Type
+                    </Text>
+                  </View>
                   <SelectList
                     setSelected={(value) => setPass(value)}
                     data={passTypes}
@@ -500,27 +585,171 @@ const PriorityPass = () => {
                     searchPlaceholder="Search airports"
                   />
                 </View>
-
-                <TextInput
-                  value={time}
-                  style={{
-                    height: 50,
-                    padding: 10,
-                    paddingHorizontal: 20,
-                    fontSize: 16,
-                    fontFamily: "PoppinsRegular",
-                    borderColor: "#C9C9C9",
-                    borderWidth: 0.5,
-                    borderRadius: 10,
-                    width: "48%",
-                  }}
-                  placeholder="TIME: Eg. 12:30PM"
-                  maxLength={7}
-                  placeholderTextColor="#C9C9C9"
-                  onChangeText={(value) => setTime(value)}
-                />
               </View>
             </View>
+
+            {/* AIRLINE */}
+            <View style={{ flexDirection: "row", marginVertical: 10 }}>
+              <Icon name="flight-takeoff" size={20} />
+              <Text
+                style={{
+                  fontFamily: "PoppinsRegular",
+                  marginHorizontal: 5,
+                }}
+              >
+                Airline
+              </Text>
+            </View>
+            <TextInput
+              value={airline}
+              style={{
+                height: 50,
+                padding: 10,
+                paddingHorizontal: 20,
+                fontSize: 16,
+                fontFamily: "PoppinsRegular",
+                borderColor: "#C9C9C9",
+                borderWidth: 0.5,
+                borderRadius: 10,
+              }}
+              placeholder="Airline"
+              placeholderTextColor="#C9C9C9"
+              onChangeText={(value) => setAirline(value)}
+            />
+
+            {/* FLIGHT NUMBER */}
+            <View style={{ flexDirection: "row", marginVertical: 10 }}>
+              <Icon name="toll" size={20} />
+              <Text
+                style={{
+                  fontFamily: "PoppinsRegular",
+                  marginHorizontal: 5,
+                }}
+              >
+                Flight Number
+              </Text>
+            </View>
+            <TextInput
+              value={flightNumber}
+              style={{
+                height: 50,
+                padding: 10,
+                paddingHorizontal: 20,
+                fontSize: 16,
+                fontFamily: "PoppinsRegular",
+                borderColor: "#C9C9C9",
+                borderWidth: 0.5,
+                borderRadius: 10,
+              }}
+              placeholder="Flight Number"
+              placeholderTextColor="#C9C9C9"
+              onChangeText={(value) => setflightNumber(value)}
+            />
+
+            {/* DATE PICKER */}
+            <View style={{ marginTop: 5 }}>
+              {/* PICKUP DATE */}
+              <TouchableOpacity
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginTop: 20,
+                  height: 50,
+                  padding: 10,
+                  paddingHorizontal: 20,
+                  fontSize: 16,
+                  fontFamily: "PoppinsRegular",
+                  borderColor: "#C9C9C9",
+                  borderWidth: 0.5,
+                  borderRadius: 10,
+                }}
+                onPress={() => setDatePicker(true)}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
+                  <Icon name="today" size={20} color="#181818" />
+                  <Text
+                    style={{
+                      fontFamily: "PoppinsRegular",
+                      marginHorizontal: 5,
+                      marginTop: 2,
+                      color: "#181818",
+                    }}
+                  >
+                    {date ? date : "Date"}
+                  </Text>
+                </View>
+                {datePicker && (
+                  <RNDateTimePicker
+                    mode="date"
+                    display="default"
+                    value={new Date(`${year}`, `${month}`, `${day}`)}
+                    onChange={(event, value) => {
+                      console.log(value.toDateString());
+                      setDate(value.toDateString());
+                      setDatePicker(false);
+                    }}
+                    minimumDate={new Date(`${year}`, `${month}`, `${day}`)}
+                  />
+                )}
+              </TouchableOpacity>
+            </View>
+
+            {/* PICKUP TIME */}
+            <TouchableOpacity
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 20,
+                height: 50,
+                padding: 10,
+                paddingHorizontal: 20,
+                fontSize: 16,
+                fontFamily: "PoppinsRegular",
+                borderColor: "#C9C9C9",
+                borderWidth: 0.5,
+                borderRadius: 10,
+              }}
+              onPress={() => setTimePicker(true)}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
+                <Icon name="schedule" size={20} color="#181818" />
+                <Text
+                  style={{
+                    fontFamily: "PoppinsRegular",
+                    marginHorizontal: 5,
+                    marginTop: 2,
+                    color: "#181818",
+                  }}
+                >
+                  {time ? time : "Time"}
+                </Text>
+              </View>
+              {timePicker && (
+                <RNDateTimePicker
+                  mode="time"
+                  display="clock"
+                  is24Hour={false}
+                  value={new Date(`${year}`, `${month}`, `${day}`)}
+                  onChange={(event, value) => {
+                    if (value?.toTimeString() !== `00:00:00 GMT+0100`) {
+                      setTime(`${value.toTimeString()}`);
+                      setTimePicker(false);
+                    }
+                    console.log("TIME:", `${value.toTimeString()}`);
+                  }}
+                />
+              )}
+            </TouchableOpacity>
 
             <View style={{ paddingTop: 20 }}>
               <TouchableOpacity
@@ -564,7 +793,7 @@ const PriorityPass = () => {
           </Text>
         </View>
       )}
-      {!isMapLoading && (
+      {/* {!isMapLoading && (
         <MapView
           style={{
             flex: 1,
@@ -572,10 +801,11 @@ const PriorityPass = () => {
             height: Dimensions.get("window").height,
           }}
           region={mapRegion}
+          provider="google"
         >
           <Marker coordinate={mapRegion} title="Marker" />
         </MapView>
-      )}
+      )} */}
     </ScrollView>
   );
 };

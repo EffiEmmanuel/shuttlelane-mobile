@@ -6,54 +6,53 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ActivityIndicator } from "react-native";
+import { useRouter } from "expo-router";
+import { TouchableOpacity } from "react-native";
+import empty from "../../assets/images/empty.png";
 
-const RecentBookings = () => {
-  const [userBookings, setUserBookings] = useState();
+const RecentBookings = ({
+  userBookings,
+  userCarBookings,
+  userPriorityBookings,
+  isLoading,
+  isGuest,
+}) => {
   const [user, setUser] = useState();
 
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
 
-  async function getUser() {
-    const user = await AsyncStorage.getItem("user");
-    const parsedUser = JSON.parse(user);
-    console.log(parsedUser);
-    setUser(parsedUser);
-  }
+  // async function fetchUserBookings() {
+  //   setIsLoading(true);
+  //   console.log("userid:", user?._id);
+  //   await axios
+  //     // .get(`https://www.shuttlelane.com/api/booking/airport/${user?._id}`)
+  //     .get(
+  //       `https://www.shuttlelane.com/api/booking/airport/user-bookings/${user?._id}`
+  //     )
+  //     .then((res) => {
+  //       console.log("USER BOOKINGS:", res.data);
+  //       setIsLoading(false);
+  //       setUserBookings(res.data.data);
+  //     })
+  //     .catch((err) => {
+  //       console.log("USER BOOKINGS ERROR:", err);
+  //     });
+  // }
 
-  async function fetchUserBookings() {
-    setIsLoading(true);
-    console.log("userid:", user?._id);
-    await axios
-      // .get(`https://www.shuttlelane.com/api/booking/airport/${user?._id}`)
-      .get(
-        `https://www.shuttlelane.com/api/booking/airport/user-bookings/${user?._id}`
-      )
-      .then((res) => {
-        console.log("USER BOOKINGS:", res.data);
-        setIsLoading(false);
-        setUserBookings(res.data.data);
-      })
-      .catch((err) => {
-        console.log("USER BOOKINGS ERROR:", err);
-      });
-  }
+  // useEffect(() => {
+  //   fetchUserBookings();
+  // }, [user?._id]);
 
-  useEffect(() => {
-    getUser();
-  }, []);
-
-  useEffect(() => {
-    fetchUserBookings();
-  }, [user?._id]);
+  const router = useRouter();
 
   return (
-    <View style={{ marginTop: 45 }}>
+    <View style={{ marginTop: 40 }}>
       <View style={{ flexDirection: "row", alignItems: "baseline" }}>
         <Text
           style={{
-            fontSize: 24,
+            fontSize: Platform.OS === "ios" ? 24 : 20,
             fontWeight: "500",
-            color: COLORS.shuttlelanePurple,
+            color: "#191919",
             fontFamily: "PoppinsBold",
           }}
         >
@@ -72,28 +71,31 @@ const RecentBookings = () => {
         </Text> */}
       </View>
 
-      <View style={{ marginTop: 20 }}>
-        {/* <View style={{ marginTop: 10 }}>
+      {!isGuest && (
+        <View style={{ marginTop: 0 }}>
+          {/* <View style={{ marginTop: 10 }}>
           <Text style={{ fontSize: 16, fontFamily: "PoppinsSemiBold" }}>
             Today
           </Text>
         </View> */}
 
-        {isLoading && <ActivityIndicator size={35} />}
-        {!isLoading && userBookings?.length === 0 && (
-          <Text style={{ fontFamily: "PoppinsSemiBold", fontSize: 14 }}>
-            Nothing here... You have not made any bookings yet.
-          </Text>
-        )}
+          {isLoading && <ActivityIndicator size={35} />}
 
-        {userBookings?.map((booking, index) => {
-          return (
-            <View key={booking?._id} style={{ marginTop: 10 }}>
+          {userBookings?.map((booking) => (
+            <TouchableOpacity
+              key={booking?._id}
+              onPress={() =>
+                router.push({
+                  pathname: "/bookings/search",
+                  bookingId: booking?.bookingReference ?? booking?._id,
+                })
+              }
+              style={{ marginVertical: 10 }}
+            >
               <View
                 style={{
-                  backgroundColor: "#FBFBFB",
                   flexDirection: "row",
-                  padding: 20,
+                  // padding: 1,
                   marginTop: 10,
                   borderRadius: 20,
                 }}
@@ -102,39 +104,31 @@ const RecentBookings = () => {
                 <View style={{ justifyContent: "center" }}>
                   <View
                     style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: "50%",
-                      backgroundColor: COLORS.shuttlelaneYellow,
+                      width: 50,
+                      height: 50,
+                      borderRadius: 50,
+                      backgroundColor: COLORS.shuttlelanePurple,
                       justifyContent: "center",
                       alignItems: "center",
                     }}
                   >
                     {booking?.bookingType === "airport" ? (
                       <Icon name="flight-takeoff" size={24} color="#FFF" />
-                    ) : (
+                    ) : booking?.isPriorityPass == "true" ? (
                       <Icon name="luggage" size={24} color="#FFF" />
+                    ) : (
+                      <Icon name="directions-car" size={24} color="#FFF" />
                     )}
                   </View>
                 </View>
 
                 {/* Booking Dropoff and Pickup addresses */}
-                <View style={{ justifyContent: "center" }}>
-                  <View style={{ flexDirection: "row" }}>
-                    <View
-                      style={{
-                        width: 16,
-                        height: 16,
-                        borderColor: "#C9C9C9",
-                        borderWidth: "1px",
-                        borderRadius: "50%",
-                        marginHorizontal: 10,
-                      }}
-                    ></View>
+                <View style={{ padding: 10 }}>
+                  <View style={{}}>
                     <Text
                       numberOfLines={1}
                       style={{
-                        maxWidth: "70%",
+                        // maxWidth: "90%",
                         fontFamily: "PoppinsRegular",
                       }}
                     >
@@ -143,85 +137,235 @@ const RecentBookings = () => {
                         ? booking?.pickupAirport
                         : booking?.pickupAddress}
                     </Text>
-                  </View>
-                  <View
-                    style={{
-                      width: 2,
-                      height: 30,
-                      marginLeft: 16.5,
-                      backgroundColor: "#D9D9D9",
-                    }}
-                  ></View>
-                  <View style={{ flexDirection: "row" }}>
-                    <View
-                      style={{
-                        width: 16,
-                        height: 16,
-                        borderColor: "#C9C9C9",
-                        borderWidth: "1px",
-                        borderRadius: "50%",
-                        marginHorizontal: 10,
-                      }}
-                    ></View>
                     <Text
                       numberOfLines={1}
                       style={{
-                        maxWidth: "70%",
+                        // maxWidth: "90%",
                         fontFamily: "PoppinsRegular",
                       }}
                     >
-                      Dropoff:{" "}
-                      {booking?.dropoffAddress === ""
-                        ? booking?.dropoffAirport
-                        : booking?.dropoffAddress}
+                      Price:{" "}
+                      {booking?.currency === "pounds"
+                        ? "£"
+                        : booking?.currency === "dollars"
+                        ? "$"
+                        : booking?.currency === "euros"
+                        ? "€"
+                        : booking?.currency === "neira"
+                        ? "₦"
+                        : "!"}
+                      {booking?.amount}
                     </Text>
                   </View>
                 </View>
+              </View>
+            </TouchableOpacity>
+          ))}
 
-                {/* Booking Price */}
-                <View
-                  style={{
-                    // height: "100%",
-                    justifyContent: "center",
-                    marginLeft: -40,
-                    marginTop: 16,
-                    maxWidth: "20%",
-                  }}
-                >
-                  <Text
+          {userCarBookings?.map((booking) => (
+            <TouchableOpacity
+              key={booking?._id}
+              onPress={() =>
+                router.push({
+                  pathname: "/bookings/search",
+                  bookingId: booking?.bookingReference ?? booking?._id,
+                })
+              }
+              style={{ marginVertical: 10 }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  // padding: 1,
+                  marginTop: 10,
+                  borderRadius: 20,
+                }}
+              >
+                {/* Booking Type */}
+                <View style={{ justifyContent: "center" }}>
+                  <View
                     style={{
-                      fontSize: 14,
-                      color: COLORS.green,
-                      fontFamily: "PoppinsBold",
+                      width: 50,
+                      height: 50,
+                      borderRadius: 50,
+                      backgroundColor: COLORS.shuttlelanePurple,
+                      justifyContent: "center",
+                      alignItems: "center",
                     }}
                   >
-                    {booking?.currency === "neira"
-                      ? "₦"
-                      : booking?.currency === "pounds"
-                      ? "£"
-                      : booking?.currency === "dollars"
-                      ? "$"
-                      : booking?.currency === "euro"
-                      ? "€"
-                      : "!"}
-                    {booking?.amount}
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: 10,
-                      // color: COLORS.green,
-                      fontFamily: "PoppinsRegular",
-                      marginTop: 5,
-                    }}
-                  >
-                    {booking?.pickupDate?.split("T")[0]}
-                  </Text>
+                    {booking?.bookingType === "airport" ? (
+                      <Icon name="flight-takeoff" size={24} color="#FFF" />
+                    ) : booking?.isPriorityPass == "true" ? (
+                      <Icon name="luggage" size={24} color="#FFF" />
+                    ) : (
+                      <Icon name="directions-car" size={24} color="#FFF" />
+                    )}
+                  </View>
+                </View>
+
+                {/* Booking Dropoff and Pickup addresses */}
+                <View style={{ padding: 10 }}>
+                  <View style={{}}>
+                    <Text
+                      numberOfLines={1}
+                      style={{
+                        // maxWidth: "90%",
+                        fontFamily: "PoppinsRegular",
+                      }}
+                    >
+                      Pick up:{" "}
+                      {booking?.pickupAddress === ""
+                        ? booking?.pickupAirport
+                        : booking?.pickupAddress}
+                    </Text>
+                    <Text
+                      numberOfLines={1}
+                      style={{
+                        // maxWidth: "90%",
+                        fontFamily: "PoppinsRegular",
+                      }}
+                    >
+                      Price:{" "}
+                      {booking?.currency === "pounds"
+                        ? "£"
+                        : booking?.currency === "dollars"
+                        ? "$"
+                        : booking?.currency === "euros"
+                        ? "€"
+                        : booking?.currency === "neira"
+                        ? "₦"
+                        : "!"}
+                      {booking?.amount}
+                    </Text>
+                  </View>
                 </View>
               </View>
-            </View>
-          );
-        })}
-      </View>
+            </TouchableOpacity>
+          ))}
+
+          {userPriorityBookings?.map((booking) => (
+            <TouchableOpacity
+              key={booking?._id}
+              onPress={() =>
+                router.push({
+                  pathname: "/bookings/search",
+                  bookingId: booking?.bookingReference ?? booking?._id,
+                })
+              }
+              style={{ marginVertical: 10 }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  // padding: 1,
+                  marginTop: 10,
+                  borderRadius: 20,
+                }}
+              >
+                {/* Booking Type */}
+                <View style={{ justifyContent: "center" }}>
+                  <View
+                    style={{
+                      width: 50,
+                      height: 50,
+                      borderRadius: 50,
+                      backgroundColor: COLORS.shuttlelanePurple,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    {booking?.bookingType === "airport" ? (
+                      <Icon name="flight-takeoff" size={24} color="#FFF" />
+                    ) : booking?.isPriorityPass == "true" ? (
+                      <Icon name="luggage" size={24} color="#FFF" />
+                    ) : (
+                      <Icon name="directions-car" size={24} color="#FFF" />
+                    )}
+                  </View>
+                </View>
+
+                {/* Booking Dropoff and Pickup addresses */}
+                <View style={{ padding: 10 }}>
+                  <View style={{}}>
+                    <Text
+                      numberOfLines={1}
+                      style={{
+                        // maxWidth: "90%",
+                        fontFamily: "PoppinsRegular",
+                      }}
+                    >
+                      Pick up:{" "}
+                      {booking?.pickupAddress === ""
+                        ? booking?.pickupAirport
+                        : booking?.pickupAddress}
+                    </Text>
+                    <Text
+                      numberOfLines={1}
+                      style={{
+                        // maxWidth: "90%",
+                        fontFamily: "PoppinsRegular",
+                      }}
+                    >
+                      Price:{" "}
+                      {booking?.currency === "pounds"
+                        ? "£"
+                        : booking?.currency === "dollars"
+                        ? "$"
+                        : booking?.currency === "euros"
+                        ? "€"
+                        : booking?.currency === "neira"
+                        ? "₦"
+                        : "!"}
+                      {booking?.amount}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
+
+          {!userBookings ||
+            !userCarBookings ||
+            !userPriorityBookings ||
+            (userBookings?.length === 0 &&
+              userCarBookings?.length === 0 &&
+              userPriorityBookings?.length === 0 && (
+                <View style={{ alignItems: "center", marginTop: 90 }}>
+                  <View style={{ alignItems: "center" }}>
+                    <Image source={empty} style={{ width: 150, height: 150 }} />
+                    <Text
+                      style={{
+                        fontFamily: "PoppinsRegular",
+                        fontSize: 14,
+                        marginTop: 10,
+                        textAlign: "center",
+                      }}
+                    >
+                      Nothing here... You have not made any bookings yet.
+                    </Text>
+                  </View>
+                </View>
+              ))}
+        </View>
+      )}
+
+      {isGuest && (
+        <View style={{ marginTop: 20 }}>
+          <View style={{ alignItems: "center" }}>
+            <Image source={empty} style={{ width: 150, height: 150 }} />
+            <Text
+              style={{
+                fontFamily: "PoppinsRegular",
+                fontSize: 14,
+                marginTop: 10,
+                textAlign: "center",
+              }}
+            >
+              Nothing here, Register or log in to see stats.
+            </Text>
+          </View>
+        </View>
+      )}
     </View>
   );
 };

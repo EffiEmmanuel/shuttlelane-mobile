@@ -21,12 +21,20 @@ import stripeLogo from "../.././../assets/images/logos/stripe.png";
 
 import { Image } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { StripeProvider, useStripe } from "@stripe/stripe-react-native";
+import {
+  PaymentSheet,
+  StripeProvider,
+  useStripe,
+} from "@stripe/stripe-react-native";
 import axios from "axios";
 import ToastMessage from "../../../components/ToastMessage";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { PayWithFlutterwave } from "flutterwave-react-native";
 import { FLUTTERWAVE_KEY, STRIPE_PUBLISHABLE_KEY } from "@env";
+import { SelectList } from "react-native-dropdown-select-list";
+import arrowDownIcon from "../../../assets/icons/arrowDownIcon.png";
+import searchIcon from "../../../assets/icons/searchIcon.png";
+import closeIcon from "../../../assets/icons/closeIcon.png";
 
 const BookingSummary = () => {
   const router = useRouter();
@@ -47,7 +55,18 @@ const BookingSummary = () => {
     service,
     total,
     days,
+    flightNumber,
+    airline,
+    countryCode,
+    email,
   } = params;
+
+  console.log("TOTAL FROM UP HERE:", total);
+  console.log("EMAIL FROM UP HERE:", email);
+  const [orderTotal, setOrderTotal] = useState(null);
+  useEffect(() => {
+    setOrderTotal(total);
+  }, []);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -106,176 +125,347 @@ const BookingSummary = () => {
 
   // STRPE CONFIG
   const stripe = useStripe();
+  const [isStripeLoading, setIsStripeLoading] = useState(false);
   async function payWithStripe() {
-    setIsLoading(true);
+    setIsStripeLoading(true);
     console.log(typeof total);
     console.log("TOTAL::", total);
-    await axios
-      .post(`https://www.shuttlelane.com/stripe/create-payment-intent`, {
-        // .post(`http://172.20.10.6:3001/stripe/create-payment-intent`, {
-        email: user?.email,
-        amount: total?.includes(",")
-          ? Number(`${total.split(",")[0]}${total.split(",")[1]}`)
-          : Number(total),
-        currency:
-          user?.currency === "neira"
-            ? "ngn"
-            : user?.currency === "dollars"
-            ? "usd"
-            : user?.currency === "pounds"
-            ? "gbp"
-            : user?.currency === "euros"
-            ? "eur"
-            : null,
-      })
-      .then(async (res) => {
-        console.log("USER DATA:", user?.email);
-        console.log("STRIPE RESPONSE:", res.data);
+    console.log("ORDER TOTAL::", orderTotal);
 
-        // INITIALIZE STRIPE PAYMENT SHEET HERE
-        const initPaymentSheet = await stripe.initPaymentSheet({
-          paymentIntentClientSecret: res.data,
-          merchantDisplayName: "Shuttlelane",
+    console.log("ISORDERTOTAL:", priorityPassAdded);
+
+    if (bookingType == "Airport Pickup" || bookingType == "Airport Dropoff") {
+      await axios
+        .post(`https://www.shuttlelane.com/stripe/create-payment-intent`, {
+          // .post(`http://172.20.10.6:3001/stripe/create-payment-intent`, {
+          email: user?.email,
+          amount:
+            !priorityPassAdded && total?.includes(",")
+              ? Number(`${total.split(",")[0]}${total.split(",")[1]}`)
+              : priorityPassAdded
+              ? Number(orderTotal)
+              : Number(total),
+          currency:
+            user?.currency === "neira"
+              ? "ngn"
+              : user?.currency === "dollars"
+              ? "usd"
+              : user?.currency === "pounds"
+              ? "gbp"
+              : user?.currency === "euros"
+              ? "eur"
+              : null,
+        })
+        .then(async (res) => {
+          console.log("USER DATA:", user?.email);
+          console.log("STRIPE RESPONSE:", res.data);
+
+          // INITIALIZE STRIPE PAYMENT SHEET HERE
+          const initPaymentSheet = await stripe.initPaymentSheet({
+            paymentIntentClientSecret: res.data,
+            merchantDisplayName: "Shuttlelane",
+          });
+          // CHECK FOR INIT SHEET ERROR
+          if (initPaymentSheet.error) {
+            setIsStripeLoading(false);
+            return Alert.alert(initPaymentSheet.error.message);
+          }
+          // PRESENT SHEET
+          const presentSheet = await stripe.presentPaymentSheet({
+            clientSecret: res.data,
+          });
+          // CHECK FOR PRESENT SHEET ERROR
+          if (presentSheet.error) {
+            setIsStripeLoading(false);
+            console.log("ERROR::", presentSheet.error);
+            if (PaymentSheet.error.code === "Failed") {
+              Alert.alert(
+                "Error",
+                "Please check your internet connection and try again."
+              );
+              return;
+            }
+            return Alert.alert(presentSheet.error.message);
+          }
+          // ELSE SHOW SUCCESS MESSAGE
+
+          // SAVE BOOKING TO THE DATABASE
+          setIsStripeLoading(true);
+
+          let response;
+
+          switch (bookingType) {
+            case "Airport Pickup" || "Airport Dropoff":
+              response = await fetch(
+                "https://www.shuttlelane.com/api/booking/airport",
+                // "http://172.20.10.6:3001/api/booking/airport",
+                {
+                  method: "POST",
+                  headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    user: user?._id,
+                    email: user?.email,
+                    mobile: user?.mobile,
+                    amount: total,
+                    currency: user?.currency,
+                    formType: bookingType,
+                    carType: carPicked,
+                    pickupAirport: pickupAirport
+                      ? airportPicked?.airportName
+                      : "",
+                    dropoffAddress: dropoffAddress ?? "",
+                    isPriorityPass: bookingType === "Priority Pass" ?? false,
+                    pickupAddress: pickupAddress ?? "",
+                    dropoffAirport: dropoffAirport
+                      ? airportPicked?.airportName
+                      : "",
+                    time: time,
+                    pickupDate: date,
+                    arrivalDate: date,
+                    passengers: passengers,
+                    countryCode: countryCode ?? user?.countryCode,
+                    firstName: user?.firstName ?? user?.name?.split(" ")[0],
+                    lastName: user?.lastName ?? user?.name?.split(" ")[1],
+                    username: `${
+                      user?.firstName ?? user?.name?.split(" ")[0]
+                    } ${user?.lastName ?? user?.name?.split(" ")[1]}`,
+                    title: `${user?.title}`,
+                    paymentStatus: "Successful",
+                    paymentId: res?.data,
+                    paymentMethod: "Stripe",
+                    flightNumber: flightNumber,
+                  }),
+                }
+              );
+              break;
+            case "Priority Pass":
+              response = await fetch(
+                "https://www.shuttlelane.com/api/booking/priority",
+                // "http://172.20.10.6:3001/api/booking/airport",
+                {
+                  method: "POST",
+                  headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    user: user?._id,
+                    email: user?.email,
+                    mobile: user?.mobile,
+                    amount: total,
+                    currency: user?.currency,
+                    airport,
+                    service,
+                    time: time,
+                    date,
+                    passengers: passengers,
+                    countryCode: countryCode ?? user?.countryCode,
+                    firstName: user?.firstName ?? user?.name?.split(" ")[0],
+                    lastName: user?.lastName ?? user?.name?.split(" ")[1],
+                    username: `${
+                      user?.firstName ?? user?.name?.split(" ")[0]
+                    } ${user?.lastName ?? user?.name?.split(" ")[1]}`,
+                    title: `${user?.title}`,
+                    paymentStatus: "Successful",
+                    paymentId: res?.data,
+                    paymentMethod: "Stripe",
+                    flightNumber,
+                    airline,
+                  }),
+                }
+              );
+              break;
+            default:
+              break;
+          }
+
+          const booking = await response.json();
+          console.log("RESPONSE:", booking);
+
+          showToastMessage("Payment successful!", "success");
+          setIsStripeLoading(false);
+          setTimeout(() => {
+            router.replace("/dashboard");
+          }, 1500);
+
+          showToastMessage("Booking successful!", "success");
+        })
+        .catch((err) => {
+          console.log("STRIPE ERROR:", err);
+          setIsStripeLoading(false);
         });
-        // CHECK FOR INIT SHEET ERROR
-        if (initPaymentSheet.error) {
-          setIsLoading(false);
-          return Alert.alert(initPaymentSheet.error.message);
-        }
-        // PRESENT SHEET
-        const presentSheet = await stripe.presentPaymentSheet({
-          clientSecret: res.data,
+    } else {
+      console.log("TTTTTTTT:", total);
+      let priorityTotalAdapted;
+      if (bookingType == "Priority Pass") {
+        // priorityTotalAdapted = total / 100;
+      }
+      await axios
+        .post(`https://www.shuttlelane.com/stripe/create-payment-intent`, {
+          // .post(`http://172.20.10.6:3001/stripe/create-payment-intent`, {
+          email: user?.email,
+          amount: total?.includes(",")
+            ? Number(`${total.split(",")[0]}${total.split(",")[1]}`).toFixed(2)
+            : Number(total).toFixed(2),
+          currency:
+            user?.currency === "neira"
+              ? "ngn"
+              : user?.currency === "dollars"
+              ? "usd"
+              : user?.currency === "pounds"
+              ? "gbp"
+              : user?.currency === "euros"
+              ? "eur"
+              : null,
+        })
+        .then(async (res) => {
+          console.log("USER DATA:", user?.email);
+          console.log("STRIPE RESPONSE:", res.data);
+
+          // INITIALIZE STRIPE PAYMENT SHEET HERE
+          const initPaymentSheet = await stripe.initPaymentSheet({
+            paymentIntentClientSecret: res.data,
+            merchantDisplayName: "Shuttlelane",
+          });
+          // CHECK FOR INIT SHEET ERROR
+          if (initPaymentSheet.error) {
+            setIsStripeLoading(false);
+            return Alert.alert(initPaymentSheet.error.message);
+          }
+          // PRESENT SHEET
+          const presentSheet = await stripe.presentPaymentSheet({
+            clientSecret: res.data,
+          });
+          // CHECK FOR PRESENT SHEET ERROR
+          if (presentSheet.error) {
+            setIsStripeLoading(false);
+            console.log("ERROR::", presentSheet.error);
+            if (PaymentSheet.error.code === "Failed") {
+              Alert.alert(
+                "Error",
+                "Please check your internet connection and try again."
+              );
+              return;
+            }
+            return Alert.alert(presentSheet.error.message);
+          }
+          // ELSE SHOW SUCCESS MESSAGE
+
+          // SAVE BOOKING TO THE DATABASE
+          setIsStripeLoading(true);
+
+          let response;
+
+          switch (bookingType) {
+            case "Airport Pickup" || "Airport Dropoff":
+              response = await fetch(
+                "https://www.shuttlelane.com/api/booking/airport",
+                // "http://172.20.10.6:3001/api/booking/airport",
+                {
+                  method: "POST",
+                  headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    user: user?._id,
+                    email: user?.email,
+                    mobile: user?.mobile,
+                    amount: total,
+                    currency: user?.currency,
+                    formType: bookingType,
+                    carType: carPicked,
+                    pickupAirport: pickupAirport
+                      ? airportPicked?.airportName
+                      : "",
+                    dropoffAddress: dropoffAddress ?? "",
+                    isPriorityPass: bookingType === "Priority Pass" ?? false,
+                    pickupAddress: pickupAddress ?? "",
+                    dropoffAirport: dropoffAirport
+                      ? airportPicked?.airportName
+                      : "",
+                    time: time,
+                    pickupDate: date,
+                    arrivalDate: date,
+                    passengers: passengers,
+                    countryCode: countryCode ?? user?.countryCode,
+                    firstName: user?.firstName ?? user?.name?.split(" ")[0],
+                    lastName: user?.lastName ?? user?.name?.split(" ")[1],
+                    username: `${
+                      user?.firstName ?? user?.name?.split(" ")[0]
+                    } ${user?.lastName ?? user?.name?.split(" ")[1]}`,
+                    title: `${user?.title}`,
+                    paymentStatus: "Successful",
+                    paymentId: res?.data,
+                    paymentMethod: "Stripe",
+                    flightNumber: flightNumber,
+                  }),
+                }
+              );
+              break;
+            case "Priority Pass":
+              response = await fetch(
+                "https://www.shuttlelane.com/api/booking/priority",
+                // "http://172.20.10.6:3001/api/booking/airport",
+                {
+                  method: "POST",
+                  headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    user: user?._id,
+                    email: user?.email,
+                    mobile: user?.mobile,
+                    amount: total,
+                    currency: user?.currency,
+                    airport,
+                    service,
+                    time: time,
+                    date,
+                    passengers: passengers,
+                    countryCode: countryCode ?? user?.countryCode,
+                    firstName: user?.firstName ?? user?.name?.split(" ")[0],
+                    lastName: user?.lastName ?? user?.name?.split(" ")[1],
+                    username: `${
+                      user?.firstName ?? user?.name?.split(" ")[0]
+                    } ${user?.lastName ?? user?.name?.split(" ")[1]}`,
+                    title: `${user?.title}`,
+                    paymentStatus: "Successful",
+                    paymentId: res?.data,
+                    paymentMethod: "Stripe",
+                    flightNumber,
+                    airline,
+                  }),
+                }
+              );
+              break;
+            default:
+              break;
+          }
+
+          const booking = await response.json();
+          console.log("RESPONSE:", booking);
+
+          showToastMessage("Payment successful!", "success");
+          setIsStripeLoading(false);
+          setTimeout(() => {
+            router.replace("/dashboard");
+          }, 1500);
+
+          showToastMessage("Booking successful!", "success");
+        })
+        .catch((err) => {
+          console.log("STRIPE ERROR:", err);
+          setIsStripeLoading(false);
         });
-        // CHECK FOR PRESENT SHEET ERROR
-        if (presentSheet.error) {
-          setIsLoading(false);
-          return Alert.alert(presentSheet.error.message);
-        }
-        // ELSE SHOW SUCCESS MESSAGE
-
-        // SAVE BOOKING TO THE DATABASE
-        setIsLoading(true);
-
-        let response;
-
-        switch (bookingType) {
-          case "Car Hire":
-            response = await fetch(
-              "https://www.shuttlelane.com/api/booking/car",
-              // "http://172.20.10.6:3001/api/booking/airport",
-              {
-                method: "POST",
-                headers: {
-                  Accept: "application/json",
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  user: user?._id,
-                  email: user?.email,
-                  mobile: user?.mobile,
-                  amount: total,
-                  currency: user?.currency,
-                  carType: carPicked,
-                  pickupAddress: pickupAddress ?? "",
-                  time: time,
-                  date: date,
-                  days: days,
-                  firstName: user?.name?.split(" ")[0],
-                  lastName: user?.name?.split(" ")[1],
-                }),
-              }
-            );
-            break;
-          case "Airport Pickup" || "Airport Dropoff":
-            response = await fetch(
-              "https://www.shuttlelane.com/api/booking/airport",
-              // "http://172.20.10.6:3001/api/booking/airport",
-              {
-                method: "POST",
-                headers: {
-                  Accept: "application/json",
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  user: user?._id,
-                  email: user?.email,
-                  mobile: user?.mobile,
-                  amount: total,
-                  currency: user?.currency,
-                  formType: bookingType,
-                  carType: carPicked,
-                  pickupAirport: pickupAirport
-                    ? airportPicked?.airportName
-                    : "",
-                  dropoffAddress: dropoffAddress ?? "",
-                  isPriorityPass: bookingType === "Priority Pass" ?? false,
-                  pickupAddress: pickupAddress ?? "",
-                  dropoffAirport: dropoffAirport
-                    ? airportPicked?.airportName
-                    : "",
-                  time: time,
-                  pickupDate: date,
-                  arrivalDate: date,
-                  passengers: passengers,
-                  firstName: user?.name?.split(" ")[0],
-                  lastName: user?.name?.split(" ")[1],
-                  paymentStatus: "Successful",
-                  paymentId: res?.data,
-                  paymentMethod: "Stripe",
-                }),
-              }
-            );
-            break;
-          case "Priority Pass":
-            response = await fetch(
-              "https://www.shuttlelane.com/api/booking/priority",
-              // "http://172.20.10.6:3001/api/booking/airport",
-              {
-                method: "POST",
-                headers: {
-                  Accept: "application/json",
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  user: user?._id,
-                  email: user?.email,
-                  mobile: user?.mobile,
-                  amount: total,
-                  currency: user?.currency,
-                  airport,
-                  service,
-                  time: time,
-                  date,
-                  passengers: passengers,
-                  firstName: user?.name?.split(" ")[0],
-                  lastName: user?.name?.split(" ")[1],
-                  paymentStatus: "Successful",
-                  paymentId: res?.data,
-                  paymentMethod: "Stripe",
-                }),
-              }
-            );
-            break;
-          default:
-            break;
-        }
-
-        const booking = await response.json();
-        console.log("RESPONSE:", booking);
-
-        showToastMessage("Payment successful!", "success");
-        setIsLoading(false);
-        setTimeout(() => {
-          router.replace("/dashboard");
-        }, 1500);
-
-        showToastMessage("Booking successful!", "success");
-      })
-      .catch((err) => {
-        console.log("STRIPE ERROR:", err);
-        setIsLoading(false);
-      });
+    }
   }
+
+  // CAR HIRE
 
   // FLUTTERWAVE CONFIGS
   /* An example function called when transaction is completed successfully or canceled */
@@ -286,41 +476,10 @@ const BookingSummary = () => {
     }
 
     if (data.status !== "cancelled" && data.status !== "failed") {
-      // ELSE SHOW SUCCESS MESSAGE
-
-      // SAVE BOOKING TO THE DATABASE
-      setIsLoading(true);
-
+      const myUser = JSON.parse(await AsyncStorage.getItem("user"));
       let response;
 
       switch (bookingType) {
-        case "Car Hire":
-          response = await fetch(
-            "https://www.shuttlelane.com/api/booking/car",
-            // "http://172.20.10.6:3001/api/booking/airport",
-            {
-              method: "POST",
-              headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                user: user?._id,
-                email: user?.email,
-                mobile: user?.mobile,
-                amount: total,
-                currency: user?.currency,
-                carType: carPicked,
-                pickupAddress: pickupAddress ?? "",
-                time: time,
-                date: date,
-                days: days,
-                firstName: user?.name?.split(" ")[0],
-                lastName: user?.name?.split(" ")[1],
-              }),
-            }
-          );
-          break;
         case "Airport Pickup" || "Airport Dropoff":
           response = await fetch(
             "https://www.shuttlelane.com/api/booking/airport",
@@ -350,11 +509,18 @@ const BookingSummary = () => {
                 pickupDate: date,
                 arrivalDate: date,
                 passengers: passengers,
-                firstName: user?.name?.split(" ")[0],
-                lastName: user?.name?.split(" ")[1],
+                countryCode: countryCode ?? user?.countryCode,
+                firstName: user?.firstName ?? user?.name?.split(" ")[0],
+                lastName: user?.lastName ?? user?.name?.split(" ")[1],
+                username: `${user?.firstName ?? user?.name?.split(" ")[0]} ${
+                  user?.lastName ?? user?.name?.split(" ")[1]
+                }`,
+                title: `${user?.title}`,
                 paymentStatus: "Successful",
                 paymentId: res?.data,
-                paymentMethod: "Stripe",
+                paymentMethod: "Flutterwave",
+                flightNumber,
+                airline,
               }),
             }
           );
@@ -380,11 +546,18 @@ const BookingSummary = () => {
                 time: time,
                 date,
                 passengers: passengers,
-                firstName: user?.name?.split(" ")[0],
-                lastName: user?.name?.split(" ")[1],
                 paymentStatus: "Successful",
                 paymentId: res?.data,
-                paymentMethod: "Stripe",
+                paymentMethod: "Flutterwave",
+                flightNumber,
+                airline,
+                countryCode: countryCode ?? user?.countryCode,
+                firstName: user?.firstName ?? user?.name?.split(" ")[0],
+                lastName: user?.lastName ?? user?.name?.split(" ")[1],
+                username: `${user?.firstName ?? user?.name?.split(" ")[0]} ${
+                  user?.lastName ?? user?.name?.split(" ")[1]
+                }`,
+                title: `${user?.title}`,
               }),
             }
           );
@@ -424,7 +597,7 @@ const BookingSummary = () => {
       pathname: "/bookings/pay-with-paypal",
       params: {
         user,
-        total,
+        total: priorityPassAdded ? orderTotal : total,
         bookingType,
         pickupAirport,
         dropoffAddress,
@@ -438,13 +611,166 @@ const BookingSummary = () => {
         airport,
         service,
         days,
+        flightNumber: flightNumber ?? "",
+        airline: airline ?? "",
+        countryCode,
       },
     });
   }
 
+  // PRIORITY PASS SETUP
+  const [priorityPasses, setPriorityPasses] = useState();
+  const [priorityPassAdded, setPriorityPassAdded] = useState(false);
+  const [selectedPass, setSelectedPass] = useState();
+  const [numberOfPass, setNumberOfPass] = useState(1);
+
   useEffect(() => {
     console.log("TOTALLLLL::", total);
+    // GET PRIORITY PASSES
+    async function fetchPrioryPasses() {
+      await axios
+        .get("https://www.shuttlelane.com/api/priority")
+        .then((res) => {
+          console.log("PASSESS:", res.data);
+          let passes = [];
+          res?.data?.data?.forEach((pass) => {
+            passes.push({
+              key: pass?.rate,
+              value: pass?.name,
+            });
+          });
+          console.log("PASSESSSSSSSSSSSSSSSSSSSSS:::", passes);
+          setPriorityPasses(passes);
+        })
+        .catch((err) => {
+          console.log("PASSESS ERROR:", err.message);
+        });
+    }
+
+    fetchPrioryPasses();
   }, []);
+
+  // CONVERSION RATES SETUP
+  const [rates, setRates] = useState();
+  // FUNCTION
+  async function fetchExchangeRates() {
+    setIsLoading(true);
+    await axios
+      .get(`https://www.shuttlelane.com/api/rates`)
+      .then((res) => {
+        const exchangeRates = res.data.data[0];
+        setRates(res.data.data[0]);
+        console.log("res:", res.data.data[0]?.dollar);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.log("err:", err);
+      });
+  }
+
+  function makeConversion(amount) {
+    const dollarRate = Number(rates?.dollar);
+    const poundRate = Number(rates?.pound);
+    const euroRate = Number(rates?.euro);
+
+    let newAmount;
+    if (user?.currency === "neira") {
+      newAmount = amount;
+      return newAmount;
+    } else if (user?.currency === "dollars") {
+      newAmount = amount / dollarRate;
+      return newAmount.toFixed(2);
+    } else if (user?.currency === "pounds") {
+      newAmount = amount / poundRate;
+      return newAmount.toFixed(2);
+    } else if (user?.currency === "euros") {
+      newAmount = amount / euroRate;
+      return newAmount.toFixed(2);
+    }
+  }
+
+  useEffect(() => {
+    async function updateTotal() {
+      console.log("TOTAL:", total);
+      console.log("TOTAL:", selectedPass);
+
+      const convertedPriorityPassX = await makeConversion(Number(selectedPass));
+      const convertedPriorityPass = (
+        convertedPriorityPassX * Number(numberOfPass)
+      ).toFixed(2);
+
+      console.log("CONVERTED PPASS:", convertedPriorityPass);
+
+      setOrderTotal(
+        Number(
+          total?.includes(",")
+            ? Number(`${total.split(",")[0]}${total.split(",")[1]}`)
+            : Number(total)
+        ) + Number(convertedPriorityPass)
+      );
+      console.log(
+        "CONVERTED PP:",
+        Number(
+          total?.includes(",")
+            ? Number(`${total.split(",")[0]}${total.split(",")[1]}`).toFixed(2)
+            : Number(total).toFixed(2)
+        ) + Number(convertedPriorityPass).toFixed(2)
+      );
+    }
+    updateTotal();
+  }, [selectedPass, numberOfPass]);
+
+  useEffect(() => {
+    fetchExchangeRates();
+    console.log("em;", user);
+  }, [user]);
+
+  // CAR HIRE HANDLER
+  const [isCarHireLoading, setIsCarHireLoading] = useState(false);
+  const carHireHandler = async () => {
+    const myUser = JSON.parse(await AsyncStorage.getItem("user"));
+    setIsCarHireLoading(true);
+
+    await axios
+      .post("https://www.shuttlelane.com/api/booking/car", {
+        // .post("http://172.20.10.6:3001/api/booking/car", {
+        user: user?._id,
+        email: `${email}` ?? `${user?.email}`,
+        mobile: user?.mobile,
+        amount: total,
+        currency: user?.currency,
+        carType: carPicked,
+        pickupAddress: pickupAddress ?? "",
+        date: date,
+        days: days,
+        firstName: user?.firstName ?? user?.name?.split(" ")[0],
+        username: `${user?.firstName ?? user?.name?.split(" ")[0]} ${
+          user?.lastName ?? user?.name?.split(" ")[1]
+        }`,
+        title: `${user?.title}`,
+        lastName: user?.lastName ?? user?.name?.split(" ")[1],
+        countryCode: countryCode ?? user?.countryCode,
+      })
+      .then((res) => {
+        console.log("RESPO::", res.data);
+        if (res.data?.message) {
+          showToastMessage(
+            "Booking Confirmed, thank you for choosing Shuttlelane.",
+            "success"
+          );
+          setTimeout(() => {
+            router.replace("/dashboard/home");
+          }, 1500);
+          return;
+        }
+      })
+      .catch((err) => {
+        console.log("ERROOR::", err);
+        showToastMessage(err?.message, "error");
+        // showToastMessage('Please check your internet connection and try again.', "error");
+      });
+    setIsCarHireLoading(false);
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
@@ -471,332 +797,587 @@ const BookingSummary = () => {
           headerTitle: "",
         }}
       />
-      {/* TOAST MESSAGE */}
-      {isToasting && (
-        <ToastMessage
-          type={toastType}
-          message={toastMessage}
-          style={{
-            position: "absolute",
-            zIndex: 90,
-            top: 0,
-            width: Dimensions.get("window").width,
-            flexDirection: "row",
-            justifyContent: "center",
-          }}
-        />
-      )}
-      <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          style={{ padding: 20 }}
-        >
-          <Text
+      <ScrollView style={{ flex: 1 }}>
+        {/* TOAST MESSAGE */}
+        {isToasting && (
+          <ToastMessage
+            type={toastType}
+            message={toastMessage}
             style={{
-              fontSize: 24,
-              fontFamily: "PoppinsBold",
-              color: COLORS.shuttlelanePurple,
+              position: "absolute",
+              zIndex: 100,
+              top: 0,
+              width: Dimensions.get("window").width,
+              flexDirection: "row",
+              justifyContent: "center",
             }}
+          />
+        )}
+        {/* <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}> */}
+        <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            style={{ padding: 20 }}
           >
-            Booking Summary
-          </Text>
-
-          {/* BOOKING TYPE */}
-          <Text
-            style={{
-              fontSize: 16,
-              fontFamily: "PoppinsSemiBold",
-            }}
-          >
-            {bookingType}
-          </Text>
-
-          <View style={{ marginTop: 20 }}>
-            <View
+            <Text
               style={{
-                //   backgroundColor: COLORS.shuttlelaneYellowFaded,
-                // padding: ,
-                marginVertical: 10,
-                borderRadius: 10,
+                fontSize: 24,
+                fontFamily: "PoppinsBold",
+                color: COLORS.shuttlelanePurple,
               }}
             >
-              {pickupAirport && (
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Image
-                    source={currentLocationIcon}
-                    resizeMode="cover"
-                    style={{ width: 28, height: 28 }}
-                  />
-                  <Text style={{ fontFamily: "PoppinsRegular" }}>
-                    {airportPicked?.airportName}
-                  </Text>
-                </View>
-              )}
+              Booking Summary
+            </Text>
 
-              {service && (
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Image
-                    source={passengerIcon}
-                    resizeMode="cover"
-                    style={{ width: 28, height: 28 }}
-                  />
-                  <Text style={{ fontFamily: "PoppinsRegular" }}>
-                    {service}
-                  </Text>
-                </View>
-              )}
-
-              {dropoffAddress && (
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Image
-                    source={destinationIcon}
-                    resizeMode="cover"
-                    style={{ width: 28, height: 28 }}
-                  />
-                  <Text style={{ fontFamily: "PoppinsRegular" }}>
-                    {dropoffAddress}
-                  </Text>
-                </View>
-              )}
-
-              {pickupAddress && (
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Image
-                    source={currentLocationIcon}
-                    resizeMode="cover"
-                    style={{ width: 28, height: 28 }}
-                  />
-                  <Text style={{ fontFamily: "PoppinsRegular" }}>
-                    {pickupAddress}
-                  </Text>
-                </View>
-              )}
-
-              {dropoffAirport && (
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Image
-                    source={destinationIcon}
-                    resizeMode="cover"
-                    style={{ width: 28, height: 28 }}
-                  />
-                  <Text style={{ fontFamily: "PoppinsRegular" }}>
-                    {airportPicked?.airportName}
-                  </Text>
-                </View>
-              )}
-
-              {airport && (
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Image
-                    source={destinationIcon}
-                    resizeMode="cover"
-                    style={{ width: 28, height: 28 }}
-                  />
-                  <Text style={{ fontFamily: "PoppinsRegular" }}>
-                    {airportPicked?.airportName}
-                  </Text>
-                </View>
-              )}
-
-              {passengers && (
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Image
-                    source={passengerIcon}
-                    resizeMode="cover"
-                    style={{ width: 28, height: 28 }}
-                  />
-                  <Text style={{ fontFamily: "PoppinsRegular" }}>
-                    {passengers}
-                  </Text>
-                </View>
-              )}
-
-              {pass && (
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Image
-                    source={priorityPassIcon}
-                    resizeMode="cover"
-                    style={{ width: 28, height: 28 }}
-                  />
-                  <Text style={{ fontFamily: "PoppinsRegular" }}>{pass}</Text>
-                </View>
-              )}
-
-              {carPicked && (
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Image
-                    source={carIcon}
-                    resizeMode="cover"
-                    style={{ width: 30, height: 30 }}
-                  />
-                  <Text
-                    style={{
-                      fontFamily: "PoppinsRegular",
-                      textTransform: "capitalize",
-                    }}
-                  >
-                    {carPicked}
-                  </Text>
-                </View>
-              )}
-
-              {date && (
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Image
-                    source={calendarIcon}
-                    resizeMode="cover"
-                    style={{ width: 30, height: 30 }}
-                  />
-                  <Text
-                    style={{
-                      fontFamily: "PoppinsRegular",
-                      textTransform: "capitalize",
-                    }}
-                  >
-                    {date}
-                  </Text>
-                </View>
-              )}
-
-              {time && (
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Image
-                    source={timeIcon}
-                    resizeMode="cover"
-                    style={{ width: 30, height: 30 }}
-                  />
-                  <Text
-                    style={{
-                      fontFamily: "PoppinsRegular",
-                      textTransform: "capitalize",
-                    }}
-                  >
-                    {time}
-                  </Text>
-                </View>
-              )}
-            </View>
-
-            {/* TOTAL */}
-            <View
+            {/* BOOKING TYPE */}
+            <Text
               style={{
-                backgroundColor: COLORS.shuttlelaneYellowFaded,
-                padding: 10,
-                borderRadius: 10,
-                marginTop: 20,
+                fontSize: 16,
+                fontFamily: "PoppinsSemiBold",
               }}
             >
+              {bookingType}
+            </Text>
+
+            <View style={{ marginTop: 20 }}>
               <View
                 style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  //   backgroundColor: COLORS.shuttlelaneYellowFaded,
+                  // padding: ,
+                  marginVertical: 10,
+                  borderRadius: 10,
                 }}
               >
-                <Text
-                  style={{
-                    fontFamily: "PoppinsBold",
-                    textAlign: "center",
-                    fontSize: 26,
-                    textTransform: "uppercase",
-                  }}
-                >
-                  TOTAL:
-                </Text>
-                <Text
-                  style={{
-                    fontFamily: "PoppinsBold",
-                    textAlign: "center",
-                    fontSize: 26,
-                    marginHorizontal: 10,
-                    textTransform: "uppercase",
-                  }}
-                >
-                  {user?.currency === "dollars"
-                    ? "$"
-                    : user?.currency === "neira"
-                    ? "₦"
-                    : user?.currency === "pounds"
-                    ? "£"
-                    : user?.currency === "euros"
-                    ? "€"
-                    : "!"}
-                  {total?.includes(",")
-                    ? total
-                    : Intl.NumberFormat("en-US", {}).format(total)}
-                </Text>
-              </View>
-            </View>
-          </View>
+                {pickupAirport && (
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Image
+                      source={currentLocationIcon}
+                      resizeMode="cover"
+                      style={{ width: 28, height: 28 }}
+                    />
+                    <Text style={{ fontFamily: "PoppinsRegular" }}>
+                      {airportPicked?.airportName}
+                    </Text>
+                  </View>
+                )}
 
-          <View style={{ marginTop: 20 }}>
-            <View
-              style={{
-                padding: 10,
-                borderRadius: 10,
-              }}
-            >
+                {service && (
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Image
+                      source={passengerIcon}
+                      resizeMode="cover"
+                      style={{ width: 28, height: 28 }}
+                    />
+                    <Text style={{ fontFamily: "PoppinsRegular" }}>
+                      {service}
+                    </Text>
+                  </View>
+                )}
+
+                {dropoffAddress && (
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Image
+                      source={destinationIcon}
+                      resizeMode="cover"
+                      style={{ width: 28, height: 28 }}
+                    />
+                    <Text style={{ fontFamily: "PoppinsRegular" }}>
+                      {dropoffAddress}
+                    </Text>
+                  </View>
+                )}
+
+                {pickupAddress && (
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Image
+                      source={currentLocationIcon}
+                      resizeMode="cover"
+                      style={{ width: 28, height: 28 }}
+                    />
+                    <Text style={{ fontFamily: "PoppinsRegular" }}>
+                      {pickupAddress}
+                    </Text>
+                  </View>
+                )}
+
+                {dropoffAirport && (
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Image
+                      source={destinationIcon}
+                      resizeMode="cover"
+                      style={{ width: 28, height: 28 }}
+                    />
+                    <Text style={{ fontFamily: "PoppinsRegular" }}>
+                      {airportPicked?.airportName}
+                    </Text>
+                  </View>
+                )}
+
+                {airline && (
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      paddingVertical: 5,
+                      paddingHorizontal: 10,
+                    }}
+                  >
+                    {/* <Image
+                    source={destinationIcon}
+                    resizeMode="cover"
+                    style={{ width: 28, height: 28 }}
+                  /> */}
+                    <Icon
+                      name="flight"
+                      size={14}
+                      style={{ marginRight: 5, marginTop: -5 }}
+                    />
+                    <Text style={{ fontFamily: "PoppinsRegular" }}>
+                      {airline}
+                    </Text>
+                  </View>
+                )}
+
+                {flightNumber && (
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      paddingVertical: 5,
+                      paddingHorizontal: 10,
+                    }}
+                  >
+                    {/* <Image
+                    source={destinationIcon}
+                    resizeMode="cover"
+                    style={{ width: 28, height: 28 }}
+                  /> */}
+                    <Icon
+                      name="flight-takeoff"
+                      size={14}
+                      style={{ marginRight: 5, marginTop: -5 }}
+                    />
+                    <Text style={{ fontFamily: "PoppinsRegular" }}>
+                      {flightNumber}
+                    </Text>
+                  </View>
+                )}
+
+                {airport && (
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Image
+                      source={destinationIcon}
+                      resizeMode="cover"
+                      style={{ width: 28, height: 28 }}
+                    />
+                    <Text style={{ fontFamily: "PoppinsRegular" }}>
+                      {airportPicked?.airportName}
+                    </Text>
+                  </View>
+                )}
+
+                {passengers && (
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Image
+                      source={passengerIcon}
+                      resizeMode="cover"
+                      style={{ width: 28, height: 28 }}
+                    />
+                    <Text style={{ fontFamily: "PoppinsRegular" }}>
+                      {passengers}
+                    </Text>
+                  </View>
+                )}
+
+                {pass && (
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Image
+                      source={priorityPassIcon}
+                      resizeMode="cover"
+                      style={{ width: 28, height: 28 }}
+                    />
+                    <Text style={{ fontFamily: "PoppinsRegular" }}>{pass}</Text>
+                  </View>
+                )}
+
+                {carPicked && (
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Image
+                      source={carIcon}
+                      resizeMode="cover"
+                      style={{ width: 30, height: 30 }}
+                    />
+                    <Text
+                      style={{
+                        fontFamily: "PoppinsRegular",
+                        textTransform: "capitalize",
+                      }}
+                    >
+                      {carPicked}
+                    </Text>
+                  </View>
+                )}
+
+                {date && (
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Image
+                      source={calendarIcon}
+                      resizeMode="cover"
+                      style={{ width: 30, height: 30 }}
+                    />
+                    <Text
+                      style={{
+                        fontFamily: "PoppinsRegular",
+                        textTransform: "capitalize",
+                      }}
+                    >
+                      {date}
+                    </Text>
+                  </View>
+                )}
+
+                {time && (
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Image
+                      source={timeIcon}
+                      resizeMode="cover"
+                      style={{ width: 30, height: 30 }}
+                    />
+                    <Text
+                      style={{
+                        fontFamily: "PoppinsRegular",
+                        textTransform: "capitalize",
+                      }}
+                    >
+                      {time}
+                    </Text>
+                  </View>
+                )}
+              </View>
+
+              {/* PASS OPTION */}
+              <View style={{ marginTop: 10 }}>
+                {priorityPassAdded && (
+                  <>
+                    <SelectList
+                      setSelected={(value) => {
+                        setSelectedPass(value);
+                      }}
+                      data={priorityPasses}
+                      arrowicon={
+                        <Image
+                          source={arrowDownIcon}
+                          style={{ width: 40, height: 40, marginTop: -8 }}
+                          resizeMode="cover"
+                        />
+                      }
+                      closeicon={
+                        <Image
+                          source={closeIcon}
+                          style={{ width: 50, height: 50, marginTop: -1 }}
+                          resizeMode="cover"
+                        />
+                      }
+                      boxStyles={{
+                        borderRadius: 10,
+                        borderWidth: 0.5,
+                        borderColor: "#C9C9C9",
+                        height: 50,
+                        padding: 10,
+                      }}
+                      dropdownItemStyles={{
+                        marginVertical: 5,
+                      }}
+                      dropdownStyles={{
+                        borderRadius: 10,
+                        borderWidth: 0.5,
+                        borderColor: "#C9C9C9",
+                        padding: 10,
+                      }}
+                      inputStyles={{
+                        fontFamily: "PoppinsRegular",
+                        color: "#C9C9C9",
+                        marginTop: 4,
+                        fontSize: 16,
+                      }}
+                      dropdownTextStyles={{
+                        fontFamily: "PoppinsRegular",
+                      }}
+                      placeholder="Select Pass"
+                      searchPlaceholder="Search passes"
+                    />
+                  </>
+                )}
+              </View>
+              {/* PASS OPTION */}
+              <View style={{ marginTop: 10 }}>
+                {priorityPassAdded && (
+                  <>
+                    <SelectList
+                      setSelected={(value) => {
+                        setNumberOfPass(value);
+                      }}
+                      data={[
+                        {
+                          key: "1",
+                          value: "1",
+                        },
+                        {
+                          key: "2",
+                          value: "2",
+                        },
+                        {
+                          key: "3",
+                          value: "3",
+                        },
+                        {
+                          key: "4",
+                          value: "4",
+                        },
+                        {
+                          key: "5",
+                          value: "5",
+                        },
+                        {
+                          key: "6",
+                          value: "6",
+                        },
+                      ]}
+                      arrowicon={
+                        <Image
+                          source={arrowDownIcon}
+                          style={{ width: 40, height: 40, marginTop: -8 }}
+                          resizeMode="cover"
+                        />
+                      }
+                      closeicon={
+                        <Image
+                          source={closeIcon}
+                          style={{ width: 50, height: 50, marginTop: -1 }}
+                          resizeMode="cover"
+                        />
+                      }
+                      boxStyles={{
+                        borderRadius: 10,
+                        borderWidth: 0.5,
+                        borderColor: "#C9C9C9",
+                        height: 50,
+                        padding: 10,
+                      }}
+                      dropdownItemStyles={{
+                        marginVertical: 5,
+                      }}
+                      dropdownStyles={{
+                        borderRadius: 10,
+                        borderWidth: 0.5,
+                        borderColor: "#C9C9C9",
+                        padding: 10,
+                      }}
+                      inputStyles={{
+                        fontFamily: "PoppinsRegular",
+                        color: "#C9C9C9",
+                        marginTop: 4,
+                        fontSize: 14,
+                      }}
+                      dropdownTextStyles={{
+                        fontFamily: "PoppinsRegular",
+                      }}
+                      placeholder="Number of pass"
+                      // search={false}
+                      searchPlaceholder="Input Number (Max 6)"
+                    />
+                  </>
+                )}
+              </View>
+
+              {/* TOTAL */}
               <View
                 style={{
-                  alignItems: "center",
-                  flexDirection: "column",
+                  backgroundColor: COLORS.shuttlelaneYellowFaded,
+                  padding: 10,
+                  borderRadius: 10,
                   marginTop: 20,
                 }}
               >
-                <Text style={{ fontSize: 18, fontFamily: "PoppinsSemiBold" }}>
-                  Pay with:
-                </Text>
-
-                {/* PAYMENT OPTIONS */}
-                <View style={{ width: "100%", alignItems: "center" }}>
-                  {/* PAYPAL PAYMENT */}
-                  {user?.currency !== "neira" && (
-                    <TouchableOpacity
-                      style={{
-                        borderWidth: 1,
-                        marginTop: 20,
-                        borderColor: "#C9C9C9",
-                        width: "100%",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        height: 60,
-                        borderRadius: 10,
-                      }}
-                      onPress={payWithPayPal}
-                    >
-                      <Image
-                        source={paypal}
-                        style={{ width: 100, height: 100 }}
-                        resizeMode="cover"
-                      />
-                    </TouchableOpacity>
-                  )}
-
-                  {/* FLUTTERWAVE PAYMENT */}
-                  <PayWithFlutterwave
-                    onRedirect={handleOnRedirect}
-                    options={{
-                      tx_ref: generateTransactionRef(10),
-                      authorization: FLUTTERWAVE_KEY,
-                      customer: {
-                        email: user?.email,
-                      },
-                      amount: total?.includes(",")
-                        ? Number(`${total.split(",")[0]}${total.split(",")[1]}`)
-                        : Number(total),
-                      currency:
-                        user?.currency === "neira"
-                          ? "NGN"
-                          : user?.currency === "dollars"
-                          ? "USD"
-                          : user?.currency === "pounds"
-                          ? "GBP"
-                          : user?.currency === "euros"
-                          ? "EUR"
-                          : "NGN",
-                      payment_options: "card",
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontFamily: "PoppinsBold",
+                      textAlign: "center",
+                      fontSize: 26,
+                      textTransform: "uppercase",
                     }}
-                    customButton={(props) => (
+                  >
+                    TOTAL:
+                  </Text>
+                  <Text
+                    style={{
+                      fontFamily: "PoppinsBold",
+                      textAlign: "center",
+                      fontSize: 26,
+                      marginHorizontal: 10,
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {user?.currency === "dollars"
+                      ? "$"
+                      : user?.currency === "neira"
+                      ? "₦"
+                      : user?.currency === "pounds"
+                      ? "£"
+                      : user?.currency === "euros"
+                      ? "€"
+                      : "!"}
+                    {(!orderTotal || !priorityPassAdded) && (
+                      <>
+                        {total?.includes(",")
+                          ? total
+                          : Intl.NumberFormat("en-US", {}).format(total)}
+                      </>
+                    )}
+
+                    {!isNaN(orderTotal) && priorityPassAdded && (
+                      <>{Number(orderTotal)?.toFixed(2)}</>
+                    )}
+                    {/* {orderTotal && priorityPassAdded && <>{orderTotal == 'NaN' ? '' : orderTotal}</>} */}
+                    {/* {orderTotal && <>{orderTotal}</>} */}
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            {(bookingType == "Airport Pickup" ||
+              bookingType == "Airport Dropoff") && (
+              <TouchableOpacity
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginTop: 20,
+                  borderColor: "#D9D9D9",
+                  borderWidth: 0.4,
+                  height: 30,
+                  flexDirection: "row",
+                }}
+                onPress={() => {
+                  setPriorityPassAdded(!priorityPassAdded);
+                }}
+              >
+                {priorityPassAdded && (
+                  <Icon name="check" size={18} color="#4BB543" />
+                )}
+                <Text style={{ fontFamily: "PoppinsRegular" }}>
+                  Add Priority Pass
+                </Text>
+              </TouchableOpacity>
+            )}
+
+            <View style={{ marginTop: 20 }}>
+              {bookingType !== "Car Hire" && (
+                <View
+                  style={{
+                    padding: 10,
+                    borderRadius: 10,
+                  }}
+                >
+                  <View
+                    style={{
+                      alignItems: "center",
+                      flexDirection: "column",
+                      marginTop: 20,
+                    }}
+                  >
+                    <Text
+                      style={{ fontSize: 18, fontFamily: "PoppinsSemiBold" }}
+                    >
+                      Pay with:
+                    </Text>
+
+                    {/* PAYMENT OPTIONS */}
+                    <View style={{ width: "100%", alignItems: "center" }}>
+                      {/* PAYPAL PAYMENT */}
+                      {user?.currency !== "neira" && (
+                        <TouchableOpacity
+                          style={{
+                            borderWidth: 1,
+                            marginTop: 20,
+                            borderColor: "#C9C9C9",
+                            width: "100%",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            height: 60,
+                            borderRadius: 10,
+                          }}
+                          onPress={payWithPayPal}
+                        >
+                          <Image
+                            source={paypal}
+                            style={{ width: 100, height: 100 }}
+                            resizeMode="cover"
+                          />
+                        </TouchableOpacity>
+                      )}
+
+                      {/* FLUTTERWAVE PAYMENT */}
+                      <PayWithFlutterwave
+                        onRedirect={handleOnRedirect}
+                        options={{
+                          tx_ref: generateTransactionRef(10),
+                          authorization: FLUTTERWAVE_KEY,
+                          customer: {
+                            email: `${email}` ?? `${user?.email}`,
+                          },
+                          amount:
+                            !priorityPassAdded && total?.includes(",")
+                              ? Number(
+                                  `${total.split(",")[0]}${total.split(",")[1]}`
+                                )
+                              : priorityPassAdded
+                              ? Number(orderTotal)
+                              : Number(total),
+                          currency:
+                            user?.currency === "neira"
+                              ? "NGN"
+                              : user?.currency === "dollars"
+                              ? "USD"
+                              : user?.currency === "pounds"
+                              ? "GBP"
+                              : user?.currency === "euros"
+                              ? "EUR"
+                              : "NGN",
+                          payment_options: "card",
+                        }}
+                        customButton={(props) => (
+                          <TouchableOpacity
+                            style={{
+                              borderWidth: 1,
+                              marginTop: 20,
+                              borderColor: "#C9C9C9",
+                              width: "100%",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              height: 60,
+                              borderRadius: 10,
+                            }}
+                            onPress={props.onPress}
+                            isBusy={props.isInitializing}
+                            disabled={props.disabled}
+                          >
+                            <Image
+                              source={flutterwave}
+                              style={{ width: 110, height: 110 }}
+                              resizeMode="contain"
+                            />
+                          </TouchableOpacity>
+                        )}
+                      />
+
+                      {/* STRIPE PAYMENT */}
                       <TouchableOpacity
                         style={{
                           borderWidth: 1,
@@ -808,49 +1389,58 @@ const BookingSummary = () => {
                           height: 60,
                           borderRadius: 10,
                         }}
-                        onPress={props.onPress}
-                        isBusy={props.isInitializing}
-                        disabled={props.disabled}
+                        onPress={payWithStripe}
                       >
-                        <Image
-                          source={flutterwave}
-                          style={{ width: 100, height: 100 }}
-                          resizeMode="contain"
-                        />
+                        {!isStripeLoading && (
+                          <Image
+                            source={stripeLogo}
+                            style={{ width: 100, height: 100 }}
+                            resizeMode="contain"
+                          />
+                        )}
+
+                        {isStripeLoading && <ActivityIndicator size={32} />}
                       </TouchableOpacity>
-                    )}
-                  />
-
-                  {/* STRIPE PAYMENT */}
-                  <TouchableOpacity
-                    style={{
-                      borderWidth: 1,
-                      marginTop: 20,
-                      borderColor: "#C9C9C9",
-                      width: "100%",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      height: 60,
-                      borderRadius: 10,
-                    }}
-                    onPress={payWithStripe}
-                  >
-                    {!isLoading && (
-                      <Image
-                        source={stripeLogo}
-                        style={{ width: 100, height: 100 }}
-                        resizeMode="contain"
-                      />
-                    )}
-
-                    {isLoading && <ActivityIndicator size={32} />}
-                  </TouchableOpacity>
+                    </View>
+                  </View>
                 </View>
-              </View>
+              )}
+
+              {bookingType == "Car Hire" && (
+                <TouchableOpacity
+                  style={{
+                    height: 50,
+                    padding: 10,
+                    paddingHorizontal: 20,
+                    fontSize: 16,
+                    marginTop: 10,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    borderColor: "#000",
+                    borderWidth: 1,
+                    borderRadius: 10,
+                    backgroundColor: COLORS.shuttlelanePurple,
+                  }}
+                  onPress={() => carHireHandler()}
+                >
+                  <Text
+                    style={{
+                      fontFamily: "PoppinsRegular",
+                      color: "#FFF",
+                    }}
+                  >
+                    {isCarHireLoading ? (
+                      <ActivityIndicator size={32} color="#FFF" />
+                    ) : (
+                      "Make Booking"
+                    )}
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
-          </View>
-        </ScrollView>
-      </StripeProvider>
+          </ScrollView>
+        </StripeProvider>
+      </ScrollView>
     </SafeAreaView>
   );
 };

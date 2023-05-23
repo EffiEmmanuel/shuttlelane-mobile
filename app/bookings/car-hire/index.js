@@ -25,6 +25,8 @@ import DatePicker from "react-native-modern-datepicker";
 import axios from "axios";
 import { ActivityIndicator } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import RNDateTimePicker from "@react-native-community/datetimepicker";
 
 const CarHire = () => {
   const router = useRouter();
@@ -38,7 +40,7 @@ const CarHire = () => {
   const [pickupAddress, setPickupAddress] = useState(false);
 
   // DAYS SETUP
-  const [days, setDays] = useState(0);
+  const [days, setDays] = useState("");
 
   // SELECT SETUP
   const [carPicked, setCarPicked] = useState("");
@@ -46,6 +48,12 @@ const CarHire = () => {
   // ARRIVAL DATE SETUP
   const currentDate = new Date();
   const [date, setDate] = useState();
+  const shuttleDate = new Date();
+  // DATE SETUP
+  const [year, setYear] = useState();
+  const [month, setMonth] = useState();
+  const [day, setDay] = useState();
+
   // DATE STATES
   const [datePicker, setDatePicker] = useState(false);
 
@@ -115,17 +123,17 @@ const CarHire = () => {
 
   // Fetch Exchange rates
   const [rates, setRates] = useState();
-
+  const [isRatesLoading, setIsRatesLoading] = useState(false);
   // FUNCTION
   async function fetchExchangeRates() {
-    setIsLoading(true);
+    setIsRatesLoading(true);
     await axios
       .get(`https://www.shuttlelane.com/api/rates`)
       .then((res) => {
         const exchangeRates = res.data.data[0];
         setRates(res.data.data[0]);
         console.log("res:", res.data.data[0]?.dollar);
-        setIsLoading(false);
+        setIsRatesLoading(false);
       })
       .catch((err) => {
         console.log("err:", err);
@@ -148,7 +156,7 @@ const CarHire = () => {
     } else if (user?.currency === "pounds") {
       newAmount = amount / poundRate;
       return newAmount;
-    } else if (user?.currency === "euro") {
+    } else if (user?.currency === "euros") {
       newAmount = amount / euroRate;
       return newAmount;
     }
@@ -156,17 +164,18 @@ const CarHire = () => {
 
   // CARS SETUP
   const [cars, setCars] = useState();
+  const [isCarsLoading, setIsCarsLoading] = useState(false);
   async function fetchCars() {
-    setIsLoading(true);
+    setIsCarsLoading(true);
     await axios
       .get("https://www.shuttlelane.com/api/cars")
       .then((res) => {
         console.log("CARS:", res.data);
         let carFormat = [];
         let carArray = res.data.data;
-        carArray.forEach((car) => {
+        carArray.forEach(async (car) => {
           console.log("CAR RATE:", car?.rate);
-          const prePrice = makeConversion(Number(car?.rate));
+          const prePrice = await makeConversion(Number(car?.rate));
           console.log("PREPRICE::", prePrice);
           const price = Intl.NumberFormat("en-US", {}).format(prePrice);
           console.log("PRICE::", price);
@@ -178,9 +187,9 @@ const CarHire = () => {
         });
         console.log("CAR FORMAT::", carFormat);
         setCars(carFormat);
-        setIsLoading(false);
+        setIsCarsLoading(false);
       })
-      .then((err) => {
+      .catch((err) => {
         console.log("CARS ERROR:", err);
         console.log("ALL CARS:", cars);
       });
@@ -188,10 +197,14 @@ const CarHire = () => {
 
   // USER DATA
   const [user, setUser] = useState();
+  // GUEST DATA
+  const [guest, setGuest] = useState();
   async function fetchUserData() {
     // const user = ;
     const parsedUser = JSON.parse(await AsyncStorage.getItem("user"));
+    const parsedGuest = JSON.parse(await AsyncStorage.getItem("isGuest"));
     setUser(parsedUser);
+    setGuest(parsedGuest);
   }
 
   useEffect(() => {
@@ -201,8 +214,13 @@ const CarHire = () => {
   }, []);
 
   useEffect(() => {
-    fetchCars();
+    // if (rates) {
+      fetchCars();
+    // }
   }, [rates]);
+
+  // CAR DATE SETUP
+  const [isCarDate, setIsCarDate] = useState();
 
   // ON FORM SUBMIT - PICKUP
   async function carHireNextStep() {
@@ -213,24 +231,57 @@ const CarHire = () => {
 
     const prePrice = cars.filter((car) => car?.value === carPicked)[0].price;
 
+    console.log("PP:", prePrice);
+
     const totalPrice = prePrice?.includes(",")
       ? Number(`${prePrice.split(",")[0]}${prePrice.split(",")[1]}`)
       : Number(prePrice);
+    console.log("TP:", totalPrice);
 
     const finalPrice = totalPrice * Number(days);
+    console.log("fP:", finalPrice);
 
-    router.push({
-      pathname: "/bookings/summary",
-      params: {
-        bookingType: "Car Hire",
-        pickupAddress,
-        carPicked: carPicked,
-        date,
-        days,
-        total: finalPrice,
-      },
-    });
+    if (guest) {
+      router.push({
+        pathname: "/bookings/user-details",
+        params: {
+          bookingType: "Car Hire",
+          pickupAddress,
+          carPicked: carPicked,
+          date,
+          days,
+          total: finalPrice,
+        },
+      });
+    } else {
+      router.push({
+        pathname: "/bookings/summary",
+        params: {
+          bookingType: "Car Hire",
+          pickupAddress,
+          carPicked: carPicked,
+          date,
+          days,
+          total: finalPrice,
+        },
+      });
+    }
   }
+
+  // SET DATE
+  useEffect(() => {
+    const shuttleDate = new Date();
+    const year = shuttleDate.getFullYear();
+    const month = shuttleDate.getMonth();
+    const day = shuttleDate.getDate();
+
+    console.log("year:::", year);
+    console.log("month:::", month);
+    console.log("day:::", day);
+    setYear(year);
+    setMonth(month);
+    setDay(day);
+  }, []);
 
   return (
     <ScrollView
@@ -260,20 +311,32 @@ const CarHire = () => {
       {isLoading && <ActivityIndicator size={36} />}
 
       {/* FORM HERE */}
-      {!isLoading && (
+      {!isLoading && !isCarsLoading && !isRatesLoading && (
         <View
           style={{
             backgroundColor: COLORS.white,
             padding: 20,
             paddingTop: 10,
             paddingBottom: 30,
-            position: "fixed",
+            // position: "fixed",
             top: 0,
           }}
         >
           {/* AIRPORT PICKUP FORM */}
 
           <View style={{ marginTop: 20 }}>
+            <View style={{ flexDirection: "row", marginTop: 20 }}>
+              <Icon name="home" size={20} color="#181818" />
+              <Text
+                style={{
+                  fontFamily: "PoppinsRegular",
+                  marginHorizontal: 5,
+                  color: "#181818",
+                }}
+              >
+                Pickup Address
+              </Text>
+            </View>
             <TextInput
               value={pickupAddress}
               style={{
@@ -293,8 +356,23 @@ const CarHire = () => {
 
             {/* SELECT DROPDOWN */}
             <View style={{ marginTop: 20 }}>
+              <View style={{ flexDirection: "row" }}>
+                <Icon name="directions-car" size={20} color="#181818" />
+                <Text
+                  style={{
+                    fontFamily: "PoppinsRegular",
+                    marginHorizontal: 5,
+                    color: "#181818",
+                  }}
+                >
+                  Car
+                </Text>
+              </View>
               <SelectList
-                setSelected={(value) => setCarPicked(value)}
+                setSelected={(value) => {
+                  console.log(value);
+                  setCarPicked(value);
+                }}
                 data={cars}
                 arrowicon={
                   <Image
@@ -341,109 +419,96 @@ const CarHire = () => {
               />
             </View>
 
-            {/* DATE PICKER */}
-            <View style={{ marginTop: 20 }}>
-              {datePicker && (
-                <Modal
-                  animationType="slide"
-                  visible={datePicker}
-                  transparent={true}
+            {/* DAYS */}
+            <View>
+              <View style={{ flexDirection: "row", marginTop: 20 }}>
+                <Icon name="today" size={20} color="#181818" />
+                <Text
+                  style={{
+                    fontFamily: "PoppinsRegular",
+                    marginHorizontal: 5,
+                    color: "#181818",
+                  }}
                 >
-                  <View
-                    style={{
-                      flex: 1,
-                      justifyContent: "center",
-                      alignItems: "center",
-                      marginTop: 22,
-                    }}
-                  >
-                    <View
-                      style={{
-                        margin: 20,
-                        backgroundColor: COLORS.white,
-                        borderRadius: 20,
-                        width: "90%",
-                        alignItems: "center",
-                        shadowColor: "#000",
-                        shadowOffset: {
-                          width: 0,
-                          height: 2,
-                        },
-                        shadowOpacity: 0.25,
-                        shadowRadius: 4,
-                        elevation: 5,
-                        paddingBottom: 20,
-                      }}
-                    >
-                      <DatePicker
-                        mode="calendar"
-                        selected={date}
-                        AirportTransfer
-                        onDateChange={(value) => setDate(value)}
-                      />
+                  Days
+                </Text>
+              </View>
 
-                      <TouchableOpacity onPress={() => setDatePicker(false)}>
-                        <Text style={{ fontFamily: "PoppinsRegular" }}>
-                          Close
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </Modal>
-              )}
+              <TextInput
+                value={days}
+                style={{
+                  height: 50,
+                  padding: 10,
+                  paddingHorizontal: 20,
+                  fontSize: 16,
+                  fontFamily: "PoppinsRegular",
+                  borderColor: "#C9C9C9",
+                  borderWidth: 0.5,
+                  borderRadius: 10,
+                  // width: "48%",
+                }}
+                keyboardType="number-pad"
+                placeholder="Days"
+                placeholderTextColor="#C9C9C9"
+                onChangeText={(value) => setDays(value)}
+              />
+            </View>
 
-              <View
+            {/* DATE PICKER */}
+            <View style={{ marginTop: 5 }}>
+              {/* PICKUP DATE */}
+              <TouchableOpacity
                 style={{
                   flexDirection: "row",
-                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginTop: 20,
+                  height: 50,
+                  padding: 10,
+                  paddingHorizontal: 20,
+                  fontSize: 16,
+                  fontFamily: "PoppinsRegular",
+                  borderColor: "#C9C9C9",
+                  borderWidth: 0.5,
+                  borderRadius: 10,
                 }}
+                onPress={() => setIsCarDate(true)}
               >
-                <TouchableOpacity
-                  value=""
+                <View
                   style={{
-                    height: 50,
-                    padding: 10,
-                    fontSize: 16,
-                    fontFamily: "PoppinsRegular",
-                    borderColor: "#C9C9C9",
-                    borderWidth: 0.5,
-                    borderRadius: 10,
-                    justifyContent: "center",
-                    alignContent: "center",
-                    width: "48%",
+                    flexDirection: "row",
+                    alignItems: "center",
                   }}
-                  onPress={() => setDatePicker(true)}
                 >
+                  <Icon name="today" size={20} color="#181818" />
                   <Text
                     style={{
-                      color: "#C9C9C9",
-                      paddingHorizontal: 10,
-                      fontSize: 16,
                       fontFamily: "PoppinsRegular",
+                      marginHorizontal: 5,
+                      marginTop: 2,
+                      color: "#181818",
                     }}
                   >
-                    {date ? date : "Set Pickup date"}
+                    {date ? date : "Date"}
                   </Text>
-                </TouchableOpacity>
-                <TextInput
-                  value={days}
-                  style={{
-                    height: 50,
-                    padding: 10,
-                    paddingHorizontal: 20,
-                    fontSize: 16,
-                    fontFamily: "PoppinsRegular",
-                    borderColor: "#C9C9C9",
-                    borderWidth: 0.5,
-                    borderRadius: 10,
-                    width: "48%",
-                  }}
-                  keyboardType="number-pad"
-                  placeholder="Days"
-                  placeholderTextColor="#C9C9C9"
-                  onChangeText={(value) => setDays(value)}
-                />
-              </View>
+                </View>
+                {isCarDate && (
+                  <RNDateTimePicker
+                    mode="date"
+                    display="calendar"
+                    value={new Date(`${year}`, `${month}`, `${day}`)}
+                    onChange={(event, value) => {
+                      console.log(value.toDateString());
+                      if (
+                        value != `${new Date(`${year}`, `${month}`, `${day}`)}`
+                      ) {
+                        setDate(value.toDateString());
+                      }
+                      setIsCarDate(false);
+                    }}
+                    minimumDate={new Date(`${year}`, `${month}`, `${day}`)}
+                  />
+                )}
+              </TouchableOpacity>
             </View>
 
             {/* NEXT BUTTON */}
@@ -489,7 +554,7 @@ const CarHire = () => {
           </Text>
         </View>
       )}
-      {!isMapLoading && (
+      {/* {!isMapLoading && (
         <MapView
           style={{
             flex: 1,
@@ -497,10 +562,11 @@ const CarHire = () => {
             height: Dimensions.get("window").height,
           }}
           region={mapRegion}
+          provider="google"
         >
           <Marker coordinate={mapRegion} title="Marker" />
         </MapView>
-      )}
+      )} */}
     </ScrollView>
   );
 };

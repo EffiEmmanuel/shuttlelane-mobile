@@ -1,10 +1,15 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import React, { createContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 export const AuthContext = createContext();
 
+export const useAuth = () => {
+  return useContext(AuthContext);
+};
+
 const AuthProvider = ({ children }) => {
+  const [authState, setAuthState] = useState({});
   // USER DATA
   const [user, setUser] = useState(null);
 
@@ -55,16 +60,14 @@ const AuthProvider = ({ children }) => {
     }
 
     showToastMessage("Log in successful", "success");
-    const stringifiedToken = JSON.stringify(user?.token);
-    const stringifiedUser = JSON.stringify(user?.data);
-    console.log(stringifiedToken);
-    console.log(stringifiedUser);
 
-    // await AsyncStorage.setItem("token", JSON.stringify(user?.token));
-    // await AsyncStorage.setItem("user", JSON.stringify(user?.data));
-    // setUser(user)
-    // setIsLoading(false);
-    // router.replace("/dashboard");
+    await AsyncStorage.setItem("token", user?.token);
+    await AsyncStorage.setItem("user", user?.data);
+
+    setAuthState({
+      token: user?.token,
+      authenticated: true,
+    });
     return;
   }
 
@@ -75,6 +78,10 @@ const AuthProvider = ({ children }) => {
     await AsyncStorage.removeItem("token");
     await AsyncStorage.removeItem("user");
     setIsLoading(false);
+    setAuthState({
+      token: null,
+      authenticated: false,
+    });
     router.replace("/login");
     return;
   }
@@ -118,6 +125,24 @@ const AuthProvider = ({ children }) => {
     router.replace("/");
     return;
   }
+
+  useEffect(() => {
+    async function prepare() {
+      try {
+        const token = await AsyncStorage.getItem("token");
+        if (token) {
+          setAuthState({
+            token,
+            authenticated: true,
+          });
+        }
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+
+    prepare();
+  }, []);
 
   return (
     <AuthContext.Provider

@@ -43,12 +43,19 @@ const SearchResultPage = () => {
       );
       const booking = await response.json();
 
+      console.log('FETCH BOOKING RESPONSE::', booking)
+
       if (booking?.status === 404) {
         setErrorMessage(booking?.message);
         setIsLoading(false);
         return;
       }
-      console.log("RES:::", booking);
+
+      if (booking?.status === 500) {
+        setErrorMessage('An error occured while we processed your request. Please try again');
+        setIsLoading(false);
+        return;
+      }
 
       setBooking(booking?.data);
       setIsLoading(false);
@@ -59,7 +66,7 @@ const SearchResultPage = () => {
 
   return (
     <SafeAreaView
-      style={{ flex: 1, backgroundColor: COLORS.white, display: "relative" }}
+      style={{ flex: 1, backgroundColor: COLORS.white, position: "relative" }}
     >
       <Stack.Screen
         options={{
@@ -77,15 +84,7 @@ const SearchResultPage = () => {
               />
             </TouchableOpacity>
           ),
-          headerTitle: () => (
-            <Image
-              source={logo}
-              resizeMode="contain"
-              style={{ width: 100, height: 100, marginTop: -28 }}
-              height={28}
-              width={28}
-            />
-          ),
+          headerTitle: "",
         }}
       />
 
@@ -125,7 +124,7 @@ const SearchResultPage = () => {
           )}
 
           {/* BOOKING DETAILS */}
-          {!isLoading && (
+          {!isLoading && !errorMessage && (
             <View style={{ marginTop: 20 }}>
               <Text
                 style={{
@@ -141,22 +140,23 @@ const SearchResultPage = () => {
 
               {/* GROUP */}
               <View>
-                <Text
-                  style={{
-                    fontSize: 20,
-                    marginTop: 30,
-                    fontWeight: "500",
-                    color: COLORS.shuttlelanePurple,
-                    fontFamily: "PoppinsSemiBold",
-                  }}
-                >
-                  Pickup{" "}
+                <View style={{ flexDirection: "row", alignItems: "center", marginTop: 25 }}>
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      fontWeight: "500",
+                      color: COLORS.shuttlelanePurple,
+                      fontFamily: "PoppinsSemiBold",
+                    }}
+                  >
+                    Pickup{" "}
+                  </Text>
                   <Icon
                     name="place"
                     size={20}
                     color={COLORS.shuttlelanePurple}
                   />
-                </Text>
+                </View>
 
                 <View
                   style={{
@@ -203,22 +203,23 @@ const SearchResultPage = () => {
 
               {/* GROUP */}
               <View>
-                <Text
-                  style={{
-                    fontSize: 20,
-                    marginTop: 30,
-                    fontWeight: "500",
-                    color: COLORS.shuttlelanePurple,
-                    fontFamily: "PoppinsSemiBold",
-                  }}
-                >
-                  Dropoff{" "}
+                <View style={{ flexDirection: "row", alignItems: "center", marginTop: 25 }}>
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      fontWeight: "500",
+                      color: COLORS.shuttlelanePurple,
+                      fontFamily: "PoppinsSemiBold",
+                    }}
+                  >
+                    Dropoff{" "}
+                  </Text>
                   <Icon
                     name="place"
                     size={20}
                     color={COLORS.shuttlelanePurple}
                   />
-                </Text>
+                </View>
 
                 <View
                   style={{
@@ -245,22 +246,23 @@ const SearchResultPage = () => {
 
               {/* GROUP */}
               <View>
-                <Text
-                  style={{
-                    fontSize: 20,
-                    marginTop: 30,
-                    fontWeight: "500",
-                    color: COLORS.shuttlelanePurple,
-                    fontFamily: "PoppinsSemiBold",
-                  }}
-                >
-                  Driver Details{" "}
+                <View style={{ flexDirection: "row", alignItems: "center", marginTop: 25 }}>
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      fontWeight: "500",
+                      color: COLORS.shuttlelanePurple,
+                      fontFamily: "PoppinsSemiBold",
+                    }}
+                  >
+                    Driver Details{" "}
+                  </Text>
                   <Icon
                     name="person"
                     size={20}
                     color={COLORS.shuttlelanePurple}
                   />
-                </Text>
+                </View>
 
                 <View
                   style={{
@@ -310,22 +312,23 @@ const SearchResultPage = () => {
               {/* GROUP */}
               {booking?.assignedCar && (
                 <View>
-                  <Text
-                    style={{
-                      fontSize: 20,
-                      marginTop: 30,
-                      fontWeight: "500",
-                      color: COLORS.shuttlelanePurple,
-                      fontFamily: "PoppinsSemiBold",
-                    }}
-                  >
-                    Car Details{" "}
+                  <View style={{ flexDirection: "row", alignItems: "center", marginTop: 25 }}>
+                    <Text
+                      style={{
+                        fontSize: 20,
+                        fontWeight: "500",
+                        color: COLORS.shuttlelanePurple,
+                        fontFamily: "PoppinsSemiBold",
+                      }}
+                    >
+                      Car Details{" "}
+                    </Text>
                     <Icon
                       name="local-taxi"
                       size={20}
                       color={COLORS.shuttlelanePurple}
                     />
-                  </Text>
+                  </View>
 
                   <View
                     style={{
@@ -397,26 +400,27 @@ const SearchResultPage = () => {
             </View>
           )}
 
-          {!isLoading && (
+          {!isLoading && !errorMessage && (
             <View>
               {/* GROUP */}
               <View>
-                <Text
-                  style={{
-                    fontSize: 20,
-                    marginTop: 30,
-                    fontWeight: "500",
-                    color: COLORS.shuttlelanePurple,
-                    fontFamily: "PoppinsSemiBold",
-                  }}
-                >
-                  Date and Time{" "}
+                <View style={{ flexDirection: "row", alignItems: "center", marginTop: 25 }}>
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      fontWeight: "500",
+                      color: COLORS.shuttlelanePurple,
+                      fontFamily: "PoppinsSemiBold",
+                    }}
+                  >
+                    Date and Time{" "}
+                  </Text>
                   <Icon
                     name="schedule"
                     size={20}
                     color={COLORS.shuttlelanePurple}
                   />
-                </Text>
+                </View>
 
                 <View
                   style={{
@@ -459,22 +463,23 @@ const SearchResultPage = () => {
 
               {/* GROUP */}
               <View>
-                <Text
-                  style={{
-                    fontSize: 20,
-                    marginTop: 30,
-                    fontWeight: "500",
-                    color: COLORS.shuttlelanePurple,
-                    fontFamily: "PoppinsSemiBold",
-                  }}
-                >
-                  Vehicle Class{" "}
+                <View style={{ flexDirection: "row", alignItems: "center", marginTop: 25 }}>
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      fontWeight: "500",
+                      color: COLORS.shuttlelanePurple,
+                      fontFamily: "PoppinsSemiBold",
+                    }}
+                  >
+                    Vehicle Class{" "}
+                  </Text>
                   <Icon
                     name="local-taxi"
                     size={20}
                     color={COLORS.shuttlelanePurple}
                   />
-                </Text>
+                </View>
 
                 <View
                   style={{
@@ -498,22 +503,23 @@ const SearchResultPage = () => {
 
               {/* GROUP */}
               <View>
-                <Text
-                  style={{
-                    fontSize: 20,
-                    marginTop: 30,
-                    fontWeight: "500",
-                    color: COLORS.shuttlelanePurple,
-                    fontFamily: "PoppinsSemiBold",
-                  }}
-                >
-                  Passenger{" "}
+                <View style={{ flexDirection: "row", alignItems: "center", marginTop: 25 }}>
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      fontWeight: "500",
+                      color: COLORS.shuttlelanePurple,
+                      fontFamily: "PoppinsSemiBold",
+                    }}
+                  >
+                    Passenger{" "}
+                  </Text>
                   <Icon
                     name="person"
                     size={20}
                     color={COLORS.shuttlelanePurple}
                   />
-                </Text>
+                </View>
 
                 <View
                   style={{
@@ -556,22 +562,23 @@ const SearchResultPage = () => {
 
               {/* GROUP */}
               <View>
-                <Text
-                  style={{
-                    fontSize: 20,
-                    marginTop: 30,
-                    fontWeight: "500",
-                    color: COLORS.shuttlelanePurple,
-                    fontFamily: "PoppinsSemiBold",
-                  }}
-                >
-                  Contact{" "}
+                <View style={{ flexDirection: "row", alignItems: "center", marginTop: 25 }}>
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      fontWeight: "500",
+                      color: COLORS.shuttlelanePurple,
+                      fontFamily: "PoppinsSemiBold",
+                    }}
+                  >
+                    Contact{" "}
+                  </Text>
                   <Icon
                     name="support-agent"
                     size={20}
                     color={COLORS.shuttlelanePurple}
                   />
-                </Text>
+                </View>
 
                 <View
                   style={{
