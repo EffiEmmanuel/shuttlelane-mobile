@@ -121,7 +121,7 @@ const PayWithPayPal = () => {
         {
           headers: {
             Authorization:
-              "Basic QVlLSmJkZ1l0YUxTU2RyX2R5X2szbTE5ZEp6aEc2MDJmc1pmM0ZTYTl6ZjlTbWdhS01XRDNjbzd1dzFfTHRZREV4QUJ4bkljVEx1MXVJY186RUpRc3Rxd1dxRGtqRnhZZkREbzAyWXYyVUVtdVpaalFTS1N3RkpTREZrN3R4a0o2Wk1hNnU5VDRuaTJtVUR4U3ZhcUJjYmhlald1QnFNNXM=",
+              // "Basic QVlLSmJkZ1l0YUxTU2RyX2R5X2szbTE5ZEp6aEc2MDJmc1pmM0ZTYTl6ZjlTbWdhS01XRDNjbzd1dzFfTHRZREV4QUJ4bkljVEx1MXVJY186RUpRc3Rxd1dxRGtqRnhZZkREbzAyWXYyVUVtdVpaalFTS1N3RkpTREZrN3R4a0o2Wk1hNnU5VDRuaTJtVUR4U3ZhcUJjYmhlald1QnFNNXM=",
             "Content-Type": "text/plain",
           },
         }
