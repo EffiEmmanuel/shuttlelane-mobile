@@ -44,7 +44,7 @@
     },
     "ios": {
       "bundleIdentifier": "com.Shuttlelane.Shuttlelane",
-      "buildNumber": "30",
+      "buildNumber": "31",
       "infoPlist": {
         "NSCameraUsageDescription": "This app uses the camera to take user pictures. This is for their profile images and problem reports."
       }
