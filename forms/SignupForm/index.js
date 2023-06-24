@@ -17,8 +17,9 @@ import * as ImagePicker from "expo-image-picker";
 import { AuthContext } from "../../context/AuthContext";
 import axios from "axios";
 import { Alert } from "react-native";
-import * as CountryCodes from "country-codes-list";
 import { Platform } from "react-native";
+
+import { CountryPicker } from "react-native-country-codes-picker";
 
 const SignupForm = () => {
   const [firstName, setFirstName] = useState("");
@@ -203,24 +204,9 @@ const SignupForm = () => {
   }
 
   // COUNTRY CODES
-  const [countryCodes, setCountryCodes] = useState();
   const [countryCode, setCountryCode] = useState("");
-  useEffect(() => {
-    const countryCodes = CountryCodes.customList(
-      "countryCode",
-      "[{countryCode}] {countryNameEn}: +{countryCallingCode}"
-    );
-    let shuttleCountryCodes = [];
-    Object.values(countryCodes).map((code) => {
-      // console.log("CODE:", code?.split("+")[1]);
-      shuttleCountryCodes.push({
-        key: `+${code?.split("+")[1]}`,
-        value: `${code?.split("] ")[1]}`,
-      });
-    });
-    console.log("ÇOUNTRY CODES::", shuttleCountryCodes);
-    setCountryCodes(shuttleCountryCodes);
-  }, []);
+  const [isCountryCodesPickerVisible, setIsCountryCodesPickerVisible] =
+    useState(false);
 
   return (
     <>
@@ -239,10 +225,10 @@ const SignupForm = () => {
           }}
         />
       )}
-      <View style={{ marginTop: 40, padding: 20 }}>
+      <View style={{ marginTop: 20, padding: 20 }}>
         <Text
           style={{
-            fontSize: 24,
+            fontSize: Platform.OS === "ios" ? 24 : 20,
             fontFamily: "PoppinsBold",
             color: COLORS.shuttlelanePurple,
             textAlign: "center",
@@ -252,7 +238,7 @@ const SignupForm = () => {
         </Text>
         <Text
           style={{
-            fontSize: 16,
+            fontSize: Platform.OS === "ios" ? 16 : 12,
             fontFamily: "PoppinsRegular",
             marginTop: 5,
             textAlign: "center",
@@ -263,14 +249,21 @@ const SignupForm = () => {
 
         <View style={{ marginTop: 20 }}>
           <View style={{ marginTop: 20 }}>
-            <Text style={{ fontFamily: "PoppinsRegular" }}>First name</Text>
+            <Text
+              style={{
+                fontFamily: "PoppinsRegular",
+                fontSize: Platform.OS === "ios" ? 16 : 12,
+              }}
+            >
+              First name
+            </Text>
             <TextInput
               value={firstName}
               style={{
                 height: 50,
                 padding: 10,
                 paddingHorizontal: 20,
-                fontSize: 16,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
                 marginTop: 10,
                 fontFamily: "PoppinsRegular",
                 borderColor: "#C9C9C9",
@@ -283,14 +276,21 @@ const SignupForm = () => {
             />
           </View>
           <View style={{ marginTop: 20 }}>
-            <Text style={{ fontFamily: "PoppinsRegular" }}>Last name</Text>
+            <Text
+              style={{
+                fontFamily: "PoppinsRegular",
+                fontSize: Platform.OS === "ios" ? 16 : 12,
+              }}
+            >
+              Last name
+            </Text>
             <TextInput
               value={lastName}
               style={{
                 height: 50,
                 padding: 10,
                 paddingHorizontal: 20,
-                fontSize: 16,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
                 marginTop: 10,
                 fontFamily: "PoppinsRegular",
                 borderColor: "#C9C9C9",
@@ -303,14 +303,21 @@ const SignupForm = () => {
             />
           </View>
           <View style={{ marginTop: 20 }}>
-            <Text style={{ fontFamily: "PoppinsRegular" }}>Email</Text>
+            <Text
+              style={{
+                fontFamily: "PoppinsRegular",
+                fontSize: Platform.OS === "ios" ? 16 : 12,
+              }}
+            >
+              Email
+            </Text>
             <TextInput
               value={email}
               style={{
                 height: 50,
                 padding: 10,
                 paddingHorizontal: 20,
-                fontSize: 16,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
                 marginTop: 10,
                 fontFamily: "PoppinsRegular",
                 borderColor: "#C9C9C9",
@@ -325,63 +332,69 @@ const SignupForm = () => {
             />
           </View>
           <View style={{ marginTop: 20 }}>
-            <Text style={{ fontFamily: "PoppinsRegular" }}>Phone Number</Text>
+            <Text
+              style={{
+                fontFamily: "PoppinsRegular",
+                fontSize: Platform.OS === "ios" ? 16 : 12,
+              }}
+            >
+              Phone Number
+            </Text>
 
             <View>
-              <SelectList
-                setSelected={(value) => setCountryCode(value)}
-                data={countryCodes}
-                arrowicon={
-                  <Image
-                    source={arrowDownIcon}
-                    style={{ width: 40, height: 40, marginTop: -8 }}
-                    resizeMode="cover"
-                  />
-                }
-                closeicon={
-                  <Image
-                    source={closeIcon}
-                    style={{ width: 50, height: 50, marginTop: -1 }}
-                    resizeMode="cover"
-                  />
-                }
-                boxStyles={{
-                  borderRadius: 10,
-                  borderWidth: 0.5,
-                  borderColor: "#C9C9C9",
+              <TouchableOpacity
+                onPress={() => setIsCountryCodesPickerVisible(true)}
+                style={{
                   height: 50,
                   padding: 10,
+                  paddingHorizontal: 20,
+                  fontSize: Platform.OS === "ios" ? 16 : 12,
                   marginTop: 10,
-                }}
-                dropdownItemStyles={{
-                  marginVertical: 5,
-                }}
-                dropdownStyles={{
-                  borderRadius: 10,
-                  borderWidth: 0.5,
-                  maxHeight: 150,
+                  fontFamily: "PoppinsRegular",
                   borderColor: "#C9C9C9",
-                  padding: 10,
+                  borderWidth: 0.5,
+                  borderRadius: 10,
                 }}
-                inputStyles={{
-                  fontFamily: "PoppinsRegular",
-                  color: "#C9C9C9",
-                  marginTop: 4,
-                  fontSize: Platform.OS === "ios" ? 16 : 14,
+              >
+                {countryCode ? (
+                  <Text
+                    style={{
+                      color: "black",
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
+                      fontFamily: "PoppinsRegular",
+                    }}
+                  >
+                    {countryCode}
+                  </Text>
+                ) : (
+                  <Text
+                    style={{
+                      color: "#C9C9C9",
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
+                      fontFamily: "PoppinsRegular",
+                    }}
+                  >
+                    Select Country Code
+                  </Text>
+                )}
+              </TouchableOpacity>
+              {/* For showing picker just put show state to show prop */}
+              <CountryPicker
+                show={isCountryCodesPickerVisible}
+                // when picker button press you will get the country object with dial code
+                pickerButtonOnPress={(item) => {
+                  setCountryCode(item.dial_code);
+                  setIsCountryCodesPickerVisible(false);
                 }}
-                dropdownTextStyles={{
-                  fontFamily: "PoppinsRegular",
-                }}
-                placeholder="+234"
-                searchPlaceholder="Search Country Code"
               />
+
               <TextInput
                 value={mobile}
                 style={{
                   height: 50,
                   padding: 10,
                   paddingHorizontal: 20,
-                  fontSize: 16,
+                  fontSize: Platform.OS === "ios" ? 16 : 12,
                   marginTop: 10,
                   fontFamily: "PoppinsRegular",
                   borderColor: "#C9C9C9",
@@ -397,14 +410,21 @@ const SignupForm = () => {
             </View>
           </View>
           <View style={{ marginTop: 20 }}>
-            <Text style={{ fontFamily: "PoppinsRegular" }}>Password</Text>
+            <Text
+              style={{
+                fontFamily: "PoppinsRegular",
+                fontSize: Platform.OS === "ios" ? 16 : 12,
+              }}
+            >
+              Password
+            </Text>
             <TextInput
               value={password}
               style={{
                 height: 50,
                 padding: 10,
                 paddingHorizontal: 20,
-                fontSize: 16,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
                 marginTop: 10,
                 fontFamily: "PoppinsRegular",
                 borderColor: "#C9C9C9",
@@ -421,7 +441,13 @@ const SignupForm = () => {
 
           {/* SERVICE SELECT DROPDOWN */}
           <View style={{ marginTop: 20 }}>
-            <Text style={{ fontFamily: "PoppinsRegular", marginTop: 10 }}>
+            <Text
+              style={{
+                fontFamily: "PoppinsRegular",
+                marginTop: 10,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
+              }}
+            >
               Currency
             </Text>
             <SelectList
@@ -451,6 +477,7 @@ const SignupForm = () => {
               }}
               dropdownItemStyles={{
                 marginVertical: 5,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
               }}
               dropdownStyles={{
                 borderRadius: 10,
@@ -458,15 +485,17 @@ const SignupForm = () => {
                 maxHeight: 150,
                 borderColor: "#C9C9C9",
                 padding: 10,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
               }}
               inputStyles={{
                 fontFamily: "PoppinsRegular",
                 color: "#C9C9C9",
                 marginTop: 4,
-                fontSize: 16,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
               }}
               dropdownTextStyles={{
                 fontFamily: "PoppinsRegular",
+                fontSize: Platform.OS === "ios" ? 16 : 12,
               }}
               placeholder="Select Currency"
               searchPlaceholder="Search Currencies"
@@ -475,7 +504,12 @@ const SignupForm = () => {
 
           {/* SELECT IMAGE */}
           <View style={{ marginTop: 20 }}>
-            <Text style={{ fontFamily: "PoppinsRegular" }}>
+            <Text
+              style={{
+                fontFamily: "PoppinsRegular",
+                fontSize: Platform.OS === "ios" ? 16 : 12,
+              }}
+            >
               Profile Picture
             </Text>
             <TouchableOpacity
@@ -483,7 +517,7 @@ const SignupForm = () => {
                 height: 50,
                 padding: 10,
                 paddingHorizontal: 20,
-                fontSize: 16,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
                 marginTop: 10,
                 justifyContent: "center",
                 alignItems: "center",
@@ -497,6 +531,7 @@ const SignupForm = () => {
                 style={{
                   fontFamily: "PoppinsRegular",
                   color: "#000",
+                  fontSize: Platform.OS === "ios" ? 16 : 12,
                 }}
               >
                 {image ? "Selected" : "Profile Picture"}
@@ -519,7 +554,7 @@ const SignupForm = () => {
                 height: 50,
                 padding: 10,
                 paddingHorizontal: 20,
-                fontSize: 16,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
                 marginTop: 10,
                 justifyContent: "center",
                 alignItems: "center",
@@ -542,6 +577,7 @@ const SignupForm = () => {
                   style={{
                     fontFamily: "PoppinsSemiBold",
                     color: COLORS.white,
+                    fontSize: Platform.OS === "ios" ? 16 : 12,
                   }}
                 >
                   Create account
@@ -561,7 +597,7 @@ const SignupForm = () => {
               // justifyContent: "center",
             }}
           >
-            <Text>
+            <Text style={{ fontSize: Platform.OS === "ios" ? 16 : 12 }}>
               Already have an account?{" "}
               <Link style={{ color: COLORS.shuttlelanePurple }} href="/login">
                 Log in

@@ -77,7 +77,7 @@ const ScreenFour = () => {
               borderRadius: 15,
             }}
           >
-            <Text style={{ color: COLORS.white }}>Get started</Text>
+            <Text style={{ color: COLORS.white, fontFamily: 'PoppinsRegular', fontSize: Platform.OS === "ios" ? 16 : 12, }}>Get started</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={async () => {
@@ -95,7 +95,7 @@ const ScreenFour = () => {
               marginTop: 20,
             }}
           >
-            <Text style={{ color: "#000" }}>Log in</Text>
+            <Text style={{ color: "#000", fontFamily: 'PoppinsRegular', fontSize: Platform.OS === "ios" ? 16 : 12, }}>Log in</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -120,6 +120,8 @@ const ScreenFour = () => {
             <Text
               style={{
                 color: COLORS.shuttlelanePurple,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
+                fontFamily: 'PoppinsRegular'
               }}
             >
               Continue as guest

@@ -18,8 +18,9 @@ import { AuthContext } from "../../context/AuthContext";
 import axios from "axios";
 import { Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as CountryCodes from "country-codes-list";
 import { Platform } from "react-native";
+
+import { CountryPicker } from "react-native-country-codes-picker";
 
 const UserDetailsForm = ({
   bookingType,
@@ -48,6 +49,10 @@ const UserDetailsForm = ({
   const {} = useSearchParams();
 
   const router = useRouter();
+
+  // COUNTRY CODES CONFIG
+  const [isCountryCodesPickerVisible, setIsCountryCodesPickerVisible] =
+    useState(false);
 
   // ICON CONFIG
   const AnimatedIcon = Animated.createAnimatedComponent(Icon);
@@ -108,7 +113,7 @@ const UserDetailsForm = ({
 
     await AsyncStorage.setItem("user", JSON.stringify(guest));
     router.push({
-      pathname: "/bookings/summary",
+      pathname: "/bookings/booking-summary",
       params: {
         bookingType,
         pickupAirport,
@@ -126,7 +131,7 @@ const UserDetailsForm = ({
         pass,
         airline,
         countryCode,
-        email
+        email,
       },
     });
   }
@@ -138,25 +143,6 @@ const UserDetailsForm = ({
     }
 
     getGuestUser();
-  }, []);
-
-  // COUNTRY CODES
-  const [countryCodes, setCountryCodes] = useState();
-  useEffect(() => {
-    const countryCodes = CountryCodes.customList(
-      "countryCode",
-      "[{countryCode}] {countryNameEn}: +{countryCallingCode}"
-    );
-    let shuttleCountryCodes = [];
-    Object.values(countryCodes).map((code) => {
-      // console.log("CODE:", code?.split("+")[1]);
-      shuttleCountryCodes.push({
-        key: `+${code?.split("+")[1]}`,
-        value: `${code?.split("] ")[1]}`,
-      });
-    });
-    console.log("ÇOUNTRY CODES::", shuttleCountryCodes);
-    setCountryCodes(shuttleCountryCodes);
   }, []);
 
   // TITLE
@@ -203,7 +189,7 @@ const UserDetailsForm = ({
       <View style={{ marginTop: 10, padding: 20 }}>
         <Text
           style={{
-            fontSize: 24,
+            fontSize: Platform.OS === "ios" ? 24 : 20,
             fontFamily: "PoppinsBold",
             color: COLORS.shuttlelanePurple,
             textAlign: "center",
@@ -211,18 +197,17 @@ const UserDetailsForm = ({
         >
           Passenger Details
         </Text>
-        <Text
-          style={{
-            fontSize: 16,
-            fontFamily: "PoppinsRegular",
-            marginTop: 5,
-            textAlign: "center",
-          }}
-        ></Text>
 
         <View style={{ marginTop: 20 }}>
           <View style={{ marginTop: 20 }}>
-            <Text style={{ fontFamily: "PoppinsRegular" }}>Title</Text>
+            <Text
+              style={{
+                fontFamily: "PoppinsRegular",
+                fontSize: Platform.OS === "ios" ? 14 : 11,
+              }}
+            >
+              Title
+            </Text>
             <SelectList
               setSelected={(value) => setTitle(value)}
               data={titles}
@@ -250,6 +235,7 @@ const UserDetailsForm = ({
               }}
               dropdownItemStyles={{
                 marginVertical: 5,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
               }}
               dropdownStyles={{
                 borderRadius: 10,
@@ -257,29 +243,38 @@ const UserDetailsForm = ({
                 maxHeight: 150,
                 borderColor: "#C9C9C9",
                 padding: 10,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
               }}
               inputStyles={{
                 fontFamily: "PoppinsRegular",
                 color: "#C9C9C9",
                 marginTop: 4,
-                fontSize: Platform.OS === "ios" ? 16 : 14,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
               }}
               dropdownTextStyles={{
                 fontFamily: "PoppinsRegular",
+                fontSize: Platform.OS === "ios" ? 16 : 12,
               }}
-              placeholder="Mr / Mrs / Miss / Ms / Dr"
+              placeholder="Select title"
               searchPlaceholder="Serch Title"
             />
           </View>
           <View style={{ marginTop: 20 }}>
-            <Text style={{ fontFamily: "PoppinsRegular" }}>First name</Text>
+            <Text
+              style={{
+                fontFamily: "PoppinsRegular",
+                fontSize: Platform.OS === "ios" ? 14 : 11,
+              }}
+            >
+              First name
+            </Text>
             <TextInput
               value={firstName}
               style={{
                 height: 50,
                 padding: 10,
                 paddingHorizontal: 20,
-                fontSize: 16,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
                 marginTop: 10,
                 fontFamily: "PoppinsRegular",
                 borderColor: "#C9C9C9",
@@ -292,14 +287,21 @@ const UserDetailsForm = ({
             />
           </View>
           <View style={{ marginTop: 20 }}>
-            <Text style={{ fontFamily: "PoppinsRegular" }}>Last name</Text>
+            <Text
+              style={{
+                fontFamily: "PoppinsRegular",
+                fontSize: Platform.OS === "ios" ? 14 : 11,
+              }}
+            >
+              Last name
+            </Text>
             <TextInput
               value={lastName}
               style={{
                 height: 50,
                 padding: 10,
                 paddingHorizontal: 20,
-                fontSize: 16,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
                 marginTop: 10,
                 fontFamily: "PoppinsRegular",
                 borderColor: "#C9C9C9",
@@ -312,14 +314,21 @@ const UserDetailsForm = ({
             />
           </View>
           <View style={{ marginTop: 20 }}>
-            <Text style={{ fontFamily: "PoppinsRegular" }}>Email</Text>
+            <Text
+              style={{
+                fontFamily: "PoppinsRegular",
+                fontSize: Platform.OS === "ios" ? 14 : 11,
+              }}
+            >
+              Email
+            </Text>
             <TextInput
               value={email}
               style={{
                 height: 50,
                 padding: 10,
                 paddingHorizontal: 20,
-                fontSize: 16,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
                 marginTop: 10,
                 fontFamily: "PoppinsRegular",
                 borderColor: "#C9C9C9",
@@ -334,55 +343,60 @@ const UserDetailsForm = ({
             />
           </View>
           <View style={{ marginTop: 20 }}>
-            <Text style={{ fontFamily: "PoppinsRegular" }}>Phone Number</Text>
+            <Text
+              style={{
+                fontFamily: "PoppinsRegular",
+                fontSize: Platform.OS === "ios" ? 14 : 11,
+              }}
+            >
+              Phone Number
+            </Text>
 
             <View>
-              <SelectList
-                setSelected={(value) => setCountryCode(value)}
-                data={countryCodes}
-                arrowicon={
-                  <Image
-                    source={arrowDownIcon}
-                    style={{ width: 40, height: 40, marginTop: -8 }}
-                    resizeMode="cover"
-                  />
-                }
-                closeicon={
-                  <Image
-                    source={closeIcon}
-                    style={{ width: 50, height: 50, marginTop: -1 }}
-                    resizeMode="cover"
-                  />
-                }
-                boxStyles={{
-                  borderRadius: 10,
-                  borderWidth: 0.5,
-                  borderColor: "#C9C9C9",
+              <TouchableOpacity
+                onPress={() => setIsCountryCodesPickerVisible(true)}
+                style={{
                   height: 50,
                   padding: 10,
+                  paddingHorizontal: 20,
+                  fontSize: Platform.OS === "ios" ? 16 : 12,
                   marginTop: 10,
-                }}
-                dropdownItemStyles={{
-                  marginVertical: 5,
-                }}
-                dropdownStyles={{
-                  borderRadius: 10,
-                  borderWidth: 0.5,
-                  maxHeight: 150,
+                  fontFamily: "PoppinsRegular",
                   borderColor: "#C9C9C9",
-                  padding: 10,
+                  borderWidth: 0.5,
+                  borderRadius: 10,
                 }}
-                inputStyles={{
-                  fontFamily: "PoppinsRegular",
-                  color: "#C9C9C9",
-                  marginTop: 4,
-                  fontSize: Platform.OS === "ios" ? 16 : 14,
+              >
+                {countryCode ? (
+                  <Text
+                    style={{
+                      color: "black",
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
+                      fontFamily: "PoppinsRegular",
+                    }}
+                  >
+                    {countryCode}
+                  </Text>
+                ) : (
+                  <Text
+                    style={{
+                      color: "#C9C9C9",
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
+                      fontFamily: "PoppinsRegular",
+                    }}
+                  >
+                    Select Country Code
+                  </Text>
+                )}
+              </TouchableOpacity>
+              {/* For showing picker just put show state to show prop */}
+              <CountryPicker
+                show={isCountryCodesPickerVisible}
+                // when picker button press you will get the country object with dial code
+                pickerButtonOnPress={(item) => {
+                  setCountryCode(item.dial_code);
+                  setIsCountryCodesPickerVisible(false);
                 }}
-                dropdownTextStyles={{
-                  fontFamily: "PoppinsRegular",
-                }}
-                placeholder="+234"
-                searchPlaceholder="Search Country Code"
               />
               <TextInput
                 value={mobile}
@@ -390,7 +404,7 @@ const UserDetailsForm = ({
                   height: 50,
                   padding: 10,
                   paddingHorizontal: 20,
-                  fontSize: 16,
+                  fontSize: Platform.OS === "ios" ? 16 : 12,
                   marginTop: 10,
                   fontFamily: "PoppinsRegular",
                   borderColor: "#C9C9C9",
@@ -412,7 +426,7 @@ const UserDetailsForm = ({
                 height: 50,
                 padding: 10,
                 paddingHorizontal: 20,
-                fontSize: 16,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
                 marginTop: 10,
                 justifyContent: "center",
                 alignItems: "center",
@@ -428,6 +442,7 @@ const UserDetailsForm = ({
                   style={{
                     fontFamily: "PoppinsSemiBold",
                     color: COLORS.white,
+                    fontSize: Platform.OS === "ios" ? 16 : 12,
                   }}
                 >
                   Make Booking

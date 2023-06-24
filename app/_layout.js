@@ -117,6 +117,20 @@ const Layout = () => {
       />
 
       <Stack.Screen
+        name="bookings/booking-summary"
+        options={{
+          headerStyle: {
+            backgroundColor: COLORS.white,
+          },
+          headerShadowVisible: false,
+          headerTitle: "",
+          headerLeft: null,
+          gestureEnabled: false,
+          headerShown: false
+        }}
+      />
+
+      <Stack.Screen
         name="screenFour"
         options={{
           headerStyle: {

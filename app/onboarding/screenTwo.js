@@ -6,6 +6,7 @@ import { COLORS } from "../../constants/themes";
 import { Stack, useRouter } from "expo-router";
 import { Platform } from "react-native";
 import { SafeAreaView } from "react-native";
+import { StatusBar } from "expo-status-bar";
 
 const ScreenTwo = () => {
   const router = useRouter();
@@ -17,7 +18,10 @@ const ScreenTwo = () => {
   }
 
   return (
-    <SafeAreaView style={{ position: "relative", flex: 1, backgroundColor: 'white' }}>
+    <SafeAreaView
+      style={{ position: "relative", flex: 1, backgroundColor: "#fff" }}
+    >
+      <StatusBar style="dark" />
       <View style={{ backgroundColor: "white", flex: 1 }}>
         <Stack.Screen
           options={{
@@ -96,7 +100,7 @@ const ScreenTwo = () => {
               <Text
                 style={{
                   fontFamily: "PoppinsBold",
-                  fontSize: 28,
+                  fontSize: Platform.OS === "ios" ? 28 : 24,
                   textAlign: "center",
                 }}
               >
@@ -111,7 +115,7 @@ const ScreenTwo = () => {
                   style={{
                     maxWidth: 300,
                     fontFamily: "PoppinsRegular",
-                    fontSize: 14,
+                    fontSize: Platform.OS === "ios" ? 14 : 12,
                     textAlign: "center",
                     marginTop: 10,
                   }}
@@ -123,35 +127,37 @@ const ScreenTwo = () => {
             </View>
 
             <View style={{ marginTop: 50, alignItems: "center" }}>
-              <View style={{ flexDirection: "row" }}>
-                <View
-                  style={{
-                    height: 10,
-                    width: 10,
-                    backgroundColor: "#D9D9D9",
-                    marginHorizontal: 5,
-                    borderRadius: 50,
-                  }}
-                ></View>
-                <View
-                  style={{
-                    height: 10,
-                    width: 10,
-                    backgroundColor: "#191919",
-                    marginHorizontal: 5,
-                    borderRadius: 50,
-                  }}
-                ></View>
-                <View
-                  style={{
-                    height: 10,
-                    width: 10,
-                    backgroundColor: "#D9D9D9",
-                    marginHorizontal: 5,
-                    borderRadius: 50,
-                  }}
-                ></View>
-              </View>
+              {Platform.OS === "ios" && (
+                <View style={{ flexDirection: "row" }}>
+                  <View
+                    style={{
+                      height: 10,
+                      width: 10,
+                      backgroundColor: "#D9D9D9",
+                      marginHorizontal: 5,
+                      borderRadius: 50,
+                    }}
+                  ></View>
+                  <View
+                    style={{
+                      height: 10,
+                      width: 10,
+                      backgroundColor: "#191919",
+                      marginHorizontal: 5,
+                      borderRadius: 50,
+                    }}
+                  ></View>
+                  <View
+                    style={{
+                      height: 10,
+                      width: 10,
+                      backgroundColor: "#D9D9D9",
+                      marginHorizontal: 5,
+                      borderRadius: 50,
+                    }}
+                  ></View>
+                </View>
+              )}
             </View>
           </View>
 
@@ -174,7 +180,14 @@ const ScreenTwo = () => {
                 borderRadius: 15,
               }}
             >
-              <Text style={{ color: COLORS.white }}>Next</Text>
+              <Text
+                style={{
+                  color: COLORS.white,
+                  fontSize: Platform.OS === "ios" ? 16 : 12,
+                }}
+              >
+                Next
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={handlePrev}
@@ -190,7 +203,14 @@ const ScreenTwo = () => {
                 marginTop: 20,
               }}
             >
-              <Text style={{ color: "#000" }}>Go back</Text>
+              <Text
+                style={{
+                  color: "#000",
+                  fontSize: Platform.OS === "ios" ? 16 : 12,
+                }}
+              >
+                Go back
+              </Text>
             </TouchableOpacity>
           </View>
         </View>

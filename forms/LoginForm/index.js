@@ -60,6 +60,11 @@ const LoginForm = () => {
       await AsyncStorage.removeItem("isGuest");
     }
 
+    if (!email || !password) {
+      showToastMessage("Fields cannot be left empty", "error");
+      return;
+    }
+
     setIsLoading(true);
     const response = await fetch(
       "https://www.shuttlelane.com/api/users/signin",
@@ -128,7 +133,7 @@ const LoginForm = () => {
       <View style={{ marginTop: 40, padding: 20 }}>
         <Text
           style={{
-            fontSize: 24,
+            fontSize: Platform.OS === "ios" ? 24 : 20,
             fontFamily: "PoppinsBold",
             color: COLORS.shuttlelanePurple,
             textAlign: "center",
@@ -138,7 +143,7 @@ const LoginForm = () => {
         </Text>
         <Text
           style={{
-            fontSize: 16,
+            fontSize: Platform.OS === "ios" ? 16 : 12,
             fontFamily: "PoppinsRegular",
             marginTop: 5,
             textAlign: "center",
@@ -149,14 +154,21 @@ const LoginForm = () => {
 
         <View style={{ marginTop: 20 }}>
           <View style={{ marginTop: 20 }}>
-            <Text style={{ fontFamily: "PoppinsRegular" }}>Email Address</Text>
+            <Text
+              style={{
+                fontFamily: "PoppinsRegular",
+                fontSize: Platform.OS === "ios" ? 16 : 12,
+              }}
+            >
+              Email Address
+            </Text>
             <TextInput
               value={email}
               style={{
                 height: 50,
                 padding: 10,
                 paddingHorizontal: 20,
-                fontSize: 16,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
                 marginTop: 10,
                 fontFamily: "PoppinsRegular",
                 borderColor: "#C9C9C9",
@@ -171,14 +183,21 @@ const LoginForm = () => {
             />
           </View>
           <View style={{ marginTop: 20 }}>
-            <Text style={{ fontFamily: "PoppinsRegular" }}>Password</Text>
+            <Text
+              style={{
+                fontFamily: "PoppinsRegular",
+                fontSize: Platform.OS === "ios" ? 16 : 12,
+              }}
+            >
+              Password
+            </Text>
             <TextInput
               value={password}
               style={{
                 height: 50,
                 padding: 10,
                 paddingHorizontal: 20,
-                fontSize: 16,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
                 marginTop: 10,
                 fontFamily: "PoppinsRegular",
                 borderColor: "#C9C9C9",
@@ -212,7 +231,7 @@ const LoginForm = () => {
                 height: 50,
                 padding: 10,
                 paddingHorizontal: 20,
-                fontSize: 16,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
                 marginTop: 10,
                 justifyContent: "center",
                 alignItems: "center",
@@ -224,7 +243,11 @@ const LoginForm = () => {
             >
               {!isLoading && (
                 <Text
-                  style={{ fontFamily: "PoppinsSemiBold", color: COLORS.white }}
+                  style={{
+                    fontFamily: "PoppinsSemiBold",
+                    color: COLORS.white,
+                    fontSize: Platform.OS === "ios" ? 16 : 12,
+                  }}
                 >
                   Log in
                 </Text>
@@ -243,7 +266,7 @@ const LoginForm = () => {
               // justifyContent: "center",
             }}
           >
-            <Text>
+            <Text style={{ fontSize: Platform.OS === "ios" ? 16 : 12 }}>
               Don't have an account?{" "}
               <Link style={{ color: COLORS.shuttlelanePurple }} href="/signup">
                 Sign up

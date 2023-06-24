@@ -66,7 +66,7 @@ const ToastMessage = (props) => {
                 color: COLORS.white,
                 fontFamily: "PoppinsBold",
                 marginLeft: 10,
-                fontSize: 16,
+                fontSize: Platform.OS === "ios" ? 16 : 14
               }}
             >
               {props?.type === "info"
@@ -82,7 +82,7 @@ const ToastMessage = (props) => {
                 color: COLORS.white,
                 fontFamily: "PoppinsRegular",
                 marginLeft: 10,
-                fontSize: 14,
+                fontSize: Platform.OS === "ios" ? 16 : 12
               }}
             >
               {props?.message}

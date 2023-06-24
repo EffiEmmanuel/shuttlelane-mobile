@@ -797,7 +797,10 @@ const BookingSummary = () => {
           headerTitle: "",
         }}
       />
-      <ScrollView style={{ flex: 1 }}>
+      <ScrollView
+        style={{ flex: 1, padding: 20 }}
+        showsVerticalScrollIndicator={false}
+      >
         {/* TOAST MESSAGE */}
         {isToasting && (
           <ToastMessage
@@ -813,571 +816,560 @@ const BookingSummary = () => {
             }}
           />
         )}
-        {/* <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}> */}
+        {/* STRIPE WRAPPER */}
         <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}>
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            style={{ padding: 20 }}
+          <Text
+            style={{
+              fontSize: Platform.OS === "ios" ? 24 : 20,
+              fontFamily: "PoppinsBold",
+              color: COLORS.shuttlelanePurple,
+            }}
           >
-            <Text
+            Booking Summary
+          </Text>
+
+          {/* BOOKING TYPE */}
+          <Text
+            style={{
+              fontSize: Platform.OS === "ios" ? 16 : 12,
+              fontFamily: "PoppinsSemiBold",
+            }}
+          >
+            {bookingType}
+          </Text>
+
+          <View style={{ marginTop: 20 }}>
+            <View
               style={{
-                fontSize: 24,
-                fontFamily: "PoppinsBold",
-                color: COLORS.shuttlelanePurple,
+                //   backgroundColor: COLORS.shuttlelaneYellowFaded,
+                // padding: ,
+                marginVertical: 10,
+                borderRadius: 10,
               }}
             >
-              Booking Summary
-            </Text>
-
-            {/* BOOKING TYPE */}
-            <Text
-              style={{
-                fontSize: 16,
-                fontFamily: "PoppinsSemiBold",
-              }}
-            >
-              {bookingType}
-            </Text>
-
-            <View style={{ marginTop: 20 }}>
-              <View
-                style={{
-                  //   backgroundColor: COLORS.shuttlelaneYellowFaded,
-                  // padding: ,
-                  marginVertical: 10,
-                  borderRadius: 10,
-                }}
-              >
-                {pickupAirport && (
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Image
-                      source={currentLocationIcon}
-                      resizeMode="cover"
-                      style={{ width: 28, height: 28 }}
-                    />
-                    <Text style={{ fontFamily: "PoppinsRegular" }}>
-                      {airportPicked?.airportName}
-                    </Text>
-                  </View>
-                )}
-
-                {service && (
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Image
-                      source={passengerIcon}
-                      resizeMode="cover"
-                      style={{ width: 28, height: 28 }}
-                    />
-                    <Text style={{ fontFamily: "PoppinsRegular" }}>
-                      {service}
-                    </Text>
-                  </View>
-                )}
-
-                {dropoffAddress && (
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Image
-                      source={destinationIcon}
-                      resizeMode="cover"
-                      style={{ width: 28, height: 28 }}
-                    />
-                    <Text style={{ fontFamily: "PoppinsRegular" }}>
-                      {dropoffAddress}
-                    </Text>
-                  </View>
-                )}
-
-                {pickupAddress && (
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Image
-                      source={currentLocationIcon}
-                      resizeMode="cover"
-                      style={{ width: 28, height: 28 }}
-                    />
-                    <Text style={{ fontFamily: "PoppinsRegular" }}>
-                      {pickupAddress}
-                    </Text>
-                  </View>
-                )}
-
-                {dropoffAirport && (
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Image
-                      source={destinationIcon}
-                      resizeMode="cover"
-                      style={{ width: 28, height: 28 }}
-                    />
-                    <Text style={{ fontFamily: "PoppinsRegular" }}>
-                      {airportPicked?.airportName}
-                    </Text>
-                  </View>
-                )}
-
-                {airline && (
-                  <View
+              {pickupAirport && (
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Image
+                    source={currentLocationIcon}
+                    resizeMode="cover"
+                    style={{ width: 28, height: 28 }}
+                  />
+                  <Text
                     style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      paddingVertical: 5,
-                      paddingHorizontal: 10,
+                      fontFamily: "PoppinsRegular",
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
                     }}
                   >
-                    {/* <Image
+                    {airportPicked?.airportName}
+                  </Text>
+                </View>
+              )}
+
+              {service && (
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Image
+                    source={passengerIcon}
+                    resizeMode="cover"
+                    style={{ width: 28, height: 28 }}
+                  />
+                  <Text
+                    style={{
+                      fontFamily: "PoppinsRegular",
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
+                    }}
+                  >
+                    {service}
+                  </Text>
+                </View>
+              )}
+
+              {dropoffAddress && (
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Image
                     source={destinationIcon}
                     resizeMode="cover"
                     style={{ width: 28, height: 28 }}
-                  /> */}
-                    <Icon
-                      name="flight"
-                      size={14}
-                      style={{ marginRight: 5, marginTop: -5 }}
-                    />
-                    <Text style={{ fontFamily: "PoppinsRegular" }}>
-                      {airline}
-                    </Text>
-                  </View>
-                )}
-
-                {flightNumber && (
-                  <View
+                  />
+                  <Text
                     style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      paddingVertical: 5,
-                      paddingHorizontal: 10,
+                      fontFamily: "PoppinsRegular",
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
                     }}
                   >
-                    {/* <Image
+                    {dropoffAddress}
+                  </Text>
+                </View>
+              )}
+
+              {pickupAddress && (
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Image
+                    source={currentLocationIcon}
+                    resizeMode="cover"
+                    style={{ width: 28, height: 28 }}
+                  />
+                  <Text
+                    style={{
+                      fontFamily: "PoppinsRegular",
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
+                    }}
+                  >
+                    {pickupAddress}
+                  </Text>
+                </View>
+              )}
+
+              {dropoffAirport && (
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Image
                     source={destinationIcon}
                     resizeMode="cover"
                     style={{ width: 28, height: 28 }}
-                  /> */}
-                    <Icon
-                      name="flight-takeoff"
-                      size={14}
-                      style={{ marginRight: 5, marginTop: -5 }}
-                    />
-                    <Text style={{ fontFamily: "PoppinsRegular" }}>
-                      {flightNumber}
-                    </Text>
-                  </View>
-                )}
+                  />
+                  <Text
+                    style={{
+                      fontFamily: "PoppinsRegular",
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
+                    }}
+                  >
+                    {airportPicked?.airportName}
+                  </Text>
+                </View>
+              )}
 
-                {airport && (
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Image
-                      source={destinationIcon}
-                      resizeMode="cover"
-                      style={{ width: 28, height: 28 }}
-                    />
-                    <Text style={{ fontFamily: "PoppinsRegular" }}>
-                      {airportPicked?.airportName}
-                    </Text>
-                  </View>
-                )}
-
-                {passengers && (
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Image
-                      source={passengerIcon}
-                      resizeMode="cover"
-                      style={{ width: 28, height: 28 }}
-                    />
-                    <Text style={{ fontFamily: "PoppinsRegular" }}>
-                      {passengers}
-                    </Text>
-                  </View>
-                )}
-
-                {pass && (
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Image
-                      source={priorityPassIcon}
-                      resizeMode="cover"
-                      style={{ width: 28, height: 28 }}
-                    />
-                    <Text style={{ fontFamily: "PoppinsRegular" }}>{pass}</Text>
-                  </View>
-                )}
-
-                {carPicked && (
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Image
-                      source={carIcon}
-                      resizeMode="cover"
-                      style={{ width: 30, height: 30 }}
-                    />
-                    <Text
-                      style={{
-                        fontFamily: "PoppinsRegular",
-                        textTransform: "capitalize",
-                      }}
-                    >
-                      {carPicked}
-                    </Text>
-                  </View>
-                )}
-
-                {date && (
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Image
-                      source={calendarIcon}
-                      resizeMode="cover"
-                      style={{ width: 30, height: 30 }}
-                    />
-                    <Text
-                      style={{
-                        fontFamily: "PoppinsRegular",
-                        textTransform: "capitalize",
-                      }}
-                    >
-                      {date}
-                    </Text>
-                  </View>
-                )}
-
-                {time && (
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Image
-                      source={timeIcon}
-                      resizeMode="cover"
-                      style={{ width: 30, height: 30 }}
-                    />
-                    <Text
-                      style={{
-                        fontFamily: "PoppinsRegular",
-                        textTransform: "capitalize",
-                      }}
-                    >
-                      {time}
-                    </Text>
-                  </View>
-                )}
-              </View>
-
-              {/* PASS OPTION */}
-              <View style={{ marginTop: 10 }}>
-                {priorityPassAdded && (
-                  <>
-                    <SelectList
-                      setSelected={(value) => {
-                        setSelectedPass(value);
-                      }}
-                      data={priorityPasses}
-                      arrowicon={
-                        <Image
-                          source={arrowDownIcon}
-                          style={{ width: 40, height: 40, marginTop: -8 }}
-                          resizeMode="cover"
-                        />
-                      }
-                      closeicon={
-                        <Image
-                          source={closeIcon}
-                          style={{ width: 50, height: 50, marginTop: -1 }}
-                          resizeMode="cover"
-                        />
-                      }
-                      boxStyles={{
-                        borderRadius: 10,
-                        borderWidth: 0.5,
-                        borderColor: "#C9C9C9",
-                        height: 50,
-                        padding: 10,
-                      }}
-                      dropdownItemStyles={{
-                        marginVertical: 5,
-                      }}
-                      dropdownStyles={{
-                        borderRadius: 10,
-                        borderWidth: 0.5,
-                        borderColor: "#C9C9C9",
-                        padding: 10,
-                      }}
-                      inputStyles={{
-                        fontFamily: "PoppinsRegular",
-                        color: "#C9C9C9",
-                        marginTop: 4,
-                        fontSize: 16,
-                      }}
-                      dropdownTextStyles={{
-                        fontFamily: "PoppinsRegular",
-                      }}
-                      placeholder="Select Pass"
-                      searchPlaceholder="Search passes"
-                    />
-                  </>
-                )}
-              </View>
-              {/* PASS OPTION */}
-              <View style={{ marginTop: 10 }}>
-                {priorityPassAdded && (
-                  <>
-                    <SelectList
-                      setSelected={(value) => {
-                        setNumberOfPass(value);
-                      }}
-                      data={[
-                        {
-                          key: "1",
-                          value: "1",
-                        },
-                        {
-                          key: "2",
-                          value: "2",
-                        },
-                        {
-                          key: "3",
-                          value: "3",
-                        },
-                        {
-                          key: "4",
-                          value: "4",
-                        },
-                        {
-                          key: "5",
-                          value: "5",
-                        },
-                        {
-                          key: "6",
-                          value: "6",
-                        },
-                      ]}
-                      arrowicon={
-                        <Image
-                          source={arrowDownIcon}
-                          style={{ width: 40, height: 40, marginTop: -8 }}
-                          resizeMode="cover"
-                        />
-                      }
-                      closeicon={
-                        <Image
-                          source={closeIcon}
-                          style={{ width: 50, height: 50, marginTop: -1 }}
-                          resizeMode="cover"
-                        />
-                      }
-                      boxStyles={{
-                        borderRadius: 10,
-                        borderWidth: 0.5,
-                        borderColor: "#C9C9C9",
-                        height: 50,
-                        padding: 10,
-                      }}
-                      dropdownItemStyles={{
-                        marginVertical: 5,
-                      }}
-                      dropdownStyles={{
-                        borderRadius: 10,
-                        borderWidth: 0.5,
-                        borderColor: "#C9C9C9",
-                        padding: 10,
-                      }}
-                      inputStyles={{
-                        fontFamily: "PoppinsRegular",
-                        color: "#C9C9C9",
-                        marginTop: 4,
-                        fontSize: 14,
-                      }}
-                      dropdownTextStyles={{
-                        fontFamily: "PoppinsRegular",
-                      }}
-                      placeholder="Number of pass"
-                      // search={false}
-                      searchPlaceholder="Input Number (Max 6)"
-                    />
-                  </>
-                )}
-              </View>
-
-              {/* TOTAL */}
-              <View
-                style={{
-                  backgroundColor: COLORS.shuttlelaneYellowFaded,
-                  padding: 10,
-                  borderRadius: 10,
-                  marginTop: 20,
-                }}
-              >
+              {airline && (
                 <View
                   style={{
                     flexDirection: "row",
                     alignItems: "center",
-                    justifyContent: "center",
+                    paddingVertical: 5,
+                    paddingHorizontal: 10,
                   }}
                 >
+                  {/* <Image
+                    source={destinationIcon}
+                    resizeMode="cover"
+                    style={{ width: 28, height: 28 }}
+                  /> */}
+                  <Icon
+                    name="flight"
+                    size={14}
+                    style={{ marginRight: 5, marginTop: -5 }}
+                  />
                   <Text
                     style={{
-                      fontFamily: "PoppinsBold",
-                      textAlign: "center",
-                      fontSize: 26,
-                      textTransform: "uppercase",
+                      fontFamily: "PoppinsRegular",
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
                     }}
                   >
-                    TOTAL:
-                  </Text>
-                  <Text
-                    style={{
-                      fontFamily: "PoppinsBold",
-                      textAlign: "center",
-                      fontSize: 26,
-                      marginHorizontal: 10,
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {user?.currency === "dollars"
-                      ? "$"
-                      : user?.currency === "neira"
-                      ? "₦"
-                      : user?.currency === "pounds"
-                      ? "£"
-                      : user?.currency === "euros"
-                      ? "€"
-                      : "!"}
-                    {(!orderTotal || !priorityPassAdded) && (
-                      <>
-                        {total?.includes(",")
-                          ? total
-                          : Intl.NumberFormat("en-US", {}).format(total)}
-                      </>
-                    )}
-
-                    {!isNaN(orderTotal) && priorityPassAdded && (
-                      <>{Number(orderTotal)?.toFixed(2)}</>
-                    )}
-                    {/* {orderTotal && priorityPassAdded && <>{orderTotal == 'NaN' ? '' : orderTotal}</>} */}
-                    {/* {orderTotal && <>{orderTotal}</>} */}
+                    {airline}
                   </Text>
                 </View>
-              </View>
-            </View>
+              )}
 
-            {(bookingType == "Airport Pickup" ||
-              bookingType == "Airport Dropoff") && (
-              <TouchableOpacity
-                style={{
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginTop: 20,
-                  borderColor: "#D9D9D9",
-                  borderWidth: 0.4,
-                  height: 30,
-                  flexDirection: "row",
-                }}
-                onPress={() => {
-                  setPriorityPassAdded(!priorityPassAdded);
-                }}
-              >
-                {priorityPassAdded && (
-                  <Icon name="check" size={18} color="#4BB543" />
-                )}
-                <Text style={{ fontFamily: "PoppinsRegular" }}>
-                  Add Priority Pass
-                </Text>
-              </TouchableOpacity>
-            )}
-
-            <View style={{ marginTop: 20 }}>
-              {bookingType !== "Car Hire" && (
+              {flightNumber && (
                 <View
                   style={{
-                    padding: 10,
-                    borderRadius: 10,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingVertical: 5,
+                    paddingHorizontal: 10,
                   }}
                 >
-                  <View
+                  {/* <Image
+                    source={destinationIcon}
+                    resizeMode="cover"
+                    style={{ width: 28, height: 28 }}
+                  /> */}
+                  <Icon
+                    name="flight-takeoff"
+                    size={14}
+                    style={{ marginRight: 5, marginTop: -5 }}
+                  />
+                  <Text
                     style={{
-                      alignItems: "center",
-                      flexDirection: "column",
-                      marginTop: 20,
+                      fontFamily: "PoppinsRegular",
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
                     }}
                   >
-                    <Text
-                      style={{ fontSize: 18, fontFamily: "PoppinsSemiBold" }}
-                    >
-                      Pay with:
-                    </Text>
+                    {flightNumber}
+                  </Text>
+                </View>
+              )}
 
-                    {/* PAYMENT OPTIONS */}
-                    <View style={{ width: "100%", alignItems: "center" }}>
-                      {/* PAYPAL PAYMENT */}
-                      {user?.currency !== "neira" && (
-                        <TouchableOpacity
-                          style={{
-                            borderWidth: 1,
-                            marginTop: 20,
-                            borderColor: "#C9C9C9",
-                            width: "100%",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            height: 60,
-                            borderRadius: 10,
-                          }}
-                          onPress={payWithPayPal}
-                        >
-                          <Image
-                            source={paypal}
-                            style={{ width: 100, height: 100 }}
-                            resizeMode="cover"
-                          />
-                        </TouchableOpacity>
-                      )}
+              {airport && (
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Image
+                    source={destinationIcon}
+                    resizeMode="cover"
+                    style={{ width: 28, height: 28 }}
+                  />
+                  <Text
+                    style={{
+                      fontFamily: "PoppinsRegular",
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
+                    }}
+                  >
+                    {airportPicked?.airportName}
+                  </Text>
+                </View>
+              )}
 
-                      {/* FLUTTERWAVE PAYMENT */}
-                      <PayWithFlutterwave
-                        onRedirect={handleOnRedirect}
-                        options={{
-                          tx_ref: generateTransactionRef(10),
-                          authorization: FLUTTERWAVE_KEY,
-                          customer: {
-                            email: `${email}` ?? `${user?.email}`,
-                          },
-                          amount:
-                            !priorityPassAdded && total?.includes(",")
-                              ? Number(
-                                  `${total.split(",")[0]}${total.split(",")[1]}`
-                                )
-                              : priorityPassAdded
-                              ? Number(orderTotal)
-                              : Number(total),
-                          currency:
-                            user?.currency === "neira"
-                              ? "NGN"
-                              : user?.currency === "dollars"
-                              ? "USD"
-                              : user?.currency === "pounds"
-                              ? "GBP"
-                              : user?.currency === "euros"
-                              ? "EUR"
-                              : "NGN",
-                          payment_options: "card",
-                        }}
-                        customButton={(props) => (
-                          <TouchableOpacity
-                            style={{
-                              borderWidth: 1,
-                              marginTop: 20,
-                              borderColor: "#C9C9C9",
-                              width: "100%",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              height: 60,
-                              borderRadius: 10,
-                            }}
-                            onPress={props.onPress}
-                            isBusy={props.isInitializing}
-                            disabled={props.disabled}
-                          >
-                            <Image
-                              source={flutterwave}
-                              style={{ width: 110, height: 110 }}
-                              resizeMode="contain"
-                            />
-                          </TouchableOpacity>
-                        )}
+              {passengers && (
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Image
+                    source={passengerIcon}
+                    resizeMode="cover"
+                    style={{ width: 28, height: 28 }}
+                  />
+                  <Text
+                    style={{
+                      fontFamily: "PoppinsRegular",
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
+                    }}
+                  >
+                    {passengers}
+                  </Text>
+                </View>
+              )}
+
+              {pass && (
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Image
+                    source={priorityPassIcon}
+                    resizeMode="cover"
+                    style={{ width: 28, height: 28 }}
+                  />
+                  <Text
+                    style={{
+                      fontFamily: "PoppinsRegular",
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
+                    }}
+                  >
+                    {pass}
+                  </Text>
+                </View>
+              )}
+
+              {carPicked && (
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Image
+                    source={carIcon}
+                    resizeMode="cover"
+                    style={{ width: 30, height: 30 }}
+                  />
+                  <Text
+                    style={{
+                      fontFamily: "PoppinsRegular",
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
+                      textTransform: "capitalize",
+                    }}
+                  >
+                    {carPicked}
+                  </Text>
+                </View>
+              )}
+
+              {date && (
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Image
+                    source={calendarIcon}
+                    resizeMode="cover"
+                    style={{ width: 30, height: 30 }}
+                  />
+                  <Text
+                    style={{
+                      fontFamily: "PoppinsRegular",
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
+                      textTransform: "capitalize",
+                    }}
+                  >
+                    {date}
+                  </Text>
+                </View>
+              )}
+
+              {time && (
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Image
+                    source={timeIcon}
+                    resizeMode="cover"
+                    style={{ width: 30, height: 30 }}
+                  />
+                  <Text
+                    style={{
+                      fontFamily: "PoppinsRegular",
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
+                      textTransform: "capitalize",
+                    }}
+                  >
+                    {time}
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            {/* PASS OPTION */}
+            <View style={{ marginTop: 10 }}>
+              {priorityPassAdded && (
+                <>
+                  <SelectList
+                    setSelected={(value) => {
+                      setSelectedPass(value);
+                    }}
+                    data={priorityPasses}
+                    arrowicon={
+                      <Image
+                        source={arrowDownIcon}
+                        style={{ width: 40, height: 40, marginTop: -8 }}
+                        resizeMode="cover"
                       />
+                    }
+                    closeicon={
+                      <Image
+                        source={closeIcon}
+                        style={{ width: 50, height: 50, marginTop: -1 }}
+                        resizeMode="cover"
+                      />
+                    }
+                    boxStyles={{
+                      borderRadius: 10,
+                      borderWidth: 0.5,
+                      borderColor: "#C9C9C9",
+                      height: 50,
+                      padding: 10,
+                    }}
+                    dropdownItemStyles={{
+                      marginVertical: 5,
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
+                    }}
+                    dropdownStyles={{
+                      borderRadius: 10,
+                      borderWidth: 0.5,
+                      borderColor: "#C9C9C9",
+                      padding: 10,
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
+                    }}
+                    inputStyles={{
+                      fontFamily: "PoppinsRegular",
+                      color: "#C9C9C9",
+                      marginTop: 4,
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
+                    }}
+                    dropdownTextStyles={{
+                      fontFamily: "PoppinsRegular",
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
+                    }}
+                    placeholder="Select Pass"
+                    searchPlaceholder="Search passes"
+                  />
+                </>
+              )}
+            </View>
+            {/* PASS OPTION */}
+            <View style={{ marginTop: 10 }}>
+              {priorityPassAdded && (
+                <>
+                  <SelectList
+                    setSelected={(value) => {
+                      setNumberOfPass(value);
+                    }}
+                    data={[
+                      {
+                        key: "1",
+                        value: "1",
+                      },
+                      {
+                        key: "2",
+                        value: "2",
+                      },
+                      {
+                        key: "3",
+                        value: "3",
+                      },
+                      {
+                        key: "4",
+                        value: "4",
+                      },
+                      {
+                        key: "5",
+                        value: "5",
+                      },
+                      {
+                        key: "6",
+                        value: "6",
+                      },
+                    ]}
+                    arrowicon={
+                      <Image
+                        source={arrowDownIcon}
+                        style={{ width: 40, height: 40, marginTop: -8 }}
+                        resizeMode="cover"
+                      />
+                    }
+                    closeicon={
+                      <Image
+                        source={closeIcon}
+                        style={{ width: 50, height: 50, marginTop: -1 }}
+                        resizeMode="cover"
+                      />
+                    }
+                    boxStyles={{
+                      borderRadius: 10,
+                      borderWidth: 0.5,
+                      borderColor: "#C9C9C9",
+                      height: 50,
+                      padding: 10,
+                    }}
+                    dropdownItemStyles={{
+                      marginVertical: 5,
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
+                    }}
+                    dropdownStyles={{
+                      borderRadius: 10,
+                      borderWidth: 0.5,
+                      borderColor: "#C9C9C9",
+                      padding: 10,
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
+                    }}
+                    inputStyles={{
+                      fontFamily: "PoppinsRegular",
+                      color: "#C9C9C9",
+                      marginTop: 4,
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
+                    }}
+                    dropdownTextStyles={{
+                      fontFamily: "PoppinsRegular",
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
+                    }}
+                    placeholder="Number of pass"
+                    // search={false}
+                    searchPlaceholder="Input Number (Max 6)"
+                  />
+                </>
+              )}
+            </View>
 
-                      {/* STRIPE PAYMENT */}
+            {/* TOTAL */}
+            <View
+              style={{
+                backgroundColor: COLORS.shuttlelaneYellowFaded,
+                padding: 10,
+                borderRadius: 10,
+                marginTop: 20,
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    fontFamily: "PoppinsBold",
+                    textAlign: "center",
+                    fontSize: Platform.OS === "ios" ? 24 : 20,
+                    textTransform: "uppercase",
+                  }}
+                >
+                  TOTAL:
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: "PoppinsBold",
+                    textAlign: "center",
+                    fontSize: Platform.OS === "ios" ? 24 : 20,
+                    marginHorizontal: 10,
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {user?.currency === "dollars"
+                    ? "$"
+                    : user?.currency === "neira"
+                    ? "₦"
+                    : user?.currency === "pounds"
+                    ? "£"
+                    : user?.currency === "euros"
+                    ? "€"
+                    : "!"}
+                  {(!orderTotal || !priorityPassAdded) && (
+                    <>
+                      {total?.includes(",")
+                        ? total
+                        : Intl.NumberFormat("en-US", {}).format(total)}
+                    </>
+                  )}
+
+                  {!isNaN(orderTotal) && priorityPassAdded && (
+                    <>{Number(orderTotal)?.toFixed(2)}</>
+                  )}
+                  {/* {orderTotal && priorityPassAdded && <>{orderTotal == 'NaN' ? '' : orderTotal}</>} */}
+                  {/* {orderTotal && <>{orderTotal}</>} */}
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          {(bookingType == "Airport Pickup" ||
+            bookingType == "Airport Dropoff") && (
+            <TouchableOpacity
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+                marginTop: 20,
+                borderColor: "#D9D9D9",
+                borderWidth: 0.4,
+                height: 30,
+                flexDirection: "row",
+              }}
+              onPress={() => {
+                setPriorityPassAdded(!priorityPassAdded);
+              }}
+            >
+              {priorityPassAdded && (
+                <Icon name="check" size={18} color="#4BB543" />
+              )}
+              <Text
+                style={{
+                  fontFamily: "PoppinsRegular",
+                  fontSize: Platform.OS === "ios" ? 16 : 12,
+                }}
+              >
+                Add Priority Pass
+              </Text>
+            </TouchableOpacity>
+          )}
+
+          <View style={{ marginTop: 20 }}>
+            {bookingType !== "Car Hire" && (
+              <View
+                style={{
+                  padding: 10,
+                  borderRadius: 10,
+                }}
+              >
+                <View
+                  style={{
+                    alignItems: "center",
+                    flexDirection: "column",
+                    marginTop: 20,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: Platform.OS === "ios" ? 18 : 14,
+                      fontFamily: "PoppinsSemiBold",
+                    }}
+                  >
+                    Pay with:
+                  </Text>
+
+                  {/* PAYMENT OPTIONS */}
+                  <View style={{ width: "100%", alignItems: "center" }}>
+                    {/* PAYPAL PAYMENT */}
+                    {user?.currency !== "neira" && (
                       <TouchableOpacity
                         style={{
                           borderWidth: 1,
@@ -1389,56 +1381,131 @@ const BookingSummary = () => {
                           height: 60,
                           borderRadius: 10,
                         }}
-                        onPress={payWithStripe}
+                        onPress={payWithPayPal}
                       >
-                        {!isStripeLoading && (
+                        <Image
+                          source={paypal}
+                          style={{ width: 100, height: 100 }}
+                          resizeMode="cover"
+                        />
+                      </TouchableOpacity>
+                    )}
+
+                    {/* FLUTTERWAVE PAYMENT */}
+                    <PayWithFlutterwave
+                      onRedirect={handleOnRedirect}
+                      options={{
+                        tx_ref: generateTransactionRef(10),
+                        authorization: FLUTTERWAVE_KEY,
+                        customer: {
+                          email: `${email}` ?? `${user?.email}`,
+                        },
+                        amount:
+                          !priorityPassAdded && total?.includes(",")
+                            ? Number(
+                                `${total.split(",")[0]}${total.split(",")[1]}`
+                              )
+                            : priorityPassAdded
+                            ? Number(orderTotal)
+                            : Number(total),
+                        currency:
+                          user?.currency === "neira"
+                            ? "NGN"
+                            : user?.currency === "dollars"
+                            ? "USD"
+                            : user?.currency === "pounds"
+                            ? "GBP"
+                            : user?.currency === "euros"
+                            ? "EUR"
+                            : "NGN",
+                        payment_options: "card",
+                      }}
+                      customButton={(props) => (
+                        <TouchableOpacity
+                          style={{
+                            borderWidth: 1,
+                            marginTop: 20,
+                            borderColor: "#C9C9C9",
+                            width: "100%",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            height: 60,
+                            borderRadius: 10,
+                          }}
+                          onPress={props.onPress}
+                          isBusy={props.isInitializing}
+                          disabled={props.disabled}
+                        >
                           <Image
-                            source={stripeLogo}
-                            style={{ width: 100, height: 100 }}
+                            source={flutterwave}
+                            style={{ width: 110, height: 110 }}
                             resizeMode="contain"
                           />
-                        )}
+                        </TouchableOpacity>
+                      )}
+                    />
 
-                        {isStripeLoading && <ActivityIndicator size={32} />}
-                      </TouchableOpacity>
-                    </View>
+                    {/* STRIPE PAYMENT */}
+                    <TouchableOpacity
+                      style={{
+                        borderWidth: 1,
+                        marginTop: 20,
+                        borderColor: "#C9C9C9",
+                        width: "100%",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        height: 60,
+                        borderRadius: 10,
+                      }}
+                      onPress={payWithStripe}
+                    >
+                      {!isStripeLoading && (
+                        <Image
+                          source={stripeLogo}
+                          style={{ width: 100, height: 100 }}
+                          resizeMode="contain"
+                        />
+                      )}
+
+                      {isStripeLoading && <ActivityIndicator size={32} />}
+                    </TouchableOpacity>
                   </View>
                 </View>
-              )}
+              </View>
+            )}
 
-              {bookingType == "Car Hire" && (
-                <TouchableOpacity
+            {bookingType == "Car Hire" && (
+              <TouchableOpacity
+                style={{
+                  height: 50,
+                  padding: 10,
+                  paddingHorizontal: 20,
+                  fontSize: 16,
+                  marginTop: 10,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderColor: "#000",
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  backgroundColor: COLORS.shuttlelanePurple,
+                }}
+                onPress={() => carHireHandler()}
+              >
+                <Text
                   style={{
-                    height: 50,
-                    padding: 10,
-                    paddingHorizontal: 20,
-                    fontSize: 16,
-                    marginTop: 10,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    borderColor: "#000",
-                    borderWidth: 1,
-                    borderRadius: 10,
-                    backgroundColor: COLORS.shuttlelanePurple,
+                    fontFamily: "PoppinsRegular",
+                    color: "#FFF",
                   }}
-                  onPress={() => carHireHandler()}
                 >
-                  <Text
-                    style={{
-                      fontFamily: "PoppinsRegular",
-                      color: "#FFF",
-                    }}
-                  >
-                    {isCarHireLoading ? (
-                      <ActivityIndicator size={32} color="#FFF" />
-                    ) : (
-                      "Make Booking"
-                    )}
-                  </Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          </ScrollView>
+                  {isCarHireLoading ? (
+                    <ActivityIndicator size={32} color="#FFF" />
+                  ) : (
+                    "Make Booking"
+                  )}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </StripeProvider>
       </ScrollView>
     </SafeAreaView>

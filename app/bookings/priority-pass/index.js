@@ -136,37 +136,37 @@ const PriorityPass = () => {
   };
 
   // MAP SETUP
-  const [mapRegion, setMapRegion] = useState();
-  const [isMapLoading, setIsMapLoading] = useState(false);
+  // const [mapRegion, setMapRegion] = useState();
+  // const [isMapLoading, setIsMapLoading] = useState(false);
   // User Location
-  const userLocation = async () => {
-    setIsMapLoading(true);
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      console.log("Access to location was denied!");
-    }
+  // const userLocation = async () => {
+  //   setIsMapLoading(true);
+  //   let { status } = await Location.requestForegroundPermissionsAsync();
+  //   if (status !== "granted") {
+  //     console.log("Access to location was denied!");
+  //   }
 
-    const location = await Location.getCurrentPositionAsync({
-      enableHighAccuracy: true,
-    });
+  //   const location = await Location.getCurrentPositionAsync({
+  //     enableHighAccuracy: true,
+  //   });
 
-    const address = await Location.reverseGeocodeAsync(location.coords);
-    console.log(address);
+  //   const address = await Location.reverseGeocodeAsync(location.coords);
+  //   console.log(address);
 
-    setMapRegion({
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude,
-      latitudeDelta: 0.0922,
-      longitudeDelta: 0.0421,
-    });
-    setIsMapLoading(false);
-  };
+  //   setMapRegion({
+  //     latitude: location.coords.latitude,
+  //     longitude: location.coords.longitude,
+  //     latitudeDelta: 0.0922,
+  //     longitudeDelta: 0.0421,
+  //   });
+  //   setIsMapLoading(false);
+  // };
 
   // PRIORITY PASS
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    userLocation();
+    // userLocation();
     fetchAllAirports();
   }, []);
 
@@ -313,7 +313,17 @@ const PriorityPass = () => {
               />
             </TouchableOpacity>
           ),
-          headerTitle: "",
+          headerTitle: () => (
+            <Text
+              style={{
+                fontFamily: "PoppinsRegular",
+                marginTop: 3,
+                fontSize: Platform.OS === "ios" ? 12 : 11,
+              }}
+            >
+              Priority Pass
+            </Text>
+          ),
         }}
       />
 
@@ -358,6 +368,7 @@ const PriorityPass = () => {
                   style={{
                     fontFamily: "PoppinsRegular",
                     marginHorizontal: 5,
+                    fontSize: Platform.OS === "ios" ? 16 : 12,
                   }}
                 >
                   Service Type
@@ -389,6 +400,7 @@ const PriorityPass = () => {
                 }}
                 dropdownItemStyles={{
                   marginVertical: 5,
+                  fontSize: Platform.OS === "ios" ? 16 : 12,
                 }}
                 dropdownStyles={{
                   borderRadius: 10,
@@ -396,18 +408,23 @@ const PriorityPass = () => {
                   maxHeight: 150,
                   borderColor: "#C9C9C9",
                   padding: 10,
+                  fontSize: Platform.OS === "ios" ? 16 : 12,
+                  fontSize: Platform.OS === "ios" ? 16 : 12,
                 }}
                 inputStyles={{
                   fontFamily: "PoppinsRegular",
                   color: "#C9C9C9",
                   marginTop: 4,
-                  fontSize: 16,
+                  fontSize: Platform.OS === "ios" ? 16 : 12,
+                  fontSize: Platform.OS === "ios" ? 16 : 12,
                 }}
                 dropdownTextStyles={{
                   fontFamily: "PoppinsRegular",
+                  fontSize: Platform.OS === "ios" ? 16 : 12,
+                  fontSize: Platform.OS === "ios" ? 16 : 12,
                 }}
                 placeholder="Select Service"
-                searchPlaceholder="Search airports"
+                searchPlaceholder="Search services"
               />
             </View>
 
@@ -419,6 +436,7 @@ const PriorityPass = () => {
                   style={{
                     fontFamily: "PoppinsRegular",
                     marginHorizontal: 5,
+                    fontSize: Platform.OS === "ios" ? 16 : 12,
                   }}
                 >
                   Airport
@@ -450,6 +468,7 @@ const PriorityPass = () => {
                 }}
                 dropdownItemStyles={{
                   marginVertical: 5,
+                  fontSize: Platform.OS === "ios" ? 16 : 12,
                 }}
                 dropdownStyles={{
                   borderRadius: 10,
@@ -457,15 +476,17 @@ const PriorityPass = () => {
                   maxHeight: 150,
                   borderColor: "#C9C9C9",
                   padding: 10,
+                  fontSize: Platform.OS === "ios" ? 16 : 12,
                 }}
                 inputStyles={{
                   fontFamily: "PoppinsRegular",
                   color: "#C9C9C9",
                   marginTop: 4,
-                  fontSize: 16,
+                  fontSize: Platform.OS === "ios" ? 16 : 12,
                 }}
                 dropdownTextStyles={{
                   fontFamily: "PoppinsRegular",
+                  fontSize: Platform.OS === "ios" ? 16 : 12,
                 }}
                 placeholder="Select Airport"
                 searchPlaceholder="Search airports"
@@ -488,6 +509,7 @@ const PriorityPass = () => {
                   style={{
                     fontFamily: "PoppinsRegular",
                     marginHorizontal: 5,
+                    fontSize: Platform.OS === "ios" ? 16 : 12,
                   }}
                 >
                   Passengers
@@ -499,7 +521,7 @@ const PriorityPass = () => {
                   height: 50,
                   padding: 10,
                   paddingHorizontal: 20,
-                  fontSize: 16,
+                  fontSize: Platform.OS === "ios" ? 16 : 12,
                   // marginTop: 10,
                   fontFamily: "PoppinsRegular",
                   borderColor: "#C9C9C9",
@@ -533,6 +555,7 @@ const PriorityPass = () => {
                       style={{
                         fontFamily: "PoppinsRegular",
                         marginHorizontal: 5,
+                        fontSize: Platform.OS === "ios" ? 16 : 12,
                       }}
                     >
                       Pass Type
@@ -564,6 +587,7 @@ const PriorityPass = () => {
                     }}
                     dropdownItemStyles={{
                       marginVertical: 5,
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
                     }}
                     dropdownStyles={{
                       borderRadius: 10,
@@ -571,18 +595,20 @@ const PriorityPass = () => {
                       maxHeight: 150,
                       borderColor: "#C9C9C9",
                       padding: 10,
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
                     }}
                     inputStyles={{
                       fontFamily: "PoppinsRegular",
                       color: "#C9C9C9",
                       marginTop: 4,
-                      fontSize: 16,
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
                     }}
                     dropdownTextStyles={{
                       fontFamily: "PoppinsRegular",
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
                     }}
                     placeholder="Select Pass"
-                    searchPlaceholder="Search airports"
+                    searchPlaceholder="Search passes"
                   />
                 </View>
               </View>
@@ -595,6 +621,7 @@ const PriorityPass = () => {
                 style={{
                   fontFamily: "PoppinsRegular",
                   marginHorizontal: 5,
+                  fontSize: Platform.OS === "ios" ? 16 : 12,
                 }}
               >
                 Airline
@@ -606,7 +633,7 @@ const PriorityPass = () => {
                 height: 50,
                 padding: 10,
                 paddingHorizontal: 20,
-                fontSize: 16,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
                 fontFamily: "PoppinsRegular",
                 borderColor: "#C9C9C9",
                 borderWidth: 0.5,
@@ -624,6 +651,7 @@ const PriorityPass = () => {
                 style={{
                   fontFamily: "PoppinsRegular",
                   marginHorizontal: 5,
+                  fontSize: Platform.OS === "ios" ? 16 : 12,
                 }}
               >
                 Flight Number
@@ -635,7 +663,7 @@ const PriorityPass = () => {
                 height: 50,
                 padding: 10,
                 paddingHorizontal: 20,
-                fontSize: 16,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
                 fontFamily: "PoppinsRegular",
                 borderColor: "#C9C9C9",
                 borderWidth: 0.5,
@@ -657,7 +685,7 @@ const PriorityPass = () => {
                   height: 50,
                   padding: 10,
                   paddingHorizontal: 20,
-                  fontSize: 16,
+                  fontSize: Platform.OS === "ios" ? 16 : 12,
                   fontFamily: "PoppinsRegular",
                   borderColor: "#C9C9C9",
                   borderWidth: 0.5,
@@ -678,6 +706,7 @@ const PriorityPass = () => {
                       marginHorizontal: 5,
                       marginTop: 2,
                       color: "#181818",
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
                     }}
                   >
                     {date ? date : "Date"}
@@ -708,7 +737,7 @@ const PriorityPass = () => {
                 height: 50,
                 padding: 10,
                 paddingHorizontal: 20,
-                fontSize: 16,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
                 fontFamily: "PoppinsRegular",
                 borderColor: "#C9C9C9",
                 borderWidth: 0.5,
@@ -727,6 +756,7 @@ const PriorityPass = () => {
                   style={{
                     fontFamily: "PoppinsRegular",
                     marginHorizontal: 5,
+                    fontSize: Platform.OS === "ios" ? 16 : 12,
                     marginTop: 2,
                     color: "#181818",
                   }}
@@ -769,7 +799,7 @@ const PriorityPass = () => {
                 <Text
                   style={{
                     paddingHorizontal: 10,
-                    fontSize: 16,
+                    fontSize: 16,fontSize: Platform.OS === "ios" ? 16 : 12,
                     fontFamily: "PoppinsRegular",
                     color: COLORS.white,
                     width: "100%",
@@ -785,14 +815,14 @@ const PriorityPass = () => {
       )}
 
       {/* MAPS HERE */}
-      {isMapLoading && (
+      {/* {isMapLoading && (
         <View style={{ marginTop: 60 }}>
           <ActivityIndicator size={48} />
-          <Text style={{ fontSize: 24, color: "#C1C1C1", textAlign: "center" }}>
+          <Text style={{ fontSize: Platform.OS === "ios" ? 16 : 12, color: "#C1C1C1", textAlign: "center" }}>
             Fetching your location
           </Text>
         </View>
-      )}
+      )} */}
       {/* {!isMapLoading && (
         <MapView
           style={{

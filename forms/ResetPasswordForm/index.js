@@ -116,7 +116,7 @@ const ResetPasswordForm = () => {
       <View style={{ padding: 10 }}>
       <Text
           style={{
-            fontSize: 24,
+            fontSize: Platform.OS === "ios" ? 24 : 20,
             fontWeight: "500",
             color: COLORS.shuttlelanePurple,
             fontFamily: "PoppinsBold",
@@ -145,14 +145,14 @@ const ResetPasswordForm = () => {
 
         <View style={{ marginTop: 20 }}>
           <View style={{ marginTop: 20 }}>
-            <Text style={{ fontFamily: "PoppinsRegular" }}>Old Password</Text>
+            <Text style={{ fontFamily: "PoppinsRegular", fontSize: Platform.OS === "ios" ? 16 : 12, }}>Old Password</Text>
             <TextInput
               value={oldPassword}
               style={{
                 height: 50,
                 padding: 10,
                 paddingHorizontal: 20,
-                fontSize: 16,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
                 marginTop: 10,
                 fontFamily: "PoppinsRegular",
                 borderColor: "#C9C9C9",
@@ -167,14 +167,14 @@ const ResetPasswordForm = () => {
             />
           </View>
           <View style={{ marginTop: 20 }}>
-            <Text style={{ fontFamily: "PoppinsRegular" }}>New Password</Text>
+            <Text style={{ fontFamily: "PoppinsRegular", fontSize: Platform.OS === "ios" ? 16 : 12, }}>New Password</Text>
             <TextInput
               value={newPassword}
               style={{
                 height: 50,
                 padding: 10,
                 paddingHorizontal: 20,
-                fontSize: 16,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
                 marginTop: 10,
                 fontFamily: "PoppinsRegular",
                 borderColor: "#C9C9C9",
@@ -195,7 +195,7 @@ const ResetPasswordForm = () => {
                 height: 50,
                 // padding: ,
                 paddingHorizontal: 20,
-                fontSize: 16,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
                 marginTop: 10,
                 justifyContent: "center",
                 alignItems: "center",
@@ -210,7 +210,7 @@ const ResetPasswordForm = () => {
               {!isLoading && (
                 <>
                   <Text
-                    style={{ color: "#FFF", fontFamily: "PoppinsSemiBold" }}
+                    style={{ color: "#FFF", fontFamily: "PoppinsSemiBold", fontSize: Platform.OS === "ios" ? 16 : 12, }}
                   >
                     Reset password
                   </Text>

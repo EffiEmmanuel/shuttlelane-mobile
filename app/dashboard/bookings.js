@@ -65,7 +65,7 @@ const Bookings = () => {
       <ScrollView style={{ flex: 1, padding: 20 }}>
         <Text
           style={{
-            fontSize: 24,
+            fontSize: Platform.OS === "ios" ? 24 : 20,
             fontWeight: "500",
             color: COLORS.shuttlelanePurple,
             fontFamily: "PoppinsBold",
@@ -75,10 +75,11 @@ const Bookings = () => {
         </Text>
         <Text
           style={{
-            fontSize: 14,
+            fontSize: Platform.OS === "ios" ? 14 : 12,
             fontWeight: "500",
             color: "#000",
             fontFamily: "PoppinsRegular",
+            // fontSize: Platform.OS === "ios" ? 16 : 12,
             marginTop: 5,
           }}
         >
@@ -92,7 +93,8 @@ const Bookings = () => {
               <Text
                 style={{
                   fontFamily: "PoppinsRegular",
-                  fontSize: 14,
+                  // fontSize: Platform.OS === "ios" ? 16 : 12,
+                  fontSize: Platform.OS === "ios" ? 14 : 12,
                   marginTop: 10,
                   textAlign: "center",
                 }}
@@ -117,10 +119,11 @@ const Bookings = () => {
             >
               <Text
                 style={{
-                  fontSize: 14,
+                  // fontSize: Platform.OS === "ios" ? 14 : 12,
                   fontWeight: "500",
                   color: "#000",
                   fontFamily: "PoppinsRegular",
+                  fontSize: Platform.OS === "ios" ? 16 : 12,
                   marginTop: 5,
                   color: COLORS.white,
                 }}
@@ -182,6 +185,7 @@ const Bookings = () => {
                         style={{
                           // maxWidth: "90%",
                           fontFamily: "PoppinsRegular",
+                          fontSize: Platform.OS === "ios" ? 16 : 12,
                         }}
                       >
                         Pick up:{" "}
@@ -194,6 +198,7 @@ const Bookings = () => {
                         style={{
                           // maxWidth: "90%",
                           fontFamily: "PoppinsRegular",
+                          fontSize: Platform.OS === "ios" ? 16 : 12,
                         }}
                       >
                         Price:{" "}
@@ -263,6 +268,7 @@ const Bookings = () => {
                         style={{
                           // maxWidth: "90%",
                           fontFamily: "PoppinsRegular",
+                          fontSize: Platform.OS === "ios" ? 16 : 12,
                         }}
                       >
                         Pick up:{" "}
@@ -275,6 +281,7 @@ const Bookings = () => {
                         style={{
                           // maxWidth: "90%",
                           fontFamily: "PoppinsRegular",
+                          fontSize: Platform.OS === "ios" ? 16 : 12,
                         }}
                       >
                         Price:{" "}
@@ -344,6 +351,7 @@ const Bookings = () => {
                         style={{
                           // maxWidth: "90%",
                           fontFamily: "PoppinsRegular",
+                          fontSize: Platform.OS === "ios" ? 16 : 12,
                         }}
                       >
                         Pick up:{" "}
@@ -356,6 +364,7 @@ const Bookings = () => {
                         style={{
                           // maxWidth: "90%",
                           fontFamily: "PoppinsRegular",
+                          fontSize: Platform.OS === "ios" ? 16 : 12,
                         }}
                       >
                         Price:{" "}
@@ -393,7 +402,8 @@ const Bookings = () => {
                       <Text
                         style={{
                           fontFamily: "PoppinsRegular",
-                          fontSize: 14,
+                          fontSize: Platform.OS === "ios" ? 16 : 12,
+                          // fontSize: 14,
                           marginTop: 10,
                           textAlign: "center",
                         }}
@@ -418,10 +428,11 @@ const Bookings = () => {
                     >
                       <Text
                         style={{
-                          fontSize: 14,
+                          // fontSize: 14,
                           fontWeight: "500",
                           color: "#000",
                           fontFamily: "PoppinsRegular",
+                          fontSize: Platform.OS === "ios" ? 16 : 12,
                           marginTop: 5,
                           color: COLORS.white,
                         }}

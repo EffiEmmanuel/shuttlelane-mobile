@@ -6,6 +6,7 @@ import { COLORS } from "../../constants/themes";
 import { useRouter } from "expo-router";
 import { Platform } from "react-native";
 import { SafeAreaView } from "react-native";
+import { StatusBar } from "expo-status-bar";
 
 const ScreenOne = () => {
   const router = useRouter();
@@ -14,7 +15,8 @@ const ScreenOne = () => {
   }
 
   return (
-    <SafeAreaView style={{ position: 'relative', flex: 1 }}>
+    <SafeAreaView style={{ position: "relative", flex: 1, backgroundColor: '#fff' }}>
+      <StatusBar style="dark" />
       <View style={{ backgroundColor: "white", flex: 1 }}>
         <View
           style={{
@@ -83,7 +85,7 @@ const ScreenOne = () => {
               <Text
                 style={{
                   fontFamily: "PoppinsBold",
-                  fontSize: 28,
+                  fontSize: Platform.OS === "ios" ? 28 : 24,
                   textAlign: "center",
                 }}
               >
@@ -98,7 +100,7 @@ const ScreenOne = () => {
                   style={{
                     maxWidth: 250,
                     fontFamily: "PoppinsRegular",
-                    fontSize: 14,
+                    fontSize: Platform.OS === "ios" ? 14 : 12,
                     textAlign: "center",
                     marginTop: 10,
                   }}
@@ -109,35 +111,37 @@ const ScreenOne = () => {
             </View>
 
             <View style={{ marginTop: 80, alignItems: "center" }}>
-              <View style={{ flexDirection: "row" }}>
-                <View
-                  style={{
-                    height: 10,
-                    width: 10,
-                    backgroundColor: "#191919",
-                    marginHorizontal: 5,
-                    borderRadius: 50,
-                  }}
-                ></View>
-                <View
-                  style={{
-                    height: 10,
-                    width: 10,
-                    backgroundColor: "#D9D9D9",
-                    marginHorizontal: 5,
-                    borderRadius: 50,
-                  }}
-                ></View>
-                <View
-                  style={{
-                    height: 10,
-                    width: 10,
-                    backgroundColor: "#D9D9D9",
-                    marginHorizontal: 5,
-                    borderRadius: 50,
-                  }}
-                ></View>
-              </View>
+              {Platform.OS === "ios" && (
+                <View style={{ flexDirection: "row" }}>
+                  <View
+                    style={{
+                      height: 10,
+                      width: 10,
+                      backgroundColor: "#191919",
+                      marginHorizontal: 5,
+                      borderRadius: 50,
+                    }}
+                  ></View>
+                  <View
+                    style={{
+                      height: 10,
+                      width: 10,
+                      backgroundColor: "#D9D9D9",
+                      marginHorizontal: 5,
+                      borderRadius: 50,
+                    }}
+                  ></View>
+                  <View
+                    style={{
+                      height: 10,
+                      width: 10,
+                      backgroundColor: "#D9D9D9",
+                      marginHorizontal: 5,
+                      borderRadius: 50,
+                    }}
+                  ></View>
+                </View>
+              )}
             </View>
           </View>
 
@@ -160,7 +164,14 @@ const ScreenOne = () => {
                 borderRadius: 15,
               }}
             >
-              <Text style={{ color: COLORS.white }}>Next</Text>
+              <Text
+                style={{
+                  color: COLORS.white,
+                  fontSize: Platform.OS === "ios" ? 16 : 12,
+                }}
+              >
+                Next
+              </Text>
             </TouchableOpacity>
           </View>
         </View>

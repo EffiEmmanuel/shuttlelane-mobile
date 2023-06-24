@@ -241,7 +241,7 @@ const AirportPickupStepTwo = () => {
                 <Text
                   style={{
                     fontFamily: "PoppinsBold",
-                    fontSize: 20,
+                    fontSize: Platform.OS === 'ios' ? 20 : 16,
                     color: COLORS.shuttlelanePurple,
                   }}
                 >
@@ -266,7 +266,7 @@ const AirportPickupStepTwo = () => {
                     alignItems: "center",
                   }}
                 >
-                  <Text style={{ fontFamily: "PoppinsBold", fontSize: 24 }}>
+                  <Text style={{ fontFamily: "PoppinsBold",fontSize: Platform.OS === 'ios' ? 24 : 20, }}>
                     {carDetails?.name}
                   </Text>
 
@@ -284,7 +284,7 @@ const AirportPickupStepTwo = () => {
                       <Text
                         style={{
                           fontFamily: "PoppinsRegular",
-                          fontSize: 18,
+                          fontSize: Platform.OS === 'ios' ? 18 : 14,
                           marginLeft: 5,
                         }}
                       >
@@ -304,7 +304,7 @@ const AirportPickupStepTwo = () => {
                       <Text
                         style={{
                           fontFamily: "PoppinsRegular",
-                          fontSize: 18,
+                          fontSize: Platform.OS === 'ios' ? 18 : 14,
                           marginLeft: 5,
                         }}
                       >
@@ -315,7 +315,7 @@ const AirportPickupStepTwo = () => {
                 </View>
 
                 <View style={{ marginTop: 20 }}>
-                  <Text style={{ fontFamily: "PoppinsRegular", fontSize: 16 }}>
+                  <Text style={{ fontFamily: "PoppinsRegular", fontSize: Platform.OS === 'ios' ? 16 : 12, }}>
                     {carDetails?.name === "Economy" &&
                       "The most economic and popular class suitable for most trips. Promises a smooth and convenient ride. Can accommodate up to 4 passengers and 2 luggages."}
 
@@ -336,7 +336,7 @@ const AirportPickupStepTwo = () => {
                   <Text
                     style={{
                       fontFamily: "PoppinsBold",
-                      fontSize: 20,
+                      fontSize: Platform.OS === 'ios' ? 20 : 16,
                       color: COLORS.shuttlelanePurple,
                     }}
                   >
@@ -349,7 +349,7 @@ const AirportPickupStepTwo = () => {
                     >
                       <Icon name="check" size={28} color="#4BB543" />
                       <Text
-                        style={{ fontFamily: "PoppinsRegular", marginLeft: 5 }}
+                        style={{ fontFamily: "PoppinsRegular", marginLeft: 5, fontSize: Platform.OS === 'ios' ? 12 : 11, }}
                       >
                         Free airport meet and greet.
                       </Text>
@@ -359,7 +359,7 @@ const AirportPickupStepTwo = () => {
                     >
                       <Icon name="check" size={28} color="#4BB543" />
                       <Text
-                        style={{ fontFamily: "PoppinsRegular", marginLeft: 5 }}
+                        style={{ fontFamily: "PoppinsRegular", marginLeft: 5, fontSize: Platform.OS === 'ios' ? 12 : 11, }}
                       >
                         Free Porter Service.
                       </Text>
@@ -369,7 +369,7 @@ const AirportPickupStepTwo = () => {
                     >
                       <Icon name="check" size={28} color="#4BB543" />
                       <Text
-                        style={{ fontFamily: "PoppinsRegular", marginLeft: 5 }}
+                        style={{ fontFamily: "PoppinsRegular", marginLeft: 5, fontSize: Platform.OS === 'ios' ? 12 : 11, }}
                       >
                         Free bottled water.
                       </Text>
@@ -379,7 +379,7 @@ const AirportPickupStepTwo = () => {
                     >
                       <Icon name="check" size={28} color="#4BB543" />
                       <Text
-                        style={{ fontFamily: "PoppinsRegular", marginLeft: 5 }}
+                        style={{ fontFamily: "PoppinsRegular", marginLeft: 5, fontSize: Platform.OS === 'ios' ? 12 : 11, }}
                       >
                         Free cancellation up to 24 hours before pick-up.
                       </Text>
@@ -389,7 +389,7 @@ const AirportPickupStepTwo = () => {
                     >
                       <Icon name="check" size={28} color="#4BB543" />
                       <Text
-                        style={{ fontFamily: "PoppinsRegular", marginLeft: 5 }}
+                        style={{ fontFamily: "PoppinsRegular", marginLeft: 5, fontSize: Platform.OS === 'ios' ? 12 : 11, }}
                       >
                         60 minutes waiting time after flight arrival.
                       </Text>
@@ -399,7 +399,7 @@ const AirportPickupStepTwo = () => {
                     >
                       <Icon name="check" size={28} color="#4BB543" />
                       <Text
-                        style={{ fontFamily: "PoppinsRegular", marginLeft: 5 }}
+                        style={{ fontFamily: "PoppinsRegular", marginLeft: 5, fontSize: Platform.OS === 'ios' ? 12 : 11, }}
                       >
                         Free Trolley.
                       </Text>
@@ -432,7 +432,7 @@ const AirportPickupStepTwo = () => {
                   resizeMode="cover"
                   style={{ width: 28, height: 28 }}
                 />
-                <Text style={{ fontFamily: "PoppinsRegular" }}>
+                <Text style={{ fontFamily: "PoppinsRegular", fontSize: Platform.OS === 'ios' ? 12 : 11 }}>
                   {airportDetails?.airportName}
                 </Text>
               </View>
@@ -443,7 +443,7 @@ const AirportPickupStepTwo = () => {
                   resizeMode="cover"
                   style={{ width: 28, height: 28 }}
                 />
-                <Text style={{ fontFamily: "PoppinsRegular", maxWidth: "90%" }}>
+                <Text style={{ fontFamily: "PoppinsRegular", maxWidth: "90%", fontSize: Platform.OS === 'ios' ? 12 : 11 }}>
                   {dropoffAddress ? dropoffAddress : pickupAddress}
                 </Text>
               </View>
@@ -533,7 +533,7 @@ const AirportPickupStepTwo = () => {
                         }}
                       >
                         <Text
-                          style={{ fontFamily: "PoppinsBold", fontSize: 22 }}
+                          style={{ fontFamily: "PoppinsBold", fontSize: Platform.OS === 'ios' ? 20 : 16}}
                         >
                           {vehicle?.name}
                         </Text>
@@ -549,7 +549,7 @@ const AirportPickupStepTwo = () => {
                             }}
                           >
                             <Icon name="person" size={20} color="#000" />
-                            <Text style={{ fontFamily: "PoppinsRegular" }}>
+                            <Text style={{ fontFamily: "PoppinsRegular", fontSize: Platform.OS === 'ios' ? 16 : 12, }}>
                               {vehicle?.capacity ?? 4}
                             </Text>
                           </View>
@@ -566,7 +566,7 @@ const AirportPickupStepTwo = () => {
                           resizeMode="cover"
                           style={{ width: 38, height: 38 }}
                         /> */}
-                            <Text style={{ fontFamily: "PoppinsRegular" }}>
+                            <Text style={{ fontFamily: "PoppinsRegular", fontSize: Platform.OS === 'ios' ? 16 : 12, }}>
                               {vehicle?.luggage ?? 3}
                             </Text>
                           </View>
@@ -600,7 +600,7 @@ const AirportPickupStepTwo = () => {
                         <Text
                           style={{
                             fontFamily: "PoppinsBold",
-                            fontSize: 32,
+                            fontSize: Platform.OS === 'ios' ? 32 : 28,
                             color: COLORS.green,
                           }}
                         >
@@ -622,7 +622,7 @@ const AirportPickupStepTwo = () => {
                       style={{}}
                       onPress={() => showCarDetails(vehicle)}
                     >
-                      <Text style={{ textDecorationLine: "underline" }}>
+                      <Text style={{ textDecorationLine: "underline", fontSize: Platform.OS === 'ios' ? 16 : 12 }}>
                         Trip details {">"}
                       </Text>
                     </TouchableOpacity>

@@ -7,10 +7,7 @@ import {
   Dimensions,
 } from "react-native";
 import { COLORS } from "../../../constants/themes";
-import { Link, Stack, useRouter, useSearchParams } from "expo-router";
-import logo from "../../../assets/images/logo.png";
-import { TextInput } from "react-native";
-import { useState } from "react";
+import { Stack, useRouter, useSearchParams } from "expo-router";
 import { TouchableOpacity } from "react-native";
 import arrowBackIcon from "../../../assets/icons/arrowBackIcon.png";
 //   import SignupForm from "../forms/SignupForm";
@@ -52,7 +49,15 @@ const UserDetails = () => {
             justifyContent: "center",
             width: Dimensions.get("window").width,
           },
-          headerLeft: null,
+          headerLeft: () => (
+            <TouchableOpacity style={{}} onPress={() => router.back()}>
+              <Image
+                source={arrowBackIcon}
+                resizeMode="cover"
+                style={{ width: 45, height: 45 }}
+              />
+            </TouchableOpacity>
+          ),
         }}
       />
 

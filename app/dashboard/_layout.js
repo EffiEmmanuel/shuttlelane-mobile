@@ -47,7 +47,8 @@ const Layout = () => {
             <Text
               style={{
                 fontFamily: "PoppinsRegular",
-                fontSize: 12,
+                // fontSize: 12,
+                // fontSize: Platform.OS === 'ios' ? 12 : 10,
                 color: color,
               }}
             >
@@ -65,7 +66,8 @@ const Layout = () => {
               <Text
                 style={{
                   fontFamily: "PoppinsSemiBold",
-                  fontSize: 18,
+                  // fontSize: 18,
+                  fontSize: Platform.OS === 'ios' ? 16 : 12
                 }}
               >
                 Hi, {user?.name?.split(' ')[0]} ✨
@@ -94,7 +96,7 @@ const Layout = () => {
           tabBarIcon: ({ style, color }) => (
             <Icon
               name="home"
-              size={28}
+              size={Platform.OS === "ios" ? 28 : 24}
               color={color}
               style={{ color: color }}
             />
@@ -110,7 +112,7 @@ const Layout = () => {
           tabBarIcon: ({ style, color }) => (
             <Icon
               name="flight-takeoff"
-              size={28}
+              size={Platform.OS === "ios" ? 28 : 24}
               color={color}
               style={{ color: color }}
             />
@@ -127,7 +129,7 @@ const Layout = () => {
           tabBarIcon: ({ style, color }) => (
             <Icon
               name="menu"
-              size={28}
+              size={Platform.OS === "ios" ? 28 : 24}
               color={color}
               style={{ color: color }}
             />

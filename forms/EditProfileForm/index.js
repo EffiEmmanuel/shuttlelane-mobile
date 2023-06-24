@@ -16,9 +16,9 @@ import { AuthContext } from "../../context/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import { Image } from "expo-image";
-import * as CountryCodes from "country-codes-list";
 import { Platform } from "react-native";
 // import { Image } from "react-native";
+import { CountryPicker } from "react-native-country-codes-picker";
 
 const blurhash =
   "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
@@ -31,9 +31,12 @@ const EditProfileForm = () => {
   const [email, setEmail] = useState(user?.email);
   const [userId, setUserId] = useState(user?._id);
   const [mobile, setMobile] = useState(user?.mobile);
-  const [countryCode, setCountryCode] = useState(user?.countryCode);
   const [currency, setCurrency] = useState(user?.currency);
   const [userImage, setUserImage] = useState(user?.userImage);
+  // COUNTRY CODES CONFIG
+  const [isCountryCodesPickerVisible, setIsCountryCodesPickerVisible] =
+    useState(false);
+  const [countryCode, setCountryCode] = useState(user?.countryCode);
 
   // TRACK DATA UPDATE
   const [dataUpdated, setDataUpdated] = useState(false);
@@ -86,7 +89,7 @@ const EditProfileForm = () => {
   //   FETCH USER DATA
   async function fetchUserData() {
     const parsedUser = JSON.parse(await AsyncStorage.getItem("user"));
-    console.log(parsedUser);
+    console.log('PARSED USER:', parsedUser);
     setUser(parsedUser);
   }
 
@@ -221,27 +224,9 @@ const EditProfileForm = () => {
     setEmail(user?.email);
     setMobile(user?.mobile);
     setCurrency(user?.currency);
+    setCountryCode(user?.countryCode)
     setUserId(user?._id);
   }, [user]);
-
-  // COUNTRY CODES
-  const [countryCodes, setCountryCodes] = useState();
-  useEffect(() => {
-    const countryCodes = CountryCodes.customList(
-      "countryCode",
-      "[{countryCode}] {countryNameEn}: +{countryCallingCode}"
-    );
-    let shuttleCountryCodes = [];
-    Object.values(countryCodes).map((code) => {
-      // console.log("CODE:", code?.split("+")[1]);
-      shuttleCountryCodes.push({
-        key: `+${code?.split("+")[1]}`,
-        value: `${code?.split("] ")[1]}`,
-      });
-    });
-    console.log("ÇOUNTRY CODES::", shuttleCountryCodes);
-    setCountryCodes(shuttleCountryCodes);
-  }, []);
 
   return (
     <>
@@ -321,14 +306,21 @@ const EditProfileForm = () => {
 
         <View style={{ marginTop: 20 }}>
           <View style={{ marginTop: 20 }}>
-            <Text style={{ fontFamily: "PoppinsRegular" }}>Full name</Text>
+            <Text
+              style={{
+                fontFamily: "PoppinsRegular",
+                fontSize: Platform.OS === "ios" ? 16 : 12,
+              }}
+            >
+              Full name
+            </Text>
             <TextInput
               value={name}
               style={{
                 height: 50,
                 padding: 10,
                 paddingHorizontal: 20,
-                fontSize: 16,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
                 marginTop: 10,
                 fontFamily: "PoppinsRegular",
                 borderColor: "#C9C9C9",
@@ -342,14 +334,21 @@ const EditProfileForm = () => {
           </View>
 
           <View style={{ marginTop: 20 }}>
-            <Text style={{ fontFamily: "PoppinsRegular" }}>Email</Text>
+            <Text
+              style={{
+                fontFamily: "PoppinsRegular",
+                fontSize: Platform.OS === "ios" ? 16 : 12,
+              }}
+            >
+              Email
+            </Text>
             <TextInput
               value={email}
               style={{
                 height: 50,
                 padding: 10,
                 paddingHorizontal: 20,
-                fontSize: 16,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
                 marginTop: 10,
                 fontFamily: "PoppinsRegular",
                 borderColor: "#C9C9C9",
@@ -364,53 +363,58 @@ const EditProfileForm = () => {
             />
           </View>
           <View style={{ marginTop: 20 }}>
-            <Text style={{ fontFamily: "PoppinsRegular" }}>Phone Number</Text>
-            <SelectList
-              setSelected={(value) => setCountryCode(value)}
-              data={countryCodes}
-              arrowicon={
-                <Image
-                  source={arrowDownIcon}
-                  style={{ width: 40, height: 40, marginTop: -8 }}
-                  resizeMode="cover"
-                />
-              }
-              closeicon={
-                <Image
-                  source={closeIcon}
-                  style={{ width: 50, height: 50, marginTop: -1 }}
-                  resizeMode="cover"
-                />
-              }
-              boxStyles={{
-                borderRadius: 10,
-                borderWidth: 0.5,
-                borderColor: "#C9C9C9",
+            <Text
+              style={{
+                fontFamily: "PoppinsRegular",
+                fontSize: Platform.OS === "ios" ? 16 : 12,
+              }}
+            >
+              Phone Number
+            </Text>
+            <TouchableOpacity
+              onPress={() => setIsCountryCodesPickerVisible(true)}
+              style={{
                 height: 50,
                 padding: 10,
+                paddingHorizontal: 20,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
                 marginTop: 10,
-              }}
-              dropdownItemStyles={{
-                marginVertical: 5,
-              }}
-              dropdownStyles={{
-                borderRadius: 10,
-                borderWidth: 0.5,
-                maxHeight: 150,
+                fontFamily: "PoppinsRegular",
                 borderColor: "#C9C9C9",
-                padding: 10,
+                borderWidth: 0.5,
+                borderRadius: 10,
               }}
-              inputStyles={{
-                fontFamily: "PoppinsRegular",
-                color: "#C9C9C9",
-                marginTop: 4,
-                fontSize: Platform.OS === "ios" ? 16 : 14,
+            >
+              {countryCode ? (
+                <Text
+                  style={{
+                    color: "black",
+                    fontSize: Platform.OS === "ios" ? 16 : 12,
+                    fontFamily: "PoppinsRegular",
+                  }}
+                >
+                  {countryCode}
+                </Text>
+              ) : (
+                <Text
+                  style={{
+                    color: "#C9C9C9",
+                    fontSize: Platform.OS === "ios" ? 16 : 12,
+                    fontFamily: "PoppinsRegular",
+                  }}
+                >
+                  Select Country Code
+                </Text>
+              )}
+            </TouchableOpacity>
+            {/* For showing picker just put show state to show prop */}
+            <CountryPicker
+              show={isCountryCodesPickerVisible}
+              // when picker button press you will get the country object with dial code
+              pickerButtonOnPress={(item) => {
+                setCountryCode(item.dial_code);
+                setIsCountryCodesPickerVisible(false);
               }}
-              dropdownTextStyles={{
-                fontFamily: "PoppinsRegular",
-              }}
-              placeholder="+234"
-              searchPlaceholder="Search Country Code"
             />
             <TextInput
               value={mobile}
@@ -418,7 +422,7 @@ const EditProfileForm = () => {
                 height: 50,
                 padding: 10,
                 paddingHorizontal: 20,
-                fontSize: 16,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
                 marginTop: 10,
                 fontFamily: "PoppinsRegular",
                 borderColor: "#C9C9C9",
@@ -435,7 +439,13 @@ const EditProfileForm = () => {
 
           {/* CURRENCY SELECT DROPDOWN */}
           <View style={{ marginTop: 10 }}>
-            <Text style={{ fontFamily: "PoppinsRegular", marginTop: 10 }}>
+            <Text
+              style={{
+                fontFamily: "PoppinsRegular",
+                marginTop: 10,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
+              }}
+            >
               Currency - {currency?.toUpperCase()}
             </Text>
             <SelectList
@@ -466,6 +476,7 @@ const EditProfileForm = () => {
               }}
               dropdownItemStyles={{
                 marginVertical: 5,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
               }}
               dropdownStyles={{
                 borderRadius: 10,
@@ -473,15 +484,17 @@ const EditProfileForm = () => {
                 maxHeight: 150,
                 borderColor: "#C9C9C9",
                 padding: 10,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
               }}
               inputStyles={{
                 fontFamily: "PoppinsRegular",
                 color: "#C9C9C9",
                 marginTop: 4,
-                fontSize: 16,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
               }}
               dropdownTextStyles={{
                 fontFamily: "PoppinsRegular",
+                fontSize: Platform.OS === "ios" ? 16 : 12,
               }}
               placeholder="Select Currency"
               searchPlaceholder="Search Currencies"
@@ -494,7 +507,7 @@ const EditProfileForm = () => {
                 height: 50,
                 padding: 10,
                 paddingHorizontal: 20,
-                fontSize: 16,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
                 marginTop: 10,
                 justifyContent: "center",
                 alignItems: "center",

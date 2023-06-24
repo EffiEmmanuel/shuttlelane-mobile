@@ -7,12 +7,14 @@ import { Stack, useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform } from "react-native";
 import { SafeAreaView } from "react-native";
+import { StatusBar } from "expo-status-bar";
 
 const ScreenThree = () => {
   const router = useRouter();
 
   return (
-    <SafeAreaView style={{ position: "relative", flex: 1 }}>
+    <SafeAreaView style={{ position: "relative", flex: 1, backgroundColor: '#fff' }}>
+      <StatusBar style="dark" />
       <View style={{ backgroundColor: "white", flex: 1 }}>
         <Stack.Screen
           options={{
@@ -92,7 +94,7 @@ const ScreenThree = () => {
               <Text
                 style={{
                   fontFamily: "PoppinsBold",
-                  fontSize: 28,
+                  fontSize: Platform.OS === "ios" ? 28 : 24,
                   textAlign: "center",
                 }}
               >
@@ -107,7 +109,7 @@ const ScreenThree = () => {
                   style={{
                     maxWidth: 300,
                     fontFamily: "PoppinsRegular",
-                    fontSize: 14,
+                    fontSize: Platform.OS === "ios" ? 14 : 12,
                     textAlign: "center",
                     marginTop: 10,
                   }}
@@ -119,35 +121,37 @@ const ScreenThree = () => {
             </View>
 
             <View style={{ marginTop: 60, alignItems: "center" }}>
-              <View style={{ flexDirection: "row" }}>
-                <View
-                  style={{
-                    height: 10,
-                    width: 10,
-                    backgroundColor: "#D9D9D9",
-                    marginHorizontal: 5,
-                    borderRadius: 50,
-                  }}
-                ></View>
-                <View
-                  style={{
-                    height: 10,
-                    width: 10,
-                    backgroundColor: "#D9D9D9",
-                    marginHorizontal: 5,
-                    borderRadius: 50,
-                  }}
-                ></View>
-                <View
-                  style={{
-                    height: 10,
-                    width: 10,
-                    backgroundColor: "#191919",
-                    marginHorizontal: 5,
-                    borderRadius: 50,
-                  }}
-                ></View>
-              </View>
+              {Platform.OS === "ios" && (
+                <View style={{ flexDirection: "row" }}>
+                  <View
+                    style={{
+                      height: 10,
+                      width: 10,
+                      backgroundColor: "#D9D9D9",
+                      marginHorizontal: 5,
+                      borderRadius: 50,
+                    }}
+                  ></View>
+                  <View
+                    style={{
+                      height: 10,
+                      width: 10,
+                      backgroundColor: "#D9D9D9",
+                      marginHorizontal: 5,
+                      borderRadius: 50,
+                    }}
+                  ></View>
+                  <View
+                    style={{
+                      height: 10,
+                      width: 10,
+                      backgroundColor: "#191919",
+                      marginHorizontal: 5,
+                      borderRadius: 50,
+                    }}
+                  ></View>
+                </View>
+              )}
             </View>
 
             {/* <View style={{ marginTop: 90, alignItems: "center" }}>
@@ -193,6 +197,8 @@ const ScreenThree = () => {
             <TouchableOpacity
               onPress={async () => {
                 await AsyncStorage.setItem("hasOnboarded", "true");
+                const hasOnboarded = JSON.parse(await AsyncStorage.getItem('hasOnboarded'))
+                console.log('HASONBOARDED:', hasOnboarded)
                 router.replace("/screenFour/signInOptions");
               }}
               style={{

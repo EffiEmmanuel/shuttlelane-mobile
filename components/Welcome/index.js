@@ -167,11 +167,16 @@ const Welcome = ({
                     style={{ position: "absolute", right: 0 }}
                   />
 
-                  <Text style={{ fontFamily: "PoppinsSemiBold", fontSize: 16 }}>
+                  <Text
+                    style={{
+                      fontFamily: "PoppinsSemiBold",
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
+                    }}
+                  >
                     Bookings:
                   </Text>
                   {!isGuest && (
-                    <Text style={{ fontFamily: "PoppinsBold", fontSize: 26 }}>
+                    <Text style={{ fontFamily: "PoppinsBold", fontSize: Platform.OS === "ios" ? 26 : 22, }}>
                       {isLoading && (
                         <ActivityIndicator
                           size={20}
@@ -179,14 +184,16 @@ const Welcome = ({
                         />
                       )}
                       {!isLoading &&
-                        userBookings?.length + userCarBookings?.length + userPriorityBookings?.length}
+                        userBookings?.length +
+                          userCarBookings?.length +
+                          userPriorityBookings?.length}
                     </Text>
                   )}
                   {isGuest && (
                     <Text
                       style={{
                         fontFamily: "PoppinsRegular",
-                        fontSize: 12,
+                        fontSize: Platform.OS === "ios" ? 12 : 10,
                         marginTop: 10,
                       }}
                     >
@@ -233,15 +240,20 @@ const Welcome = ({
                     style={{ position: "absolute", right: 0 }}
                   />
 
-                  <Text style={{ fontFamily: "PoppinsSemiBold", fontSize: 16 }}>
+                  <Text
+                    style={{
+                      fontFamily: "PoppinsSemiBold",
+                      fontSize: Platform.OS === "ios" ? 16 : 12,
+                    }}
+                  >
                     Total Spent:
                   </Text>
                   {!isGuest && (
-                    <Text style={{ fontFamily: "PoppinsBold", fontSize: 26 }}>
+                    <Text style={{ fontFamily: "PoppinsBold", fontSize: Platform.OS === "ios" ? 26 : 22,}}>
                       {isSpendLoading && (
                         <ActivityIndicator
                           size={20}
-                          color={COLORS.shuttlelanePuple}
+                          color={COLORS.shuttlelanePurple}
                         />
                       )}
 
@@ -260,7 +272,7 @@ const Welcome = ({
                     <Text
                       style={{
                         fontFamily: "PoppinsRegular",
-                        fontSize: 12,
+                        fontSize: Platform.OS === "ios" ? 12 : 10,
                         marginTop: 10,
                       }}
                     >
@@ -274,7 +286,7 @@ const Welcome = ({
 
           <Text
             style={{
-              fontSize: Platform.OS === "ios" ? 28 : 23,
+              fontSize: Platform.OS === "ios" ? 28 : 20,
               marginTop: 10,
               fontWeight: "500",
               color: "#191919",
@@ -298,6 +310,7 @@ const Welcome = ({
               borderTopRightRadius: 0,
               borderBottomRightRadius: 0,
               fontFamily: "PoppinsRegular",
+              fontSize: Platform.OS === "ios" ? 16 : 12,
               width: "85%",
             }}
             placeholder="Search for a booking"
@@ -358,8 +371,8 @@ const Welcome = ({
                   flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",
-                  height: 60,
-                  width: 60,
+                  height: Platform.OS === "ios" ? 60 : 50,
+                  width: Platform.OS === "ios" ? 60 : 50,
                   borderWidth: 1,
                   backgroundColor: COLORS.shuttlelanePurple,
                   borderRadius: 50,
@@ -379,14 +392,14 @@ const Welcome = ({
                 {/* <Image source={airplaneIcon} style={{ width: 55, height: 55 }} /> */}
                 <Icon
                   name="flight-takeoff"
-                  size={30}
+                  size={Platform.OS === "ios" ? 30 : 27}
                   color={COLORS.white}
-                  style={{ marginVertical: 12 }}
+                  style={{ marginVertical: "auto" }}
                 />
               </TouchableOpacity>
               <Text
                 style={{
-                  fontSize: 12,
+                  fontSize: Platform.OS === "ios" ? 12 : 11,
                   marginTop: -5,
                   color: "#A1A1A1",
                   fontFamily: "PoppinsRegular",
@@ -407,8 +420,8 @@ const Welcome = ({
                   flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",
-                  height: 60,
-                  width: 60,
+                  height: Platform.OS === "ios" ? 60 : 50,
+                  width: Platform.OS === "ios" ? 60 : 50,
                   borderWidth: 1,
                   backgroundColor: COLORS.shuttlelanePurple,
                   borderRadius: 50,
@@ -418,14 +431,14 @@ const Welcome = ({
               >
                 <Icon
                   name="car-rental"
-                  size={30}
+                  size={Platform.OS === "ios" ? 30 : 27}
                   color={COLORS.white}
-                  style={{ marginVertical: 15 }}
+                  style={{ marginVertical: "auto" }}
                 />
               </TouchableOpacity>
               <Text
                 style={{
-                  fontSize: 12,
+                  fontSize: Platform.OS === "ios" ? 12 : 11,
                   marginTop: -10,
                   color: "#A1A1A1",
                   fontFamily: "PoppinsRegular",
@@ -446,8 +459,8 @@ const Welcome = ({
                   flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",
-                  height: 60,
-                  width: 60,
+                  height: Platform.OS === "ios" ? 60 : 50,
+                  width: Platform.OS === "ios" ? 60 : 50,
                   borderWidth: 1,
                   backgroundColor: COLORS.shuttlelanePurple,
                   borderRadius: 50,
@@ -459,12 +472,12 @@ const Welcome = ({
                   name="luggage"
                   size={30}
                   color={COLORS.white}
-                  style={{ marginVertical: 12 }}
+                  style={{ marginVertical: "auto" }}
                 />
               </TouchableOpacity>
               <Text
                 style={{
-                  fontSize: 12,
+                  fontSize: Platform.OS === 'ios' ? 12 : 11,
                   marginTop: 0,
                   color: "#A1A1A1",
                   fontFamily: "PoppinsRegular",

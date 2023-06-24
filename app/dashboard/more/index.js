@@ -126,7 +126,7 @@ const More = () => {
         <View style={{ flex: 1, paddingVertical: 15, paddingHorizontal: 30 }}>
           <Text
             style={{
-              fontSize: 24,
+              fontSize: Platform.OS === "ios" ? 24 : 20,
               fontWeight: "500",
               color: COLORS.shuttlelanePurple,
               fontFamily: "PoppinsBold",
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontFamily: "PoppinsRegular",
-    fontSize: 14,
+    fontSize: Platform.OS === "ios" ? 14 : 12,
     marginHorizontal: 10,
   },
 });

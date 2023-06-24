@@ -50,7 +50,7 @@ const RecentBookings = ({
       <View style={{ flexDirection: "row", alignItems: "baseline" }}>
         <Text
           style={{
-            fontSize: Platform.OS === "ios" ? 24 : 20,
+            fontSize: Platform.OS === "ios" ? 24 : 18,
             fontWeight: "500",
             color: "#191919",
             fontFamily: "PoppinsBold",
@@ -130,6 +130,7 @@ const RecentBookings = ({
                       style={{
                         // maxWidth: "90%",
                         fontFamily: "PoppinsRegular",
+                        fontSize: Platform.OS === "ios" ? 16 : 12,
                       }}
                     >
                       Pick up:{" "}
@@ -142,6 +143,7 @@ const RecentBookings = ({
                       style={{
                         // maxWidth: "90%",
                         fontFamily: "PoppinsRegular",
+                        fontSize: Platform.OS === "ios" ? 16 : 12,
                       }}
                     >
                       Price:{" "}
@@ -211,6 +213,7 @@ const RecentBookings = ({
                       style={{
                         // maxWidth: "90%",
                         fontFamily: "PoppinsRegular",
+                        fontSize: Platform.OS === "ios" ? 16 : 12,
                       }}
                     >
                       Pick up:{" "}
@@ -223,6 +226,7 @@ const RecentBookings = ({
                       style={{
                         // maxWidth: "90%",
                         fontFamily: "PoppinsRegular",
+                        fontSize: Platform.OS === "ios" ? 16 : 12,
                       }}
                     >
                       Price:{" "}
@@ -292,6 +296,7 @@ const RecentBookings = ({
                       style={{
                         // maxWidth: "90%",
                         fontFamily: "PoppinsRegular",
+                        fontSize: Platform.OS === "ios" ? 16 : 12,
                       }}
                     >
                       Pick up:{" "}
@@ -304,6 +309,7 @@ const RecentBookings = ({
                       style={{
                         // maxWidth: "90%",
                         fontFamily: "PoppinsRegular",
+                        fontSize: Platform.OS === "ios" ? 16 : 12,
                       }}
                     >
                       Price:{" "}
@@ -336,7 +342,7 @@ const RecentBookings = ({
                     <Text
                       style={{
                         fontFamily: "PoppinsRegular",
-                        fontSize: 14,
+                        fontSize: Platform.OS === "ios" ? 14 : 12,
                         marginTop: 10,
                         textAlign: "center",
                       }}
@@ -356,7 +362,7 @@ const RecentBookings = ({
             <Text
               style={{
                 fontFamily: "PoppinsRegular",
-                fontSize: 14,
+                fontSize: Platform.OS === "ios" ? 16 : 12,
                 marginTop: 10,
                 textAlign: "center",
               }}

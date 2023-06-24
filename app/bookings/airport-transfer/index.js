@@ -70,7 +70,7 @@ const AirportTransfer = () => {
   const [airports, setAirports] = useState([]);
 
   // MAP SETUP
-  const [mapRegion, setMapRegion] = useState();
+  // const [mapRegion, setMapRegion] = useState();
   const [pickupAddress, setPickupAddress] = useState("");
   const [dropoffAddress, setDropoffAddress] = useState("");
   const [flightNumber, setFlightNumber] = useState("");
@@ -81,30 +81,30 @@ const AirportTransfer = () => {
   const [userAddress, setUserAddress] = useState("");
 
   // User Location
-  const [isMapLoading, setIsMapLoading] = useState(false);
-  const userLocation = async () => {
-    setIsMapLoading(true);
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      console.log("Access to location was denied!");
-    }
+  // const [isMapLoading, setIsMapLoading] = useState(false);
+  // const userLocation = async () => {
+  //   setIsMapLoading(true);
+  //   let { status } = await Location.requestForegroundPermissionsAsync();
+  //   if (status !== "granted") {
+  //     console.log("Access to location was denied!");
+  //   }
 
-    const location = await Location.getCurrentPositionAsync({
-      enableHighAccuracy: true,
-    });
+  //   const location = await Location.getCurrentPositionAsync({
+  //     enableHighAccuracy: true,
+  //   });
 
-    const address = await Location.reverseGeocodeAsync(location.coords);
-    console.log(address);
-    setUserAddress(address);
+  //   const address = await Location.reverseGeocodeAsync(location.coords);
+  //   console.log(address);
+  //   setUserAddress(address);
 
-    setMapRegion({
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude,
-      latitudeDelta: 0.0922,
-      longitudeDelta: 0.0421,
-    });
-    setIsMapLoading(false);
-  };
+  //   setMapRegion({
+  //     latitude: location.coords.latitude,
+  //     longitude: location.coords.longitude,
+  //     latitudeDelta: 0.0922,
+  //     longitudeDelta: 0.0421,
+  //   });
+  //   setIsMapLoading(false);
+  // };
 
   // Fetch airports
   const fetchAllAirports = async () => {
@@ -140,7 +140,7 @@ const AirportTransfer = () => {
 
   useEffect(() => {
     fetchAllAirports();
-    userLocation();
+    // userLocation();
     console.log("ISGUEUST FROM FORM AT:", isGuest);
   }, []);
 
@@ -188,33 +188,33 @@ const AirportTransfer = () => {
   }
 
   // SET USER DROPOFF ADDRESS
-  useEffect(() => {
-    if (userAddress) {
-      const streetNumber =
-        userAddress[0]?.streetNumber !== null
-          ? `${userAddress[0]?.streetNumber},`
-          : null;
-      const street =
-        userAddress[0]?.street !== null ? `${userAddress[0]?.street},` : null;
-      const city =
-        userAddress[0]?.city !== null ? `${userAddress[0]?.city},` : null;
-      const region =
-        userAddress[0]?.region !== null ? `${userAddress[0]?.region},` : null;
-      const country =
-        userAddress[0]?.country !== null ? `${userAddress[0]?.country}` : null;
-      const name =
-        userAddress[0]?.name !== null ? `${userAddress[0]?.name},` : null;
+  // useEffect(() => {
+  //   if (userAddress) {
+  //     const streetNumber =
+  //       userAddress[0]?.streetNumber !== null
+  //         ? `${userAddress[0]?.streetNumber},`
+  //         : null;
+  //     const street =
+  //       userAddress[0]?.street !== null ? `${userAddress[0]?.street},` : null;
+  //     const city =
+  //       userAddress[0]?.city !== null ? `${userAddress[0]?.city},` : null;
+  //     const region =
+  //       userAddress[0]?.region !== null ? `${userAddress[0]?.region},` : null;
+  //     const country =
+  //       userAddress[0]?.country !== null ? `${userAddress[0]?.country}` : null;
+  //     const name =
+  //       userAddress[0]?.name !== null ? `${userAddress[0]?.name},` : null;
 
-      const address = `${streetNumber !== null ? streetNumber : ""} ${
-        name !== null ? name : ""
-      } ${street !== null ? street : ""}  ${city !== null ? city : ""} ${
-        region !== null ? region : ""
-      } ${country !== null ? country : ""}`;
+  //     const address = `${streetNumber !== null ? streetNumber : ""} ${
+  //       name !== null ? name : ""
+  //     } ${street !== null ? street : ""}  ${city !== null ? city : ""} ${
+  //       region !== null ? region : ""
+  //     } ${country !== null ? country : ""}`;
 
-      console.log(address);
-      setDropoffAddress(address);
-    }
-  }, [isMapLoading]);
+  //     console.log(address);
+  //     setDropoffAddress(address);
+  //   }
+  // }, [isMapLoading]);
 
   // SET DATE
   useEffect(() => {
@@ -252,7 +252,17 @@ const AirportTransfer = () => {
               />
             </TouchableOpacity>
           ),
-          headerTitle: "",
+          headerTitle: () => (
+            <Text
+              style={{
+                fontFamily: "PoppinsRegular",
+                marginTop: 3,
+                fontSize: Platform.OS === "ios" ? 14 : 11,
+              }}
+            >
+              Airport Transfer
+            </Text>
+          ),
         }}
       />
 
@@ -266,7 +276,7 @@ const AirportTransfer = () => {
           top: 0,
         }}
       >
-        {!isLoading && !isMapLoading && (
+        {!isLoading && (
           <>
             {/* RADIO BUTTONS */}
             <View
@@ -308,7 +318,13 @@ const AirportTransfer = () => {
                     ></View>
                   )}
                 </View>
-                <Text style={{ fontFamily: "PoppinsRegular", marginLeft: 8 }}>
+                <Text
+                  style={{
+                    fontFamily: "PoppinsRegular",
+                    marginLeft: 8,
+                    fontSize: Platform.OS === "ios" ? 14 : 11,
+                  }}
+                >
                   Airport Pickup
                 </Text>
               </TouchableOpacity>
@@ -344,7 +360,13 @@ const AirportTransfer = () => {
                     ></View>
                   )}
                 </View>
-                <Text style={{ fontFamily: "PoppinsRegular", marginLeft: 8 }}>
+                <Text
+                  style={{
+                    fontFamily: "PoppinsRegular",
+                    marginLeft: 8,
+                    fontSize: Platform.OS === "ios" ? 14 : 11,
+                  }}
+                >
                   Airport Dropoff
                 </Text>
               </TouchableOpacity>
@@ -360,6 +382,7 @@ const AirportTransfer = () => {
                     style={{
                       fontFamily: "PoppinsRegular",
                       marginHorizontal: 5,
+                      fontSize: Platform.OS === "ios" ? 14 : 11,
                     }}
                   >
                     Dropoff Address
@@ -371,7 +394,7 @@ const AirportTransfer = () => {
                     height: 50,
                     padding: 10,
                     paddingHorizontal: 20,
-                    fontSize: 16,
+                    fontSize: Platform.OS === "ios" ? 14 : 11,
                     fontFamily: "PoppinsRegular",
                     borderColor: "#C9C9C9",
                     borderWidth: 0.5,
@@ -391,6 +414,7 @@ const AirportTransfer = () => {
                         fontFamily: "PoppinsRegular",
                         marginHorizontal: 5,
                         color: "#181818",
+                        fontSize: Platform.OS === "ios" ? 14 : 11,
                       }}
                     >
                       Pickup Airport
@@ -424,21 +448,24 @@ const AirportTransfer = () => {
                       }}
                       dropdownItemStyles={{
                         marginVertical: 5,
+                        fontSize: Platform.OS === 'ios' ? 12 : 11,
                       }}
                       dropdownStyles={{
                         borderRadius: 10,
                         borderWidth: 0.5,
                         borderColor: "#C9C9C9",
                         padding: 10,
+                        fontSize: Platform.OS === 'ios' ? 12 : 11,
                       }}
                       inputStyles={{
                         fontFamily: "PoppinsRegular",
                         color: "#C9C9C9",
                         marginTop: 4,
-                        fontSize: 16,
+                        fontSize: Platform.OS === 'ios' ? 12 : 11,
                       }}
                       dropdownTextStyles={{
                         fontFamily: "PoppinsRegular",
+                        fontSize: Platform.OS === 'ios' ? 12 : 11,
                       }}
                       placeholder="Select Pickup Airport"
                       searchPlaceholder="Search airports"
@@ -455,6 +482,7 @@ const AirportTransfer = () => {
                         fontFamily: "PoppinsRegular",
                         marginHorizontal: 5,
                         color: "#181818",
+                        fontSize: Platform.OS === "ios" ? 14 : 11,
                       }}
                     >
                       Passengers
@@ -466,7 +494,7 @@ const AirportTransfer = () => {
                       height: 50,
                       padding: 10,
                       paddingHorizontal: 20,
-                      fontSize: 16,
+                      fontSize: Platform.OS === 'ios' ? 16 : 12,
                       fontFamily: "PoppinsRegular",
                       borderColor: "#C9C9C9",
                       borderWidth: 0.5,
@@ -491,6 +519,7 @@ const AirportTransfer = () => {
                         fontFamily: "PoppinsRegular",
                         marginHorizontal: 5,
                         color: "#181818",
+                        fontSize: Platform.OS === "ios" ? 14 : 11,
                       }}
                     >
                       Flight Number
@@ -502,7 +531,7 @@ const AirportTransfer = () => {
                       height: 50,
                       padding: 10,
                       paddingHorizontal: 20,
-                      fontSize: 16,
+                      fontSize: Platform.OS === 'ios' ? 16 : 12,
                       fontFamily: "PoppinsRegular",
                       borderColor: "#C9C9C9",
                       borderWidth: 0.5,
@@ -525,7 +554,7 @@ const AirportTransfer = () => {
                     height: 50,
                     padding: 10,
                     paddingHorizontal: 20,
-                    fontSize: 16,
+                    fontSize: Platform.OS === "ios" ? 14 : 11,
                     fontFamily: "PoppinsRegular",
                     borderColor: "#C9C9C9",
                     borderWidth: 0.5,
@@ -545,6 +574,7 @@ const AirportTransfer = () => {
                     <Text
                       style={{
                         fontFamily: "PoppinsRegular",
+                        fontSize: Platform.OS === "ios" ? 14 : 11,
                         marginHorizontal: 5,
                         marginTop: 2,
                         color: "#181818",
@@ -582,7 +612,7 @@ const AirportTransfer = () => {
                     height: 50,
                     padding: 10,
                     paddingHorizontal: 20,
-                    fontSize: 16,
+                    fontSize: Platform.OS === "ios" ? 14 : 11,
                     fontFamily: "PoppinsRegular",
                     borderColor: "#C9C9C9",
                     borderWidth: 0.5,
@@ -600,6 +630,7 @@ const AirportTransfer = () => {
                     <Text
                       style={{
                         fontFamily: "PoppinsRegular",
+                        fontSize: Platform.OS === "ios" ? 14 : 11,
                         marginHorizontal: 5,
                         marginTop: 2,
                         color: "#181818",
@@ -643,7 +674,7 @@ const AirportTransfer = () => {
                     <Text
                       style={{
                         paddingHorizontal: 10,
-                        fontSize: 16,
+                        fontSize: Platform.OS === "ios" ? 16 : 12,
                         fontFamily: "PoppinsRegular",
                         color: COLORS.white,
                         width: "100%",
@@ -666,6 +697,7 @@ const AirportTransfer = () => {
                     style={{
                       fontFamily: "PoppinsRegular",
                       marginHorizontal: 5,
+                      fontSize: Platform.OS === "ios" ? 14 : 11,
                       color: "#181818",
                     }}
                   >
@@ -678,7 +710,7 @@ const AirportTransfer = () => {
                     height: 50,
                     padding: 10,
                     paddingHorizontal: 20,
-                    fontSize: 16,
+                    fontSize: Platform.OS === 'ios' ? 16 : 12,
                     fontFamily: "PoppinsRegular",
                     borderColor: "#C9C9C9",
                     borderWidth: 0.5,
@@ -698,6 +730,7 @@ const AirportTransfer = () => {
                         fontFamily: "PoppinsRegular",
                         marginHorizontal: 5,
                         color: "#181818",
+                        fontSize: Platform.OS === "ios" ? 14 : 11,
                       }}
                     >
                       Dropoff Airport
@@ -729,21 +762,24 @@ const AirportTransfer = () => {
                     }}
                     dropdownItemStyles={{
                       marginVertical: 5,
+                      fontSize: Platform.OS === "ios" ? 14 : 11,
                     }}
                     dropdownStyles={{
                       borderRadius: 10,
                       borderWidth: 0.5,
                       borderColor: "#C9C9C9",
                       padding: 10,
+                      fontSize: Platform.OS === "ios" ? 14 : 11,
                     }}
                     inputStyles={{
                       fontFamily: "PoppinsRegular",
                       color: "#C9C9C9",
                       marginTop: 4,
-                      fontSize: 16,
+                      fontSize: Platform.OS === "ios" ? 14 : 11,
                     }}
                     dropdownTextStyles={{
                       fontFamily: "PoppinsRegular",
+                      fontSize: Platform.OS === "ios" ? 14 : 11,
                     }}
                     placeholder="Select Dropoff Airport"
                     searchPlaceholder="Search airports"
@@ -759,6 +795,7 @@ const AirportTransfer = () => {
                     style={{
                       fontFamily: "PoppinsRegular",
                       marginHorizontal: 5,
+                      fontSize: Platform.OS === "ios" ? 14 : 11,
                       color: "#181818",
                     }}
                   >
@@ -771,7 +808,7 @@ const AirportTransfer = () => {
                     height: 50,
                     padding: 10,
                     paddingHorizontal: 20,
-                    fontSize: 16,
+                    fontSize: Platform.OS === 'ios' ? 16 : 12,
                     fontFamily: "PoppinsRegular",
                     borderColor: "#C9C9C9",
                     borderWidth: 0.5,
@@ -794,6 +831,7 @@ const AirportTransfer = () => {
                     style={{
                       fontFamily: "PoppinsRegular",
                       marginHorizontal: 5,
+                      fontSize: Platform.OS === "ios" ? 14 : 11,
                       color: "#181818",
                     }}
                   >
@@ -806,7 +844,7 @@ const AirportTransfer = () => {
                     height: 50,
                     padding: 10,
                     paddingHorizontal: 20,
-                    fontSize: 16,
+                    fontSize: Platform.OS === 'ios' ? 16 : 12,
                     fontFamily: "PoppinsRegular",
                     borderColor: "#C9C9C9",
                     borderWidth: 0.5,
@@ -830,7 +868,7 @@ const AirportTransfer = () => {
                     height: 50,
                     padding: 10,
                     paddingHorizontal: 20,
-                    fontSize: 16,
+                    fontSize: Platform.OS === "ios" ? 14 : 11,
                     fontFamily: "PoppinsRegular",
                     borderColor: "#C9C9C9",
                     borderWidth: 0.5,
@@ -847,6 +885,7 @@ const AirportTransfer = () => {
                     <Text
                       style={{
                         fontFamily: "PoppinsRegular",
+                        fontSize: Platform.OS === "ios" ? 14 : 11,
                         marginHorizontal: 5,
                         marginTop: 2,
                         color: "#181818",
@@ -888,7 +927,7 @@ const AirportTransfer = () => {
                     height: 50,
                     padding: 10,
                     paddingHorizontal: 20,
-                    fontSize: 16,
+                    fontSize: Platform.OS === "ios" ? 14 : 11,
                     fontFamily: "PoppinsRegular",
                     borderColor: "#C9C9C9",
                     borderWidth: 0.5,
@@ -906,6 +945,7 @@ const AirportTransfer = () => {
                     <Text
                       style={{
                         fontFamily: "PoppinsRegular",
+                        fontSize: Platform.OS === "ios" ? 14 : 11,
                         marginHorizontal: 5,
                         marginTop: 2,
                         color: "#181818",
@@ -951,7 +991,8 @@ const AirportTransfer = () => {
                     <Text
                       style={{
                         paddingHorizontal: 10,
-                        fontSize: 16,
+                        // fontSize: 16,
+                        fontSize: Platform.OS === "ios" ? 16 : 12,
                         fontFamily: "PoppinsRegular",
                         color: COLORS.white,
                         width: "100%",
@@ -971,14 +1012,14 @@ const AirportTransfer = () => {
       </View>
 
       {/* MAPS HERE */}
-      {isMapLoading && (
+      {/* {isMapLoading && (
         <View style={{ marginTop: 60 }}>
           <ActivityIndicator size={48} />
-          <Text style={{ fontSize: 24, color: "#C1C1C1", textAlign: "center" }}>
+          <Text style={{ fontSize: 24, color: "#C1C1C1", textAlign: "center", fontSize: Platform.OS === "ios" ? 16 : 12, }}>
             Fetching your location
           </Text>
         </View>
-      )}
+      )} */}
 
       {/* MAPS HERE */}
       {/* {!isMapLoading && (
