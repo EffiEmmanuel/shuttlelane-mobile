@@ -26,8 +26,15 @@ import axios from "axios";
 import ToastMessage from "../../../components/ToastMessage";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { PayWithFlutterwave } from "flutterwave-react-native";
-import { FLUTTERWAVE_KEY, STRIPE_PUBLISHABLE_KEY, PAYPAL_BEARER } from "@env";
+import {
+  FLUTTERWAVE_KEY,
+  STRIPE_PUBLISHABLE_KEY,
+  PAYPAL_BEARER,
+  PAYPAL_CLIENT_ID,
+  PAYPAL_SECRET_KEY,
+} from "@env";
 import WebView from "react-native-webview";
+import base64 from "react-native-base64";
 
 const PayWithPayPal = () => {
   const router = useRouter();
@@ -59,14 +66,6 @@ const PayWithPayPal = () => {
     const parsedUser = JSON.parse(await AsyncStorage.getItem("user"));
     setUser(parsedUser);
   }
-
-  useEffect(() => {
-    fetchUserData();
-  }, []);
-
-  useEffect(() => {
-    paypalPayment();
-  }, [user]);
 
   //   PAYPAL PAYMENT
   const [accessToken, setAccessToken] = useState();
@@ -120,11 +119,14 @@ const PayWithPayPal = () => {
         "grant_type=client_credentials",
         {
           headers: {
-            "Content-Type": "text/plain"
+            "Content-Type": "text/plain",
+            Authorization: `Basic ${base64.encode(
+              process.env.PAYPAL_CLIENT_ID
+            )}:${base64.encode(process.env.PAYPAL_SECRET_KEY)}`,
           },
         }
       )
-      .then((res) => {
+      .then(async (res) => {
         console.log("RESPONSE FROM TOKEN GENERATION:", res.data);
         setAccessToken(res.data.access_token);
 
@@ -159,6 +161,7 @@ const PayWithPayPal = () => {
       })
       .catch((err) => {
         console.log("payment ERROR response 2::", err?.message);
+        console.log(JSON.stringify(err));
       });
   }
 
@@ -305,6 +308,16 @@ const PayWithPayPal = () => {
     }
   }
 
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      paypalPayment();
+    }
+  }, [user]);
+
   // TOAST MESSAGE CONFIG
   // TOAST CONFIGS
   const [isToasting, setIsToasting] = useState(false);
@@ -353,7 +366,6 @@ const PayWithPayPal = () => {
             style={{
               height: Dimensions.get("window").height,
               width: Dimensions.get("window").width,
-              backgroundColor: "red",
             }}
             source={{ uri: approvalUrl }}
             onNavigationStateChange={onNavigationStateChange}

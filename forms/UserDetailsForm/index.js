@@ -186,7 +186,7 @@ const UserDetailsForm = ({
           }}
         />
       )}
-      <View style={{ marginTop: 10, padding: 20 }}>
+      <View style={{ marginTop: 10, paddingHorizontal: 10 }}>
         <Text
           style={{
             fontSize: Platform.OS === "ios" ? 24 : 20,

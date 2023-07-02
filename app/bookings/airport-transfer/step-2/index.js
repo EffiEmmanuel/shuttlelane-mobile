@@ -499,7 +499,7 @@ const AirportPickupStepTwo = () => {
                             });
                           } else {
                             router.push({
-                              pathname: "/bookings/summary",
+                              pathname: "/bookings/booking-summary",
                               params: {
                                 bookingType: pickupAirport
                                   ? "Airport Pickup"

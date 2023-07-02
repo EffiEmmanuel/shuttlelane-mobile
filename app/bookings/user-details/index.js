@@ -62,7 +62,7 @@ const UserDetails = () => {
       />
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={{ flex: 1, padding: 20 }}>
+        <View style={{ flex: 1, paddingVertical: 20, paddingHorizontal: 10 }}>
           <UserDetailsForm
             bookingType={bookingType}
             pickupAirport={pickupAirport}

@@ -260,7 +260,7 @@ const PriorityPass = () => {
       });
     } else {
       router.push({
-        pathname: "/bookings/summary",
+        pathname: "/bookings/booking-summary",
         params: {
           bookingType: "Priority Pass",
           service,
@@ -318,7 +318,7 @@ const PriorityPass = () => {
               style={{
                 fontFamily: "PoppinsRegular",
                 marginTop: 3,
-                fontSize: Platform.OS === "ios" ? 12 : 11,
+                fontSize: Platform.OS === "ios" ? 14 : 11,
               }}
             >
               Priority Pass

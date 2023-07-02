@@ -112,7 +112,7 @@ const Layout = () => {
           headerTitle: "",
           headerLeft: null,
           gestureEnabled: false,
-          headerShown: false
+          headerShown: false,
         }}
       />
 
@@ -124,9 +124,21 @@ const Layout = () => {
           },
           headerShadowVisible: false,
           headerTitle: "",
-          headerLeft: null,
-          gestureEnabled: false,
-          headerShown: false
+          headerLeft: () => (
+            <TouchableOpacity
+              onPress={() => {
+                router.back();
+              }}
+            >
+              <Image
+                source={arrowBackIcon}
+                resizeMode="cover"
+                style={{ width: 45, height: 45 }}
+              />
+            </TouchableOpacity>
+          ),
+          gestureEnabled: true,
+          headerShown: false,
         }}
       />
 
@@ -140,29 +152,30 @@ const Layout = () => {
           headerTitle: "",
           headerLeft: null,
           gestureEnabled: false,
-          headerShown: false
+          headerShown: false,
         }}
       />
 
       <Stack.Screen
         name="signup"
         options={{
-          headerTitle: () => (
-            <Image
-              source={logo}
-              resizeMode="contain"
-              style={style.headerImage}
-              height={28}
-              width={28}
-            />
-          ),
+          // headerTitle: () => (
+          //   <Image
+          //     source={logo}
+          //     resizeMode="contain"
+          //     style={style.headerImage}
+          //     height={28}
+          //     width={28}
+          //   />
+          // ),
           headerStyle: {
             display: "flex",
             flexDirection: "row",
             justifyContent: "center",
             width: Dimensions.get("window").width,
           },
-          headerLeft: null,
+          headerLeft: () => '',
+          gestureEnabled: false
         }}
       />
 
@@ -289,11 +302,11 @@ const Layout = () => {
             backgroundColor: COLORS.white,
           },
           headerShadowVisible: false,
-          headerLeft: () => '',
-          headerRight: () => '',
+          headerLeft: () => "",
+          headerRight: () => "",
           headerShown: false,
           headerTitle: "",
-          gestureEnabled: false
+          gestureEnabled: false,
         }}
       />
     </Stack>

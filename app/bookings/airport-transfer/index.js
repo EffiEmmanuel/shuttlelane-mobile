@@ -394,7 +394,7 @@ const AirportTransfer = () => {
                     height: 50,
                     padding: 10,
                     paddingHorizontal: 20,
-                    fontSize: Platform.OS === "ios" ? 14 : 11,
+                    fontSize: Platform.OS === "ios" ? 16 : 12,
                     fontFamily: "PoppinsRegular",
                     borderColor: "#C9C9C9",
                     borderWidth: 0.5,
@@ -448,24 +448,24 @@ const AirportTransfer = () => {
                       }}
                       dropdownItemStyles={{
                         marginVertical: 5,
-                        fontSize: Platform.OS === 'ios' ? 12 : 11,
+                        fontSize: Platform.OS === 'ios' ? 16 : 12,
                       }}
                       dropdownStyles={{
                         borderRadius: 10,
                         borderWidth: 0.5,
                         borderColor: "#C9C9C9",
                         padding: 10,
-                        fontSize: Platform.OS === 'ios' ? 12 : 11,
+                        fontSize: Platform.OS === 'ios' ? 16 : 12,
                       }}
                       inputStyles={{
                         fontFamily: "PoppinsRegular",
                         color: "#C9C9C9",
                         marginTop: 4,
-                        fontSize: Platform.OS === 'ios' ? 12 : 11,
+                        fontSize: Platform.OS === 'ios' ? 16 : 12,
                       }}
                       dropdownTextStyles={{
                         fontFamily: "PoppinsRegular",
-                        fontSize: Platform.OS === 'ios' ? 12 : 11,
+                        fontSize: Platform.OS === 'ios' ? 16 : 12,
                       }}
                       placeholder="Select Pickup Airport"
                       searchPlaceholder="Search airports"

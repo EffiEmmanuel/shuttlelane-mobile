@@ -262,7 +262,7 @@ const Welcome = ({
                           {user?.currency === "dollars" && "$"}
                           {user?.currency === "pounds" && "£"}
                           {user?.currency === "euros" && "€"}
-                          {user?.currency === "naira" && "₦"}
+                          {user?.currency === "neira" && "₦"}
                           {userSpend}
                         </>
                       )}

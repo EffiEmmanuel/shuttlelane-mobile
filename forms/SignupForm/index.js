@@ -208,6 +208,58 @@ const SignupForm = () => {
   const [isCountryCodesPickerVisible, setIsCountryCodesPickerVisible] =
     useState(false);
 
+  useEffect(() => {
+    async function getCountry() {
+      await axios
+        .get("http://ip-api.com/json/?fields=61439")
+        .then(async (res) => {
+          console.log("USER LOCATION:", res.data);
+          const country = res.data?.country;
+          const timezone = res.data?.timezone;
+          if (country?.toLowerCase() == "nigeria") {
+            setCurrency("neira");
+          } else if (country?.toLowerCase() == "united kingdom") {
+            setCurrency("pounds");
+          } else if (
+            country?.toLowerCase() == "andorra" ||
+            country?.toLowerCase() == "austria" ||
+            country?.toLowerCase() == "belgium" ||
+            country?.toLowerCase() == "cyprus" ||
+            country?.toLowerCase() == "estonia" ||
+            country?.toLowerCase() == "finland" ||
+            country?.toLowerCase() == "france" ||
+            country?.toLowerCase() == "germany" ||
+            country?.toLowerCase() == "greece" ||
+            country?.toLowerCase() == "ireland" ||
+            country?.toLowerCase() == "italy" ||
+            country?.toLowerCase() == "kosovo" ||
+            country?.toLowerCase() == "latvia" ||
+            country?.toLowerCase() == "lithuania" ||
+            country?.toLowerCase() == "luxembourg" ||
+            country?.toLowerCase() == "malta" ||
+            country?.toLowerCase() == "monaco" ||
+            country?.toLowerCase() == "montenegro" ||
+            country?.toLowerCase() == "netherlands" ||
+            country?.toLowerCase() == "portugal" ||
+            country?.toLowerCase() == "san marino" ||
+            country?.toLowerCase() == "slovakia" ||
+            country?.toLowerCase() == "slovenia" ||
+            country?.toLowerCase() == "spain" ||
+            country?.toLowerCase() == "vatican city"
+          ) {
+            setCurrency("euros");
+          } else {
+            setCurrency("dollars");
+          }
+        })
+        .catch((err) => {
+          console.log("USER LOCATION ERROR:", err);
+        });
+    }
+
+    getCountry();
+  }, []);
+
   return (
     <>
       {/* TOAST MESSAGE */}
@@ -439,7 +491,7 @@ const SignupForm = () => {
             />
           </View>
 
-          {/* SERVICE SELECT DROPDOWN */}
+          {/* SERVICE SELECT DROPDOWN
           <View style={{ marginTop: 20 }}>
             <Text
               style={{
@@ -500,7 +552,7 @@ const SignupForm = () => {
               placeholder="Select Currency"
               searchPlaceholder="Search Currencies"
             />
-          </View>
+          </View> */}
 
           {/* SELECT IMAGE */}
           <View style={{ marginTop: 20 }}>

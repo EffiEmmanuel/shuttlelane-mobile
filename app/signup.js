@@ -26,27 +26,19 @@ const SignUp = () => {
     >
       <Stack.Screen
         options={{
-          headerTitle: () => (
-            <Image
-              source={logo}
-              resizeMode="contain"
-              style={style.headerImage}
-              height={28}
-              width={28}
-            />
-          ),
+          headerTitle: '',
           headerStyle: {
             display: "flex",
             flexDirection: "row",
             justifyContent: "center",
             width: Dimensions.get("window").width,
           },
-          headerLeft: null,
+          headerLeft: () => "",
         }}
       />
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={{ flex: 1, padding: 20 }}>
+        <View style={{ flex: 1, paddingVertical: 20, paddingHorizontal: 10 }}>
           <SignupForm />
         </View>
       </ScrollView>

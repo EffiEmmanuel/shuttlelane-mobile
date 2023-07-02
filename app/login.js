@@ -34,7 +34,7 @@ const LoginPage = () => {
       />
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={{ flex: 1, padding: 20, marginTop: 50 }}>
+        <View style={{ flex: 1, paddingVertical: 20, paddingHorizontal: 10, marginTop: 50 }}>
           <LoginForm />
         </View>
       </ScrollView>

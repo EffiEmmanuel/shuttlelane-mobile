@@ -1396,7 +1396,7 @@ const BookingSummary = () => {
                       onRedirect={handleOnRedirect}
                       options={{
                         tx_ref: generateTransactionRef(10),
-                        authorization: FLUTTERWAVE_KEY,
+                        authorization: process.env.FLUTTERWAVE_KEY,
                         customer: {
                           email: `${email}` ?? `${user?.email}`,
                         },

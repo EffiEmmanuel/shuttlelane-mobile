@@ -31,7 +31,6 @@ const EditProfileForm = () => {
   const [email, setEmail] = useState(user?.email);
   const [userId, setUserId] = useState(user?._id);
   const [mobile, setMobile] = useState(user?.mobile);
-  const [currency, setCurrency] = useState(user?.currency);
   const [userImage, setUserImage] = useState(user?.userImage);
   // COUNTRY CODES CONFIG
   const [isCountryCodesPickerVisible, setIsCountryCodesPickerVisible] =
@@ -43,24 +42,24 @@ const EditProfileForm = () => {
 
   const router = useRouter();
 
-  const currencies = [
-    {
-      key: "neira",
-      value: "₦ - Naira",
-    },
-    {
-      key: "pounds",
-      value: "£ - Pounds",
-    },
-    {
-      key: "dollars",
-      value: "$ - Dollars",
-    },
-    {
-      key: "euros",
-      value: "€ - Euro",
-    },
-  ];
+  // const currencies = [
+  //   {
+  //     key: "neira",
+  //     value: "₦ - Naira",
+  //   },
+  //   {
+  //     key: "pounds",
+  //     value: "£ - Pounds",
+  //   },
+  //   {
+  //     key: "dollars",
+  //     value: "$ - Dollars",
+  //   },
+  //   {
+  //     key: "euros",
+  //     value: "€ - Euro",
+  //   },
+  // ];
 
   // ICON CONFIG
   const AnimatedIcon = Animated.createAnimatedComponent(Icon);
@@ -166,7 +165,6 @@ const EditProfileForm = () => {
           email: email ? email : user?.email,
           mobile: mobile ? mobile : user?.mobile,
           countryCode: countryCode ? countryCode : user?.countryCode,
-          currency: currency ? currency : user?.currency,
           image: imageUrl ? imageUrl : user?.image,
         }),
       }
@@ -223,7 +221,6 @@ const EditProfileForm = () => {
     setName(user?.name);
     setEmail(user?.email);
     setMobile(user?.mobile);
-    setCurrency(user?.currency);
     setCountryCode(user?.countryCode)
     setUserId(user?._id);
   }, [user]);
@@ -434,70 +431,6 @@ const EditProfileForm = () => {
               placeholder="+23481234567890"
               placeholderTextColor="#C9C9C9"
               onChangeText={(value) => setMobile(value)}
-            />
-          </View>
-
-          {/* CURRENCY SELECT DROPDOWN */}
-          <View style={{ marginTop: 10 }}>
-            <Text
-              style={{
-                fontFamily: "PoppinsRegular",
-                marginTop: 10,
-                fontSize: Platform.OS === "ios" ? 16 : 12,
-              }}
-            >
-              Currency - {currency?.toUpperCase()}
-            </Text>
-            <SelectList
-              setSelected={(value) => setCurrency(value)}
-              defaultOption={currency}
-              data={currencies}
-              arrowicon={
-                <Image
-                  source={arrowDownIcon}
-                  style={{ width: 40, height: 40, marginTop: -8 }}
-                  contentFit="cover"
-                />
-              }
-              closeicon={
-                <Image
-                  source={closeIcon}
-                  style={{ width: 50, height: 50, marginTop: -1 }}
-                  contentFit="cover"
-                />
-              }
-              boxStyles={{
-                borderRadius: 10,
-                borderWidth: 0.5,
-                borderColor: "#C9C9C9",
-                height: 50,
-                padding: 10,
-                marginTop: 10,
-              }}
-              dropdownItemStyles={{
-                marginVertical: 5,
-                fontSize: Platform.OS === "ios" ? 16 : 12,
-              }}
-              dropdownStyles={{
-                borderRadius: 10,
-                borderWidth: 0.5,
-                maxHeight: 150,
-                borderColor: "#C9C9C9",
-                padding: 10,
-                fontSize: Platform.OS === "ios" ? 16 : 12,
-              }}
-              inputStyles={{
-                fontFamily: "PoppinsRegular",
-                color: "#C9C9C9",
-                marginTop: 4,
-                fontSize: Platform.OS === "ios" ? 16 : 12,
-              }}
-              dropdownTextStyles={{
-                fontFamily: "PoppinsRegular",
-                fontSize: Platform.OS === "ios" ? 16 : 12,
-              }}
-              placeholder="Select Currency"
-              searchPlaceholder="Search Currencies"
             />
           </View>
 

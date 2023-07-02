@@ -33,7 +33,7 @@ const Home = () => {
   const [userPriorityBookings, setUserPriorityBookings] = useState();
 
   // IF IT IS A GUEST
-  const [currency, setCurrency] = useState("dollars");
+  const [currency, setCurrency] = useState();
   const [guest, setGuest] = useState();
   const currencies = [
     {
@@ -59,9 +59,65 @@ const Home = () => {
     await AsyncStorage.setItem("user", JSON.stringify(user));
   }
 
+  // DYNAMICALLY SET USER'S CURRENCY
+  // COUNTRY
+  // const [userCountry, setUserCountry] = useState();
+  useEffect(() => {
+    async function getCountry() {
+      await axios
+        .get("http://ip-api.com/json/?fields=61439")
+        .then(async (res) => {
+          console.log("USER LOCATION:", res.data);
+          const country = res.data?.country;
+          const timezone = res.data?.timezone;
+          if (country?.toLowerCase() == "nigeria") {
+            setCurrency("neira");
+          } else if (country?.toLowerCase() == "united kingdom") {
+            setCurrency("pounds");
+          } else if (
+            country?.toLowerCase() == "andorra" ||
+            country?.toLowerCase() == "austria" ||
+            country?.toLowerCase() == "belgium" ||
+            country?.toLowerCase() == "cyprus" ||
+            country?.toLowerCase() == "estonia" ||
+            country?.toLowerCase() == "finland" ||
+            country?.toLowerCase() == "france" ||
+            country?.toLowerCase() == "germany" ||
+            country?.toLowerCase() == "greece" ||
+            country?.toLowerCase() == "ireland" ||
+            country?.toLowerCase() == "italy" ||
+            country?.toLowerCase() == "kosovo" ||
+            country?.toLowerCase() == "latvia" ||
+            country?.toLowerCase() == "lithuania" ||
+            country?.toLowerCase() == "luxembourg" ||
+            country?.toLowerCase() == "malta" ||
+            country?.toLowerCase() == "monaco" ||
+            country?.toLowerCase() == "montenegro" ||
+            country?.toLowerCase() == "netherlands" ||
+            country?.toLowerCase() == "portugal" ||
+            country?.toLowerCase() == "san marino" ||
+            country?.toLowerCase() == "slovakia" ||
+            country?.toLowerCase() == "slovenia" ||
+            country?.toLowerCase() == "spain" ||
+            country?.toLowerCase() == "vatican city"
+          ) {
+            setCurrency("euros");
+          } else {
+            setCurrency("dollars");
+          }
+        })
+        .catch((err) => {
+          console.log("USER LOCATION ERROR:", err);
+        });
+    }
+
+    getCountry();
+  }, []);
+
   useEffect(() => {
     if (guest) {
       setUserCurrency(currency);
+      console.log('CUUCUCUC:', currency)
       console.log("GUESTTTTTTTT IS LOGGED IN OOOOO");
     }
   }, [currency]);
@@ -307,7 +363,7 @@ const Home = () => {
       <ScrollView showsVerticalScrollIndicator={false}>
         <StatusBar style="dark" />
         <View style={{ flex: 1, padding: 20 }}>
-          {guest && (
+          {/* {guest && (
             <View style={{ marginTop: 20 }}>
               <Text
                 style={{
@@ -367,7 +423,7 @@ const Home = () => {
                 searchPlaceholder="Search Currencies"
               />
             </View>
-          )}
+          )} */}
           <Welcome
             userBookings={userAirportBookings}
             userCarBookings={userCarBookings}

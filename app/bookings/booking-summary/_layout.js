@@ -1,9 +1,13 @@
 import { Link, Stack, useRouter } from "expo-router";
-import logo from "../../../assets/images/logo.png";
 import { Image, StyleSheet } from "react-native";
 import { COLORS } from "../../../constants/themes";
+import { TouchableOpacity } from "react-native";
+
+// Icons
+import arrowBackIcon from '../../../assets/icons/arrowBackIcon.png'
 
 const Layout = () => {
+  const router = useRouter();
   return (
     <Stack
       screenOptions={{
@@ -22,7 +26,19 @@ const Layout = () => {
           },
           headerShadowVisible: false,
           headerTitle: "",
-          headerLeft: null,
+          headerLeft: () => (
+            <TouchableOpacity
+              onPress={() => {
+                router.back();
+              }}
+            >
+              <Image
+                source={arrowBackIcon}
+                resizeMode="cover"
+                style={{ width: 45, height: 45 }}
+              />
+            </TouchableOpacity>
+          ),
           headerShown: false,
         }}
       />

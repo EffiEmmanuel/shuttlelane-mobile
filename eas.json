@@ -15,7 +15,9 @@
         "API_BASE_URL": "https://www.shuttlelane.com/api",
         "STRIPE_PUBLISHABLE_KEY": "pk_live_51FSsN2JVCyKylojXO49aThUPBcYv2nXWa0kwTMCa63ftDdhFsC2E8i3uz72XSYE2QtvWLjgZu9InJaiQXXE4npKE00bQEQlrDh",
         "FLUTTERWAVE_KEY": "FLWPUBK-4e040f92b25e6e3615d680449918aeb5-X",
-        "PAYPAL_BEARER": "A21AAP2N8impybVlekbJG1twqb9DbHpMpQavWQFUpZM405IZ-3SKFc1MoiGRm0H7hJTbcJ4uqs1ZDTJLzrkq_4RoQrQq__x8Q"
+        "PAYPAL_BEARER": "A21AAPPLF9FrMq-IqUm1Kf_E4ygWU0F8NdtTHPrU__OZvmIGPrd1_AnqwqzR-SCsUGJ9mVhJsc1nysZUYFFLG7hqCGbVvW6hg",
+        "PAYPAL_CLIENT_ID": "AYKJbdgYtaLSSdr_dy_k3m19dJzhG602fsZf3FSa9zf9SmgaKMWD3co7uw1_LtYDExABxnIcTLu1uIc_",
+        "PAYPAL_SECRET_KEY": "EJQstqwWqDkjFxYfDDo02Yv2UEmuZZjQSKSwFJSDFk7txkJ6ZMa6u9T4ni2mUDxSvaqBcbhejWuBqM5s"
       },
       "autoIncrement": true
     },
@@ -26,7 +28,9 @@
           "API_BASE_URL": "https://www.shuttlelane.com/api",
           "STRIPE_PUBLISHABLE_KEY": "pk_live_51FSsN2JVCyKylojXO49aThUPBcYv2nXWa0kwTMCa63ftDdhFsC2E8i3uz72XSYE2QtvWLjgZu9InJaiQXXE4npKE00bQEQlrDh",
           "FLUTTERWAVE_KEY": "FLWPUBK-4e040f92b25e6e3615d680449918aeb5-X",
-          "PAYPAL_BEARER": "A21AAP2N8impybVlekbJG1twqb9DbHpMpQavWQFUpZM405IZ-3SKFc1MoiGRm0H7hJTbcJ4uqs1ZDTJLzrkq_4RoQrQq__x8Q"
+          "PAYPAL_BEARER": "A21AAPPLF9FrMq-IqUm1Kf_E4ygWU0F8NdtTHPrU__OZvmIGPrd1_AnqwqzR-SCsUGJ9mVhJsc1nysZUYFFLG7hqCGbVvW6hg",
+          "PAYPAL_CLIENT_ID": "AYKJbdgYtaLSSdr_dy_k3m19dJzhG602fsZf3FSa9zf9SmgaKMWD3co7uw1_LtYDExABxnIcTLu1uIc_",
+          "PAYPAL_SECRET_KEY": "EJQstqwWqDkjFxYfDDo02Yv2UEmuZZjQSKSwFJSDFk7txkJ6ZMa6u9T4ni2mUDxSvaqBcbhejWuBqM5s"
         }
       }
     }
